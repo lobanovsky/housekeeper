@@ -27,6 +27,7 @@ target/
 ###
 /build/
 /logs/
+/logs-in-container/
 /etc/
 /compose/
 /private/
