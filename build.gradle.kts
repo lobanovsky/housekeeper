@@ -1,6 +1,6 @@
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
-group = "ru.tsn"
+group = "ru.housekeeper"
 version = "0.0.1"
 java.sourceCompatibility = JavaVersion.VERSION_17
 
