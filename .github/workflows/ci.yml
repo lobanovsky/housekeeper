@@ -26,3 +26,8 @@ jobs:
         
     - name: Build with Gradle
       uses: gradle/gradle-build-action@v2
+
+    - name: Yandex Cloud Container Registry Login
+      uses: yc-actions/yc-cr-login@v0.1-alpha
+      with:
+        yc-sa-json-credentials: ${{ secrets.YC_CR_SA_JSON_CREDENTIALS }}
