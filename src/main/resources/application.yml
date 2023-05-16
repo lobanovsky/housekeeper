@@ -26,7 +26,7 @@ spring:
 
   datasource:
     url: ${POSTGRES_URL}
-    username: ${POSTGRES_USERNAME}
+    username: ${POSTGRES_USER}
     password: ${POSTGRES_PASSWORD}
   jpa:
     generate-ddl: true

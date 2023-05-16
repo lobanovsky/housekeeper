@@ -13,6 +13,22 @@ jobs:
   build:
     name: Build
     runs-on: ubuntu-latest
+    env:
+      TAG: ${{ github.sha }}
+      #
+      POSTGRES_URL: ${{ secret.POSTGRES_URL}}
+      POSTGRES_USER: ${{ secret.POSTGRES_USER}}
+      POSTGRES_PASSWORD: ${{ secret.POSTGRES_PASSWORD}}
+      #
+      POSTGRES_DB: ${{ secret.POSTGRES_DB}}
+      #
+      MAIL_HOST: ${{ secret.MAIL_HOST}}
+      MAIL_USER_NAME: ${{ secret.MAIL_USER_NAME}}
+      MAIL_USER_PASSWORD: ${{ secret.MAIL_USER_PASSWORD}}
+      #
+      MY_INN: ${{ secret.MY_INN}}
+      MY_NAME: ${{ secret.MY_NAME}}
+      MY_ACCOUNT: ${{ secret.MY_ACCOUNT}}
 
     steps:
     - name: Check out code
@@ -30,7 +46,7 @@ jobs:
         arguments: bootJar
 
     - name: Yandex Cloud Container Registry Login
-      uses: yc-actions/yc-cr-login@v0.1-alpha
+      uses: yc-actions/yc-cr-login@v1.2.0
       with:
         yc-sa-json-credentials: ${{ secrets.YC_CR_SA_JSON_CREDENTIALS }}
 
@@ -42,3 +58,24 @@ jobs:
       run: |
         docker build -t cr.yandex/$CR_REGISTRY/$CR_REPOSITORY:$IMAGE_TAG .
         docker push cr.yandex/$CR_REGISTRY/$CR_REPOSITORY:$IMAGE_TAG
+
+    - name: Deploy to Yandex Container Optimized Image VM
+      id: deploy-ci
+      uses: yc-actions/yc-coi-deploy@v1
+      env:
+        CR_REGISTRY: ${{ secrets.YC_CR_REGISTRY }}
+        CR_REPOSITORY: housekeeper
+        IMAGE_TAG: ${{ github.sha }}
+      with:
+        yc-sa-json-credentials: ${{ secrets.YC_SA_JSON_CREDENTIALS }}
+        folder-id: $${{ secrets.YC_FOLDER_ID }}
+        VM-name: $${{ secrets.YC_VM_NAME }}
+        vm-service-account-id: $${{ secrets.YC_COMPUTE_SERVICE_ACCOUNT_ID }}
+        vm-cores: 2
+        vm-memory: 2Gb
+        vm-core-fraction: 20
+        vm-subnet-id: ${{secrets.YC_SUBNET_ID}}
+        vm-disk-type: network-ssd
+        vm-disk-size: 1GB
+        user-data-path: './user-data.yaml'
+        docker-compose-path: './docker-compose.yaml'
