@@ -66,6 +66,8 @@ jobs:
           MY_INN: ${{ secrets.MY_INN}}
           MY_NAME: ${{ secrets.MY_NAME}}
           MY_ACCOUNT: ${{ secrets.MY_ACCOUNT}}
+          #
+          SSH_KEY: ${{ secrets.SSH_KEY }}
         with:
           yc-sa-json-credentials: ${{ secrets.YC_ADMIN_SA_JSON_CREDENTIALS }}
           folder-id: ${{ vars.YC_FOLDER_ID }}
