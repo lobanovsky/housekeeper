@@ -67,7 +67,7 @@ jobs:
         MY_NAME: ${{ secrets.MY_NAME}}
         MY_ACCOUNT: ${{ secrets.MY_ACCOUNT}}
       with:
-        yc-sa-json-credentials: ${{ secrets.YC_SA_JSON_CREDENTIALS }}
+        yc-sa-json-credentials: ${{ secrets.YC_CR_SA_JSON_CREDENTIALS }}
         folder-id: $${{ secrets.YC_FOLDER_ID }}
         VM-name: $${{ secrets.YC_VM_NAME }}
         vm-service-account-id: $${{ secrets.YC_COMPUTE_SERVICE_ACCOUNT_ID }}
