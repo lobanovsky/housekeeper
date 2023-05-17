@@ -13,22 +13,6 @@ jobs:
   build:
     name: Build
     runs-on: ubuntu-latest
-    env:
-      TAG: ${{ github.sha }}
-      #
-      POSTGRES_URL: ${{ secret.POSTGRES_URL}}
-      POSTGRES_USER: ${{ secret.POSTGRES_USER}}
-      POSTGRES_PASSWORD: ${{ secret.POSTGRES_PASSWORD}}
-      #
-      POSTGRES_DB: ${{ secret.POSTGRES_DB}}
-      #
-      MAIL_HOST: ${{ secret.MAIL_HOST}}
-      MAIL_USER_NAME: ${{ secret.MAIL_USER_NAME}}
-      MAIL_USER_PASSWORD: ${{ secret.MAIL_USER_PASSWORD}}
-      #
-      MY_INN: ${{ secret.MY_INN}}
-      MY_NAME: ${{ secret.MY_NAME}}
-      MY_ACCOUNT: ${{ secret.MY_ACCOUNT}}
 
     steps:
     - name: Check out code
@@ -66,6 +50,22 @@ jobs:
         CR_REGISTRY: ${{ secrets.YC_CR_REGISTRY }}
         CR_REPOSITORY: housekeeper
         IMAGE_TAG: ${{ github.sha }}
+        #
+        TAG: ${{ github.sha }}
+        #
+        POSTGRES_URL: ${{ secret.POSTGRES_URL}}
+        POSTGRES_USER: ${{ secret.POSTGRES_USER}}
+        POSTGRES_PASSWORD: ${{ secret.POSTGRES_PASSWORD}}
+        #
+        POSTGRES_DB: ${{ secret.POSTGRES_DB}}
+        #
+        MAIL_HOST: ${{ secret.MAIL_HOST}}
+        MAIL_USER_NAME: ${{ secret.MAIL_USER_NAME}}
+        MAIL_USER_PASSWORD: ${{ secret.MAIL_USER_PASSWORD}}
+        #
+        MY_INN: ${{ secret.MY_INN}}
+        MY_NAME: ${{ secret.MY_NAME}}
+        MY_ACCOUNT: ${{ secret.MY_ACCOUNT}}
       with:
         yc-sa-json-credentials: ${{ secrets.YC_SA_JSON_CREDENTIALS }}
         folder-id: $${{ secrets.YC_FOLDER_ID }}
