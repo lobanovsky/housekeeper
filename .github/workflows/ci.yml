@@ -70,6 +70,7 @@ jobs:
           yc-sa-json-credentials: ${{ secrets.YC_ADMIN_SA_JSON_CREDENTIALS }}
           folder-id: ${{ vars.YC_FOLDER_ID }}
           vm-name: ${{ vars.YC_VM_NAME }}
+          vm-service-account-name: ${{vars.YC_ADMIN_SA_NAME}}
           vm-cores: 2
           vm-memory: 2Gb
           vm-core-fraction: 20
