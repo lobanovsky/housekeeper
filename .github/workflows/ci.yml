@@ -69,7 +69,7 @@ jobs:
         with:
           yc-sa-json-credentials: ${{ secrets.YC_COMPUTE_SA_JSON_CREDENTIALS }}
           folder-id: b1go4lvo9ftojc3hcfr1
-          VM-name: $${{ vars.YC_VM_NAME }}
+          vm-name: $${{ vars.YC_VM_NAME }}
           vm-service-account-id: $${{ vars.YC_COMPUTE_SERVICE_ACCOUNT_ID }}
           vm-cores: 2
           vm-memory: 2Gb
