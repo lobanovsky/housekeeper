@@ -67,14 +67,14 @@ jobs:
         MY_NAME: ${{ secrets.MY_NAME}}
         MY_ACCOUNT: ${{ secrets.MY_ACCOUNT}}
       with:
-        yc-sa-json-credentials: ${{ secrets.YC_CR_SA_JSON_CREDENTIALS }}
-        folder-id: $${{ secrets.YC_FOLDER_ID }}
-        VM-name: $${{ secrets.YC_VM_NAME }}
-        vm-service-account-id: $${{ secrets.YC_COMPUTE_SERVICE_ACCOUNT_ID }}
+        yc-sa-json-credentials: ${{ secrets.YC_COMPUTE_SA_JSON_CREDENTIALS }}
+        folder-id: $${{ vars.YC_FOLDER_ID }}
+        VM-name: $${{ vars.YC_VM_NAME }}
+        vm-service-account-id: $${{ vars.YC_COMPUTE_SERVICE_ACCOUNT_ID }}
         vm-cores: 2
         vm-memory: 2Gb
         vm-core-fraction: 20
-        vm-subnet-id: ${{secrets.YC_SUBNET_ID}}
+        vm-subnet-id: ${{vars.YC_SUBNET_ID}}
         vm-disk-type: network-ssd
         vm-disk-size: 1GB
         user-data-path: './user-data.yaml'
