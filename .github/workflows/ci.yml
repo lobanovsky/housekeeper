@@ -69,12 +69,12 @@ jobs:
       - name: docker pull && up
         uses: appleboy/ssh-action@master
         with:
-          host: ${{ env.HOST_IP }}
-          username: ${{ env.HOST_USERNAME }}
-          key: ${{ env.HOST_KEY }}
+          host: ${{ secrets.HOST_IP }}
+          username: ${{ secrets.HOST_USERNAME }}
+          key: ${{ secrets.HOST_KEY }}
           script: |
             docker login --username json_key --password-stdin cr.yandex <<< '${{ secrets.YC_ADMIN_SA_JSON_CREDENTIALS }}'
-            cd ${{ env.HOST_PROJECT_PATH }}
+            cd ${{ secrets.HOST_PROJECT_PATH }}
             docker-compose -f docker-compose.yml pull
             docker-compose -f docker-compose.yml up -d
             docker logout cr.yandex
