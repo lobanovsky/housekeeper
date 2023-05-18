@@ -15,26 +15,26 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Check out code
+      - name: checkout
         uses: actions/checkout@v3
 
-      - name: Set up JDK 17
+      - name: set up JDK 17
         uses: actions/setup-java@v3
         with:
           java-version: '17'
           distribution: 'temurin'
 
-      - name: Build with Gradle
+      - name: build with gradle
         uses: gradle/gradle-build-action@v2
         with:
           arguments: bootJar
 
-      - name: Yandex Cloud Container Registry Login
+      - name: yandex cloud container registry Login
         uses: yc-actions/yc-cr-login@v1.2.0
         with:
           yc-sa-json-credentials: ${{ secrets.YC_CR_SA_JSON_CREDENTIALS }}
 
-      - name: Build, tag, and push image to Yandex Cloud Container Registry
+      - name: build, tag, and push image to Yandex Cloud Container Registry
         env:
           CR_REGISTRY: ${{ vars.YC_CR_REGISTRY_ID }}
           CR_REPOSITORY: housekeeper
@@ -43,7 +43,7 @@ jobs:
           docker build -t cr.yandex/$CR_REGISTRY/$CR_REPOSITORY:$IMAGE_TAG .
           docker push cr.yandex/$CR_REGISTRY/$CR_REPOSITORY:$IMAGE_TAG
 
-      - name: Create env variables file for Docker
+      - name: create env variables file for Docker
         run: |
           echo "CONTAINER_REGISTRY=cr.yandex/${{ vars.YC_CR_REGISTRY_ID }}" > .env
           echo "TAG=${{ github.sha }}" >> .env
@@ -57,11 +57,24 @@ jobs:
           echo "MY_NAME=${{ secrets.MY_NAME}}" >> .env
           echo "MY_ACCOUNT=${{ secrets.MY_ACCOUNT}}" >> .env
 
-      - name: Copy files to host
+      - name: copy files to host
         uses: appleboy/scp-action@v0.1.4
         with:
           host: ${{ secrets.HOST_IP }}
           username: ${{ secrets.HOST_USERNAME }}
           key: ${{ secrets.HOST_KEY }}
-          source: ".env,docker-compose.yml"
+          source: ".env, docker-compose.yaml"
           target: ${{ secrets.HOST_PROJECT_PATH }}
+
+      - name: docker pull && up
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ env.HOST_IP }}
+          username: ${{ env.HOST_USERNAME }}
+          key: ${{ env.HOST_KEY }}
+          script: |
+            docker login --username json_key --password-stdin cr.yandex <<< '${{ secrets.YC_ADMIN_SA_JSON_CREDENTIALS }}'
+            cd ${{ env.HOST_PROJECT_PATH }}
+            docker-compose -f docker-compose.yml pull
+            docker-compose -f docker-compose.yml up -d
+            docker logout cr.yandex
