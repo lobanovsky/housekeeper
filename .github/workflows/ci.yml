@@ -74,7 +74,7 @@ jobs:
           key: ${{ secrets.HOST_KEY }}
           script: |
             docker login --username json_key --password-stdin cr.yandex <<< '${{ secrets.YC_ADMIN_SA_JSON_CREDENTIALS }}'
-            cd ${{ secrets.HOST_PROJECT_PATH }}
-            docker-compose -f docker-compose.yml pull
-            docker-compose -f docker-compose.yml up -d
+            cd ${{ secrets.HOST_PROJECT_PATH }}            
+            docker compose pull
+            docker compose up -d
             docker logout cr.yandex
