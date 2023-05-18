@@ -6,37 +6,26 @@ services:
     build:
       context: .
       dockerfile: ${DOCKERFILE:-Dockerfile}
-    depends_on:
-      - housekeeper-postgres
-    image: housekeeper:${TAG}
+    image: ${CONTAINER_REGISTRY}/housekeeper:${TAG}
     container_name: housekeeper
     restart: always
     environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_URL: ${POSTGRES_URL}
       MAIL_HOST: ${MAIL_HOST}
       MAIL_USER_NAME: ${MAIL_USER_NAME}
       MAIL_USER_PASSWORD: ${MAIL_USER_PASSWORD}
       MY_ACCOUNT: ${MY_ACCOUNT}
       MY_INN: ${MY_INN}
       MY_NAME: ${MY_NAME}
-      POSTGRES_USER: ${POSTGRES_USER}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
-      POSTGRES_URL: ${POSTGRES_URL}
     ports:
-      - 8080:8080
+      - "8080:8080"
     volumes:
-      - ./logs-housekeeper:/opt/app/logs
+      - ./logs:/opt/app/logs
+    networks:
+      - housekeeper-network
 
-  housekeeper-postgres:
-    image: postgres:15.3
-    container_name: pg_housekeeper
-    restart: always
-    environment:
-      POSTGRES_USER: ${POSTGRES_USER}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
-      POSTGRES_DB: ${POSTGRES_DB}
-    ports:
-      - "5435:5432"
-    volumes:
-      - ./init-user-db.sh:/docker-entrypoint-initdb.d/init-user-db.sh
-      - ./var/postgres/data:/var/lib/postgresql/data
-      - ./var/postgres/logs:/var/log/postgresql
+networks:
+  housekeeper-network:
+    external: true

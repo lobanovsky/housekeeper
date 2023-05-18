@@ -4,5 +4,6 @@
 
 1. contact holder
 2. payment analyzer
-3. decision maker
+3. counter
 4. gate keeper
+5. decision maker (tail)
