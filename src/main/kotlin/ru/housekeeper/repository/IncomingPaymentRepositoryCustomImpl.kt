@@ -7,24 +7,27 @@ import org.springframework.data.domain.PageRequest
 import org.springframework.data.domain.Pageable
 import org.springframework.data.support.PageableExecutionUtils
 import ru.housekeeper.model.entity.IncomingPayment
-import ru.housekeeper.model.filter.CompanyPaymentsFilter
+import ru.housekeeper.model.filter.IncomingPaymentsFilter
 
 class IncomingPaymentRepositoryCustomImpl(
     @PersistenceContext private val entityManager: EntityManager,
 ) : IncomingPaymentRepositoryCustom {
 
-    override fun findAllFromCompanyByFilter(
-        inn: String,
+    override fun findAllWithFilter(
         pageNum: Int,
         pageSize: Int,
-        filter: CompanyPaymentsFilter
+        filter: IncomingPaymentsFilter
     ): Page<IncomingPayment> {
         val predicates = mutableMapOf<String, String>()
-        predicates["fromInn"] = if (inn.isNotEmpty()) "AND LOWER(p.fromInn) LIKE '%${inn.lowercase().trim()}%'" else ""
-        predicates["fromName"] = if (filter.fromName?.isNotEmpty() == true) "AND LOWER(p.fromName) LIKE '%${filter.fromName.lowercase().trim()}%'" else ""
-        predicates["purpose"] = if (filter.purpose?.isNotEmpty() == true) "AND LOWER(p.purpose) LIKE '%${filter.purpose.lowercase().trim()}%'" else ""
+        predicates["fromInn"] = if (filter.fromInn?.isNotEmpty() == true)
+            "AND LOWER(p.fromInn) LIKE '%${filter.fromInn.lowercase().trim()}%'" else ""
+        predicates["fromName"] = if (filter.fromName?.isNotEmpty() == true)
+            "AND LOWER(p.fromName) LIKE '%${filter.fromName.lowercase().trim()}%'" else ""
+        predicates["purpose"] = if (filter.purpose?.isNotEmpty() == true)
+            "AND LOWER(p.purpose) LIKE '%${filter.purpose.lowercase().trim()}%'" else ""
         predicates["taxable"] = if (filter.taxable == true) "AND p.taxable = true" else ""
-        predicates["date"] = if (filter.startDate != null && filter.endDate != null) "AND (cast(p.date as date) BETWEEN '${filter.startDate}' AND '${filter.endDate}')" else ""
+        predicates["date"] =
+            if (filter.startDate != null && filter.endDate != null) "AND (cast(p.date as date) BETWEEN '${filter.startDate}' AND '${filter.endDate}')" else ""
 
         val conditions = predicates.values.joinToString(separator = " ")
 
@@ -35,7 +38,10 @@ class IncomingPaymentRepositoryCustomImpl(
         val pageable: Pageable = PageRequest.of(pageNum, pageSize)
         query.firstResult = pageSize * pageNum
         query.maxResults = pageable.pageSize
-        return PageableExecutionUtils.getPage(query.resultList, pageable) { entityManager.createQuery(sqlCount).resultList[0] as Long }
+        return PageableExecutionUtils.getPage(
+            query.resultList,
+            pageable
+        ) { entityManager.createQuery(sqlCount).resultList[0] as Long }
     }
 
 //    override fun findAnnualPayments(

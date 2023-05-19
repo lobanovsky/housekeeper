@@ -11,7 +11,8 @@ import ru.housekeeper.model.dto.PaymentVO
 import ru.housekeeper.model.entity.IncomingPayment
 import ru.housekeeper.model.entity.OutgoingPayment
 import ru.housekeeper.model.entity.Payment
-import ru.housekeeper.model.filter.CompanyPaymentsFilter
+import ru.housekeeper.model.filter.IncomingPaymentsFilter
+import ru.housekeeper.model.filter.OutgoingPaymentsFilter
 import ru.housekeeper.parser.PaymentParser
 import ru.housekeeper.repository.IncomingPaymentRepository
 import ru.housekeeper.repository.OutgoingPaymentRepository
@@ -89,16 +90,19 @@ class PaymentService(
         return savePayments(payments, paymentsFile.originalFilename ?: paymentsFile.name, checksum)
     }
 
-    fun findAllFromCompanyByFilter(
-        inn: String,
+    fun findAllIncomingPaymentsWithFilter(
         pageNum: Int,
         pageSize: Int,
-        filter: CompanyPaymentsFilter
+        filter: IncomingPaymentsFilter
     ): Page<IncomingPayment> =
-        incomingPaymentRepository.findAllFromCompanyByFilter(inn, pageNum, pageSize, filter)
+        incomingPaymentRepository.findAllWithFilter(pageNum, pageSize, filter)
 
-    fun findAllOutgoingPaymentsByFilter(i: Int, pageNum: Int, filter: CompanyPaymentsFilter): Page<OutgoingPayment> =
-        outgoingPaymentRepository.findAllOutgoingPaymentsByFilter(i, pageNum, filter)
+    fun findAllOutgoingPaymentsWithFilter(
+        pageNum: Int,
+        pageSize: Int,
+        filter: OutgoingPaymentsFilter
+    ): Page<OutgoingPayment> =
+        outgoingPaymentRepository.findAllWithFilter(pageNum, pageSize, filter)
 
     fun findAllDeposits(): List<OutgoingPayment> = outgoingPaymentRepository.findAllDeposits(myInn)
 

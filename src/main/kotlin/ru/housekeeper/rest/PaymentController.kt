@@ -5,8 +5,8 @@ import org.springframework.data.domain.Page
 import org.springframework.web.bind.annotation.*
 import ru.housekeeper.model.dto.AnnualPaymentVO
 import ru.housekeeper.model.dto.PaymentVO
-import ru.housekeeper.model.filter.CompanyPaymentsFilter
-import ru.housekeeper.service.CounterpartyService
+import ru.housekeeper.model.filter.IncomingPaymentsFilter
+import ru.housekeeper.model.filter.OutgoingPaymentsFilter
 import ru.housekeeper.service.PaymentService
 import ru.housekeeper.utils.*
 
@@ -15,7 +15,6 @@ import ru.housekeeper.utils.*
 @RequestMapping("/payments")
 class PaymentController(
     private val paymentService: PaymentService,
-    private val counterpartyService: CounterpartyService,
 ) {
 
     @Operation(summary = "Find all deposits made (outgoing payments)")
@@ -35,13 +34,23 @@ class PaymentController(
     ): AnnualPaymentVO = paymentService.findAnnualPayments(year)
 
 
-    @PostMapping(path = ["/counterparties/{inn}/incoming-payments"])
-    @Operation(summary = "Find payments from the company")
-    fun findPaymentsFromCompany(
+    @PostMapping(path = ["/incoming"])
+    @Operation(summary = "Find incoming payments with filter")
+    fun findIncomingPayments(
         @RequestParam(value = "pageNum", required = false, defaultValue = "0") pageNum: Int,
         @RequestParam(value = "pageSize", required = false, defaultValue = "10") pageSize: Int,
-        @PathVariable inn: String,
-        @RequestBody filter: CompanyPaymentsFilter,
-    ): Page<PaymentVO> = counterpartyService.findAllFromCompanyByFilter(inn, pageNum, pageSize, filter)
+        @RequestBody filter: IncomingPaymentsFilter,
+    ): Page<PaymentVO> = paymentService.findAllIncomingPaymentsWithFilter(pageNum, pageSize, filter)
         .toIncomingPaymentResponse(pageNum, pageSize)
+
+
+    @PostMapping(path = ["/outgoing"])
+    @Operation(summary = "Find outgoing payments with filter")
+    fun findOutgoingPayments(
+        @RequestParam(value = "pageNum", required = false, defaultValue = "0") pageNum: Int,
+        @RequestParam(value = "pageSize", required = false, defaultValue = "10") pageSize: Int,
+        @RequestBody filter: OutgoingPaymentsFilter
+    ): Page<PaymentVO> = paymentService.findAllOutgoingPaymentsWithFilter(pageNum, pageSize, filter)
+        .toOutgoingPaymentResponse(pageNum, pageSize)
+
 }

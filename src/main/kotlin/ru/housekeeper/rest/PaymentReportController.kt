@@ -6,8 +6,8 @@ import org.springframework.http.MediaType
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
 import ru.housekeeper.excel.*
-import ru.housekeeper.model.filter.CompanyPaymentsFilter
-import ru.housekeeper.service.CounterpartyService
+import ru.housekeeper.model.filter.IncomingPaymentsFilter
+import ru.housekeeper.model.filter.OutgoingPaymentsFilter
 import ru.housekeeper.service.PaymentService
 import ru.housekeeper.utils.*
 import java.time.LocalDateTime
@@ -16,16 +16,15 @@ import java.time.LocalDateTime
 @RestController
 @RequestMapping("/reports")
 class PaymentReportController(
-    private val counterpartyService: CounterpartyService,
     private val paymentService: PaymentService,
 ) {
 
     @PostMapping(path = ["/outgoing-payments"])
     @Operation(summary = "Find all outgoing payments by filter")
     fun findAllOutgoingPaymentsByFilter(
-        @RequestBody filter: CompanyPaymentsFilter,
+        @RequestBody filter: OutgoingPaymentsFilter,
     ): ResponseEntity<ByteArray> {
-        val payments = paymentService.findAllOutgoingPaymentsByFilter(0, MAX_SIZE_PER_PAGE_FOR_EXCEL, filter)
+        val payments = paymentService.findAllOutgoingPaymentsWithFilter(0, MAX_SIZE_PER_PAGE_FOR_EXCEL, filter)
             .toOutgoingPaymentResponse(0, MAX_SIZE_PER_PAGE_FOR_EXCEL)
         val fileName = "outgoing_payments_${LocalDateTime.now().format(yyyyMMddHHmmssDateFormat())}.xlsx"
         return ResponseEntity.ok()
@@ -35,15 +34,14 @@ class PaymentReportController(
             .body(toExcelPayments(payments = payments.content))
     }
 
-    @PostMapping(path = ["/counterparties/{inn}/incoming-payments"])
+    @PostMapping(path = ["/counterparties/incoming-payments"])
     @Operation(summary = "Find payments from the company")
     fun findPaymentsFromCompany(
-        @PathVariable inn: String,
-        @RequestBody filter: CompanyPaymentsFilter,
+        @RequestBody filter: IncomingPaymentsFilter,
     ): ResponseEntity<ByteArray> {
-        val payments = counterpartyService.findAllFromCompanyByFilter(inn, 0, MAX_SIZE_PER_PAGE_FOR_EXCEL, filter)
+        val payments = paymentService.findAllIncomingPaymentsWithFilter(0, MAX_SIZE_PER_PAGE_FOR_EXCEL, filter)
             .toIncomingPaymentResponse(0, MAX_SIZE_PER_PAGE_FOR_EXCEL)
-        val fileName = "payments_${inn}_${LocalDateTime.now().format(yyyyMMddHHmmssDateFormat())}.xlsx"
+        val fileName = "incoming_payments_${filter.fromInn}_${LocalDateTime.now().format(yyyyMMddHHmmssDateFormat())}.xlsx"
         return ResponseEntity.ok()
             .contentType(MediaType.APPLICATION_OCTET_STREAM)
             .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"$fileName\"")

@@ -1,15 +1,10 @@
 package ru.housekeeper.service
 
 import org.apache.poi.ss.usermodel.WorkbookFactory
-import org.springframework.data.domain.Page
-import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
 import org.springframework.web.multipart.MultipartFile
 import ru.housekeeper.model.entity.Counterparty
-import ru.housekeeper.model.entity.IncomingPayment
-import ru.housekeeper.model.filter.CompanyPaymentsFilter
 import ru.housekeeper.repository.CounterpartyRepository
-import ru.housekeeper.utils.entityNotfound
 import ru.housekeeper.utils.logger
 
 @Service
@@ -87,10 +82,5 @@ class CounterpartyService(
         val bik: String,
         val sign: String,
     )
-
-    fun findById(id: Long): Counterparty = counterpartyRepository.findByIdOrNull(id) ?: entityNotfound("Counterparty" to id)
-
-    fun findAllFromCompanyByFilter(inn: String, pageNum: Int, pageSize: Int, filter: CompanyPaymentsFilter): Page<IncomingPayment> =
-        paymentService.findAllFromCompanyByFilter(inn, pageNum, pageSize, filter)
 
 }
