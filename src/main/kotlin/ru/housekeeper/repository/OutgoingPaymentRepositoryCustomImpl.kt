@@ -21,8 +21,8 @@ class OutgoingPaymentRepositoryCustomImpl(
         val predicates = mutableMapOf<String, String>()
         predicates["toName"] = if (filter.toName?.isNotEmpty() == true)
             "AND LOWER(p.toName) LIKE '%${filter.toName.lowercase().trim()}%'" else ""
-        predicates["fromName"] = if (filter.fromName?.isNotEmpty() == true)
-            "AND LOWER(p.fromName) LIKE '%${filter.fromName.lowercase().trim()}%'" else ""
+        predicates["toInn"] = if (filter.toInn?.isNotEmpty() == true)
+            "AND LOWER(p.fromName) LIKE '%${filter.toInn.lowercase().trim()}%'" else ""
         predicates["purpose"] = if (filter.purpose?.isNotEmpty() == true)
             "AND LOWER(p.purpose) LIKE '%${filter.purpose.lowercase().trim()}%'" else ""
         predicates["taxable"] = if (filter.taxable == true) "AND p.taxable = true" else ""
