@@ -31,7 +31,7 @@ class OutgoingPaymentRepositoryCustomImpl(
 
         val conditions = predicates.values.joinToString(separator = " ")
 
-        val sql = "SELECT p FROM OutgoingPayment p WHERE true = true $conditions ORDER BY p.date"
+        val sql = "SELECT p FROM OutgoingPayment p WHERE true = true $conditions ORDER BY p.date DESC"
         val sqlCount = "SELECT count(p) FROM OutgoingPayment p WHERE true = true $conditions"
 
         val query = entityManager.createQuery(sql, OutgoingPayment::class.java)
