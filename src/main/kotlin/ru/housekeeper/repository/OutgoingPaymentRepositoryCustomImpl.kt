@@ -22,12 +22,12 @@ class OutgoingPaymentRepositoryCustomImpl(
         predicates["toName"] = if (filter.toName?.isNotEmpty() == true)
             "AND LOWER(p.toName) LIKE '%${filter.toName.lowercase().trim()}%'" else ""
         predicates["toInn"] = if (filter.toInn?.isNotEmpty() == true)
-            "AND LOWER(p.fromName) LIKE '%${filter.toInn.lowercase().trim()}%'" else ""
+            "AND LOWER(p.toInn) LIKE '%${filter.toInn.lowercase().trim()}%'" else ""
         predicates["purpose"] = if (filter.purpose?.isNotEmpty() == true)
             "AND LOWER(p.purpose) LIKE '%${filter.purpose.lowercase().trim()}%'" else ""
         predicates["taxable"] = if (filter.taxable == true) "AND p.taxable = true" else ""
-        predicates["date"] =
-            if (filter.startDate != null && filter.endDate != null) "AND (cast(p.date as date) BETWEEN '${filter.startDate}' AND '${filter.endDate}')" else ""
+        predicates["date"] = if (filter.startDate != null && filter.endDate != null)
+            "AND (cast(p.date as date) BETWEEN '${filter.startDate}' AND '${filter.endDate}')" else ""
 
         val conditions = predicates.values.joinToString(separator = " ")
 
