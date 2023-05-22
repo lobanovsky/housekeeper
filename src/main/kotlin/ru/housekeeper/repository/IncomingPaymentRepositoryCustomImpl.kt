@@ -19,15 +19,11 @@ class IncomingPaymentRepositoryCustomImpl(
         filter: IncomingPaymentsFilter
     ): Page<IncomingPayment> {
         val predicates = mutableMapOf<String, String>()
-        predicates["fromInn"] = if (filter.fromInn?.isNotEmpty() == true)
-            "AND LOWER(p.fromInn) LIKE '%${filter.fromInn.lowercase().trim()}%'" else ""
-        predicates["fromName"] = if (filter.fromName?.isNotEmpty() == true)
-            "AND LOWER(p.fromName) LIKE '%${filter.fromName.lowercase().trim()}%'" else ""
-        predicates["purpose"] = if (filter.purpose?.isNotEmpty() == true)
-            "AND LOWER(p.purpose) LIKE '%${filter.purpose.lowercase().trim()}%'" else ""
-        predicates["taxable"] = if (filter.taxable == true) "AND p.taxable = true" else ""
-        predicates["date"] =
-            if (filter.startDate != null && filter.endDate != null) "AND (cast(p.date as date) BETWEEN '${filter.startDate}' AND '${filter.endDate}')" else ""
+        predicates["fromInn"] = filterBy("p.toName", filter.fromInn)
+        predicates["fromName"] = filterBy("p.toInn", filter.fromName)
+        predicates["purpose"] = filterBy("p.purpose", filter.purpose)
+        predicates["taxable"] = filterBy("p.taxable", filter.taxable)
+        predicates["date"] = filterByDate("cast(p.date as date)", filter.startDate, filter.endDate)
 
         val conditions = predicates.values.joinToString(separator = " ")
 
