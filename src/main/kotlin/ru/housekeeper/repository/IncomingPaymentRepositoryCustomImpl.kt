@@ -3,9 +3,6 @@ package ru.housekeeper.repository
 import jakarta.persistence.EntityManager
 import jakarta.persistence.PersistenceContext
 import org.springframework.data.domain.Page
-import org.springframework.data.domain.PageRequest
-import org.springframework.data.domain.Pageable
-import org.springframework.data.support.PageableExecutionUtils
 import ru.housekeeper.model.entity.IncomingPayment
 import ru.housekeeper.model.filter.IncomingPaymentsFilter
 
@@ -18,26 +15,12 @@ class IncomingPaymentRepositoryCustomImpl(
         pageSize: Int,
         filter: IncomingPaymentsFilter
     ): Page<IncomingPayment> {
-        val predicates = mutableMapOf<String, String>()
-        predicates["fromInn"] = filterBy("p.toName", filter.fromInn)
-        predicates["fromName"] = filterBy("p.toInn", filter.fromName)
-        predicates["purpose"] = filterBy("p.purpose", filter.purpose)
-        predicates["taxable"] = filterBy("p.taxable", filter.taxable)
-        predicates["date"] = filterByDate("cast(p.date as date)", filter.startDate, filter.endDate)
-
-        val conditions = predicates.values.joinToString(separator = " ")
+        val conditions = incomingFilters(filter)
 
         val sql = "SELECT p FROM IncomingPayment p WHERE true = true $conditions ORDER BY p.date DESC"
         val sqlCount = "SELECT count(p) FROM IncomingPayment p WHERE true = true $conditions"
 
-        val query = entityManager.createQuery(sql, IncomingPayment::class.java)
-        val pageable: Pageable = PageRequest.of(pageNum, pageSize)
-        query.firstResult = pageSize * pageNum
-        query.maxResults = pageable.pageSize
-        return PageableExecutionUtils.getPage(
-            query.resultList,
-            pageable
-        ) { entityManager.createQuery(sqlCount).resultList[0] as Long }
+        return getPage<IncomingPayment>(entityManager, sql, sqlCount, pageNum, pageSize)
     }
 
 //    override fun findAnnualPayments(
