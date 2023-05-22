@@ -23,7 +23,7 @@ class OutgoingPaymentRepositoryCustomImpl(
         predicates["toInn"] = filterBy("p.toInn", filter.toInn)
         predicates["purpose"] = filterBy("p.purpose", filter.purpose)
         predicates["taxable"] = filterBy("p.taxable", filter.taxable)
-        predicates["date"] = filterByDate("(cast(p.date as date)", filter.startDate, filter.endDate)
+        predicates["date"] = filterByDate("cast(p.date as date)", filter.startDate, filter.endDate)
 
         val conditions = predicates.values.joinToString(separator = " ")
 
