@@ -20,7 +20,7 @@ class OutgoingPaymentRepositoryCustomImpl(
     ): Page<OutgoingPayment> {
         val predicates = mutableMapOf<String, String>()
         predicates["toName"] = filterBy("p.toName", filter.toName)
-        predicates["toInn"] = filterBy("p.toInn", filter.toName)
+        predicates["toInn"] = filterBy("p.toInn", filter.toInn)
         predicates["purpose"] = filterBy("p.purpose", filter.purpose)
         predicates["taxable"] = filterBy("p.taxable", filter.taxable)
         predicates["date"] = filterByDate("(cast(p.date as date)", filter.startDate, filter.endDate)
