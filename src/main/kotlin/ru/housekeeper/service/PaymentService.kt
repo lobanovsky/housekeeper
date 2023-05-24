@@ -84,6 +84,7 @@ class PaymentService(
         return groupedPayments.values.toList()
     }
 
+    @Transactional
     fun parseAndSave(paymentsFile: MultipartFile, checksum: String): UploadFileInfo {
         val payments = PaymentParser(paymentsFile).parse()
         logger().info("Parsed ${payments.size} payments")
