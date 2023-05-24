@@ -1,4 +1,4 @@
-package ru.housekeeper.repository
+package ru.housekeeper.repository.room
 
 import org.springframework.data.jpa.repository.Query
 import org.springframework.data.repository.CrudRepository
@@ -9,7 +9,7 @@ import ru.housekeeper.model.entity.Room
 import java.math.BigDecimal
 
 @Repository
-interface RoomRepository : CrudRepository<Room, Long> {
+interface RoomRepository : CrudRepository<Room, Long>, RoomRepositoryCustom {
 
     @Query("SELECT r FROM Room r WHERE r.number = :number AND r.type = :type")
     fun findByNumberAndType(

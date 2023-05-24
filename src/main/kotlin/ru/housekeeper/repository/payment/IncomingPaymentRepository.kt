@@ -1,4 +1,4 @@
-package ru.housekeeper.repository
+package ru.housekeeper.repository.payment
 
 import org.springframework.data.jpa.repository.Modifying
 import org.springframework.data.jpa.repository.Query

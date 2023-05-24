@@ -1,13 +1,15 @@
 package ru.housekeeper.service
 
+import org.springframework.data.domain.Page
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import org.springframework.web.multipart.MultipartFile
 import ru.housekeeper.model.dto.OwnerVO
 import ru.housekeeper.model.entity.Room
+import ru.housekeeper.model.filter.RoomFilter
 import ru.housekeeper.parser.HomeownerAccountParser
 import ru.housekeeper.parser.RegistryParser
-import ru.housekeeper.repository.RoomRepository
+import ru.housekeeper.repository.room.RoomRepository
 import ru.housekeeper.utils.logger
 import java.math.BigDecimal
 
@@ -100,5 +102,8 @@ class RoomService(
 
     fun findByRoomNumbersAndType(roomNumbers: Set<String>): List<Room> =
         roomRepository.findByRoomNumbersAndType(roomNumbers)
+
+    fun findWithFilter(pageNum: Int, pageSize: Int, filter: RoomFilter): Page<Room> =
+        roomRepository.findAllWithFilter(pageNum, pageSize, filter)
 
 }

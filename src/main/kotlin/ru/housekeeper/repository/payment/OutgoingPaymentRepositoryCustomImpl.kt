@@ -1,10 +1,11 @@
-package ru.housekeeper.repository
+package ru.housekeeper.repository.payment
 
 import jakarta.persistence.EntityManager
 import jakarta.persistence.PersistenceContext
 import org.springframework.data.domain.Page
 import ru.housekeeper.model.entity.OutgoingPayment
 import ru.housekeeper.model.filter.OutgoingPaymentsFilter
+import ru.housekeeper.repository.getPage
 
 class OutgoingPaymentRepositoryCustomImpl(
     @PersistenceContext private val entityManager: EntityManager,

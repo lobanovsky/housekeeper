@@ -14,8 +14,8 @@ import ru.housekeeper.model.entity.Payment
 import ru.housekeeper.model.filter.IncomingPaymentsFilter
 import ru.housekeeper.model.filter.OutgoingPaymentsFilter
 import ru.housekeeper.parser.PaymentParser
-import ru.housekeeper.repository.IncomingPaymentRepository
-import ru.housekeeper.repository.OutgoingPaymentRepository
+import ru.housekeeper.repository.payment.IncomingPaymentRepository
+import ru.housekeeper.repository.payment.OutgoingPaymentRepository
 import ru.housekeeper.utils.logger
 import ru.housekeeper.utils.sum
 import ru.housekeeper.utils.toPaymentVO

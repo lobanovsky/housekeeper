@@ -8,7 +8,7 @@ import ru.housekeeper.model.dto.ContactVO
 import ru.housekeeper.model.entity.Contact
 import ru.housekeeper.parser.ContactParser
 import ru.housekeeper.repository.ContactRepository
-import ru.housekeeper.repository.RoomRepository
+import ru.housekeeper.repository.room.RoomRepository
 import ru.housekeeper.utils.logger
 
 @Service

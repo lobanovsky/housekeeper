@@ -1,4 +1,4 @@
-package ru.housekeeper.repository
+package ru.housekeeper.repository.payment
 
 import org.springframework.data.domain.Page
 import ru.housekeeper.model.entity.IncomingPayment

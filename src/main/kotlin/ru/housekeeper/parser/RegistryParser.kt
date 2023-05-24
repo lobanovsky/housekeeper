@@ -14,7 +14,7 @@ import java.math.RoundingMode
 class RegistryParser(private val file: MultipartFile) {
 
     fun parse(): List<RoomVO> {
-        logger().info("Start parsing registy file ${file.originalFilename}")
+        logger().info("Start parsing registry file ${file.originalFilename}")
         val workbook = WorkbookFactory.create(file.inputStream)
         val sheet = workbook.getSheet("Собственники")
         logger().info("Parsing sheet: ${sheet.sheetName}")
