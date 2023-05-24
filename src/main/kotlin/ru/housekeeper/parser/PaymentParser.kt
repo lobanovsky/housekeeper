@@ -37,6 +37,9 @@ class PaymentParser(private val file: MultipartFile) {
 
         logger().info("Reading ${sheet.lastRowNum} rows from sheet: ${sheet.sheetName}")
 
+        val uuidSet = mutableSetOf<String>()
+        val uuidList = mutableListOf<String>()
+
         val payments = mutableListOf<PaymentVO>()
         val numberOfSkippingRows = 11
         for (i in numberOfSkippingRows..sheet.lastRowNum) {
@@ -58,9 +61,13 @@ class PaymentParser(private val file: MultipartFile) {
 
             logger().info("#$i: date=$date, num=$docNumber, out=$outgoingSum, in=$incomingSum, purpose=$purpose")
 
+            val uuid = "$date $docNumber ${sum(outgoingSum, incomingSum)}"
+            uuidSet.add(uuid)
+            uuidList.add(uuid)
+
             payments.add(
                 PaymentVO(
-                    uuid = "$date $docNumber ${sum(outgoingSum, incomingSum)}",
+                    uuid = uuid,
                     date = date,
                     fromAccount = payer.account,
                     fromInn = payer.inn,
@@ -78,6 +85,8 @@ class PaymentParser(private val file: MultipartFile) {
                 )
             )
         }
+        logger().info("Set size: ${uuidSet.size}")
+        logger().info("List size: ${uuidList.size}")
         return payments
     }
 
