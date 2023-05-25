@@ -8,6 +8,7 @@ import ru.housekeeper.model.entity.Room
 
 fun Room.toRoomVO(): RoomVO {
     return RoomVO(
+        id = id,
         street = street,
         building = building,
         cadastreNumber = cadastreNumber,

@@ -7,6 +7,8 @@ import java.math.BigDecimal
 
 data class RoomVO(
 
+    val id: Long? = null,
+
     val street: String? = null,
     val building: String? = null,
     val cadastreNumber: String? = null,
