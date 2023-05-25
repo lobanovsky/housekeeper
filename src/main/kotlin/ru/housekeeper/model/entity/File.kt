@@ -2,6 +2,7 @@ package ru.housekeeper.model.entity
 
 import jakarta.persistence.*
 import org.hibernate.annotations.CreationTimestamp
+import ru.housekeeper.enums.FileTypeEnum
 import java.time.LocalDateTime
 
 @Entity
@@ -18,6 +19,9 @@ class File(
 
     @Column(nullable = false, unique = true)
     val checksum: String,
+
+    @Enumerated(EnumType.STRING)
+    val fileTypeEnum: FileTypeEnum? = null,
 
     @CreationTimestamp
     @Column(updatable = false)

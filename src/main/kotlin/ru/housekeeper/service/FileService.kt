@@ -6,6 +6,7 @@ import org.apache.commons.io.FilenameUtils
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
 import org.springframework.web.multipart.MultipartFile
+import ru.housekeeper.enums.FileTypeEnum
 import ru.housekeeper.exception.FileException
 import ru.housekeeper.model.entity.File
 import ru.housekeeper.repository.FileRepository
@@ -40,13 +41,14 @@ class FileService(
         return checkSum
     }
 
-    fun saveFileInfo(name: String, size: Long, checksum: String): File {
-        logger().info("Try save file info: name: $name size: $size checksum: $checksum")
+    fun saveFileInfo(name: String, size: Long, checksum: String, fileTypeEnum: FileTypeEnum): File {
+        logger().info("Try save file [${fileTypeEnum.description}}: name: $name size: $size checksum: $checksum")
         return fileRepository.save(
             File(
                 name = name,
                 size = size,
                 checksum = checksum,
+                fileTypeEnum = fileTypeEnum
             )
         )
     }

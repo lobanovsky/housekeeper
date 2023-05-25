@@ -3,6 +3,7 @@ package ru.housekeeper.rest
 import io.swagger.v3.oas.annotations.Operation
 import org.springframework.web.bind.annotation.*
 import org.springframework.web.multipart.MultipartFile
+import ru.housekeeper.enums.FileTypeEnum
 import ru.housekeeper.enums.counter.CounterTypeEnum
 import ru.housekeeper.service.*
 import ru.housekeeper.service.counter.CounterService
@@ -36,7 +37,7 @@ class FileController(
         val imei = file.originalFilename?.substringAfter("IMEI")?.substringBefore("_")
             ?: throw IllegalArgumentException("File name must contain IMEI")
         val (totalSize) = logEntryService.parseAndSave(file, checkSum, imei)
-        fileService.saveFileInfo(file.originalFilename ?: "", file.size, checkSum)
+        fileService.saveFileInfo(file.originalFilename ?: "", file.size, checkSum, FileTypeEnum.ENTRY_LOG)
         return EldesGateInfoResponse(file.originalFilename, totalSize)
     }
 
@@ -78,7 +79,7 @@ class FileController(
         fileService.isExtensionEqual(file)
         val checkSum = fileService.isDuplicateAndGetChecksum(file)
         val totalSize = counterService.waterCounterParseAndSave(file, checkSum)
-        fileService.saveFileInfo(file.originalFilename ?: "", file.size, checkSum)
+        fileService.saveFileInfo(file.originalFilename ?: "", file.size, checkSum, FileTypeEnum.COUNTER_WATER_VALUES)
         return CounterInfoResponse(file.originalFilename, totalSize)
     }
 
@@ -96,7 +97,7 @@ class FileController(
         fileService.isExtensionEqual(file)
         val checkSum = fileService.isDuplicateAndGetChecksum(file)
         val totalSize = decisionService.parseAndSave(file, checkSum)
-        fileService.saveFileInfo(file.originalFilename ?: "", file.size, checkSum)
+        fileService.saveFileInfo(file.originalFilename ?: "", file.size, checkSum, FileTypeEnum.DECISION_ANSWERS)
         return AnswerInfoResponse(file.originalFilename, totalSize)
     }
 
@@ -114,7 +115,7 @@ class FileController(
         fileService.isExtensionEqual(file)
         val checkSum = fileService.isDuplicateAndGetChecksum(file)
         val (totalSize, officeSize, flatSize, garageSize) = contactService.parseAndSave(file, checkSum)
-        fileService.saveFileInfo(file.originalFilename ?: "", file.size, checkSum)
+        fileService.saveFileInfo(file.originalFilename ?: "", file.size, checkSum, FileTypeEnum.CONTACTS)
         return ContactInfoResponse(file.originalFilename, totalSize, officeSize, flatSize, garageSize)
     }
 
@@ -138,7 +139,7 @@ class FileController(
             file,
             checkSum
         )
-        fileService.saveFileInfo(file.originalFilename ?: "", file.size, checkSum)
+        fileService.saveFileInfo(file.originalFilename ?: "", file.size, checkSum, FileTypeEnum.REGISTRIES)
         return AccountRegistryResponse(
             file.originalFilename,
             totalSize,
@@ -163,7 +164,7 @@ class FileController(
         fileService.isExtensionEqual(file)
         val checkSum = fileService.isDuplicateAndGetChecksum(file)
         val (roomSize, ownerSize, totalSquare, totalPercentage) = roomService.parseAndSave(file, checkSum)
-        fileService.saveFileInfo(file.originalFilename ?: "", file.size, checkSum)
+        fileService.saveFileInfo(file.originalFilename ?: "", file.size, checkSum, FileTypeEnum.ACCOUNTS)
         return AccountHomeownersResponse(file.originalFilename, roomSize, ownerSize, totalSquare, totalPercentage)
     }
 
@@ -184,7 +185,7 @@ class FileController(
         fileService.isExtensionEqual(file)
         val checkSum = fileService.isDuplicateAndGetChecksum(file)
         val (size, numberOfUnique) = counterpartyService.parseAndSave(file)
-        fileService.saveFileInfo(file.originalFilename ?: "", file.size, checkSum)
+        fileService.saveFileInfo(file.originalFilename ?: "", file.size, checkSum, FileTypeEnum.COUNTERPARTIES)
         return CounterpartyInfoResponse(file.originalFilename, size, numberOfUnique)
     }
 
@@ -207,7 +208,7 @@ class FileController(
             file,
             checkSum
         )
-        fileService.saveFileInfo(file.originalFilename ?: "", file.size, checkSum)
+        fileService.saveFileInfo(file.originalFilename ?: "", file.size, checkSum, FileTypeEnum.PAYMENTS)
         return PaymentInfoResponse(
             file.originalFilename,
             totalSize,
