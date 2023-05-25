@@ -24,7 +24,7 @@ class RoomRepositoryCustomImpl(
         predicates["type"] = filterBy("r.type", filter.type)
         val conditions = predicates.values.joinToString(separator = " ")
 
-        val sql = "SELECT r FROM Room r WHERE true = true $conditions ORDER BY r.number DESC"
+        val sql = "SELECT r FROM Room r WHERE true = true $conditions ORDER BY r.building, r.account DESC"
         val sqlCount = "SELECT count(r) FROM Room r WHERE true = true $conditions"
 
         return getPage<Room>(entityManager, sql, sqlCount, pageNum, pageSize)
