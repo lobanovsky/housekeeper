@@ -10,9 +10,8 @@ import java.io.ByteArrayOutputStream
 
 
 fun toExcelPayments(payments: List<PaymentVO>): ByteArray {
-    val companyName = payments[0].fromName
     val workBook = XSSFWorkbook()
-    createPaymentSheet(workBook, companyName, payments)
+    createPaymentSheet(workBook, sheetName = "Платежи", payments)
     val outputStream = ByteArrayOutputStream()
     workBook.write(outputStream)
     workBook.close()
