@@ -19,19 +19,26 @@ class PaymentReportController(
     private val paymentService: PaymentService,
 ) {
 
-    @PostMapping(path = ["/outgoing-payments"])
-    @Operation(summary = "Find all outgoing payments by filter")
-    fun findAllOutgoingPaymentsByFilter(
+    @PostMapping(path = ["/payments/outgoing"])
+    @Operation(summary = "Export outgoing payments by filter to excel")
+    fun exportOutgoingPayments(
         @RequestBody filter: OutgoingPaymentsFilter,
     ): ResponseEntity<ByteArray> {
         val payments = paymentService.findAllOutgoingPaymentsWithFilter(0, MAX_SIZE_PER_PAGE_FOR_EXCEL, filter)
             .toOutgoingPaymentResponse(0, MAX_SIZE_PER_PAGE_FOR_EXCEL)
         val fileName = "outgoing_payments_${LocalDateTime.now().format(yyyyMMddHHmmssDateFormat())}.xlsx"
-        return ResponseEntity.ok()
-            .contentType(MediaType.APPLICATION_OCTET_STREAM)
-            .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"$fileName\"")
-            .header(HttpHeaders.ACCESS_CONTROL_EXPOSE_HEADERS, HttpHeaders.CONTENT_DISPOSITION)
-            .body(toExcelPayments(payments = payments.content))
+        return getExcelReport(fileName) { toExcelPayments(payments = payments.content) }
+    }
+
+    @PostMapping(path = ["/payments/incoming"])
+    @Operation(summary = "Export incoming payments by filter to excel")
+    fun exportIncomingPayments(
+        @RequestBody filter: IncomingPaymentsFilter,
+    ): ResponseEntity<ByteArray> {
+        val payments = paymentService.findAllIncomingPaymentsWithFilter(0, MAX_SIZE_PER_PAGE_FOR_EXCEL, filter)
+            .toIncomingPaymentResponse(0, MAX_SIZE_PER_PAGE_FOR_EXCEL)
+        val fileName = "incoming_payments_${LocalDateTime.now().format(yyyyMMddHHmmssDateFormat())}.xlsx"
+        return getExcelReport(fileName) { toExcelPayments(payments = payments.content) }
     }
 
     @PostMapping(path = ["/counterparties/incoming-payments"])
