@@ -4,6 +4,7 @@ import com.vladmihalcea.hibernate.type.json.JsonType
 import jakarta.persistence.*
 import org.hibernate.annotations.CreationTimestamp
 import org.hibernate.annotations.Type
+import ru.housekeeper.enums.SexEnum
 import java.time.LocalDateTime
 
 
@@ -15,6 +16,9 @@ class Owner(
     val id: Long? = null,
 
     val fullName: String,
+
+    @Enumerated(EnumType.STRING)
+    val sex: SexEnum? = null,
 
     @Type(JsonType::class)
     @Column(name = "emails", columnDefinition = "jsonb")

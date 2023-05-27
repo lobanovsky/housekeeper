@@ -8,6 +8,7 @@ import ru.housekeeper.model.entity.Decision
 import ru.housekeeper.model.entity.Room
 import ru.housekeeper.parser.AnswerParser
 import ru.housekeeper.repository.DecisionRepository
+import ru.housekeeper.service.email.MailService
 import ru.housekeeper.utils.logger
 import ru.housekeeper.utils.yyyyMMddHHmmssDateFormat
 import java.io.File

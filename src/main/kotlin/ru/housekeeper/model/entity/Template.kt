@@ -12,6 +12,7 @@ class Template(
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     val id: Long? = null,
 
+    @Column(unique = true)
     val name: String,
 
     @Column(columnDefinition = "TEXT")
@@ -19,6 +20,9 @@ class Template(
 
     @Column(columnDefinition = "TEXT")
     val footer: String,
+
+    @Column(columnDefinition = "TEXT")
+    val subject: String,
 
     @Column(columnDefinition = "TEXT")
     val body: String,

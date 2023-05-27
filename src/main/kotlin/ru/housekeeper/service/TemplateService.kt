@@ -29,6 +29,8 @@ class TemplateService(
 
     fun findTemplateById(id: Long): Template? = templateRepository.findByIdOrNull(id) ?: entityNotfound("Template" to id)
 
+    fun findTemplateByName(name: String): Template? = templateRepository.findByName(name) ?: entityNotfound("Template" to name)
+
     fun deleteTemplateById(id: Long) = templateRepository.deleteById(id)
 
 }

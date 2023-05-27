@@ -1,4 +1,4 @@
-package ru.housekeeper.service
+package ru.housekeeper.service.email
 
 import jakarta.mail.internet.MimeMessage
 import org.springframework.mail.javamail.JavaMailSender
@@ -35,10 +35,11 @@ class MailService(
             if (attachmentFilename != null && attachmentFile != null) {
                 helper.addAttachment(attachmentFilename, attachmentFile)
             }
+            logger().info("Send email to $to with subject $subject")
             mailSender.send(message)
             true
         } catch (e: Exception) {
-            logger().error("Error send email to $to: " + e.message)
+            logger().error("Error send email to $to with subject $subject", e)
             false
         }
     }
