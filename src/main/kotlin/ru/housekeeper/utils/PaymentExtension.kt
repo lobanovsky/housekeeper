@@ -3,10 +3,10 @@ package ru.housekeeper.utils
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.PageRequest
 import org.springframework.data.support.PageableExecutionUtils
-import ru.housekeeper.model.dto.PaymentVO
-import ru.housekeeper.model.entity.IncomingPayment
-import ru.housekeeper.model.entity.OutgoingPayment
-import ru.housekeeper.model.entity.Payment
+import ru.housekeeper.model.dto.payment.PaymentVO
+import ru.housekeeper.model.entity.payment.IncomingPayment
+import ru.housekeeper.model.entity.payment.OutgoingPayment
+import ru.housekeeper.model.entity.payment.Payment
 import java.math.BigDecimal
 
 enum class FlaggedColorEnum(val color: String, val description: String) {

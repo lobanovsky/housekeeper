@@ -1,4 +1,4 @@
-package ru.housekeeper.rest
+package ru.housekeeper.rest.decision
 
 import io.swagger.v3.oas.annotations.Operation
 import org.springframework.http.HttpHeaders

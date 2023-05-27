@@ -1,4 +1,4 @@
-package ru.housekeeper.model.dto
+package ru.housekeeper.model.dto.payment
 
 import org.springframework.data.domain.Page
 import java.math.BigDecimal

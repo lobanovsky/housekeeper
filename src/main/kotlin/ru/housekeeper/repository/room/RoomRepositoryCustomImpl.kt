@@ -6,8 +6,8 @@ import org.springframework.data.domain.Page
 import ru.housekeeper.model.entity.Room
 import ru.housekeeper.model.filter.RoomFilter
 import ru.housekeeper.repository.equalFilterBy
-import ru.housekeeper.repository.getPage
 import ru.housekeeper.repository.likeFilterBy
+import ru.housekeeper.utils.getPage
 
 class RoomRepositoryCustomImpl(
     @PersistenceContext private val entityManager: EntityManager,

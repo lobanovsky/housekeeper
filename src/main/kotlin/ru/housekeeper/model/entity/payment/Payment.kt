@@ -1,4 +1,4 @@
-package ru.housekeeper.model.entity
+package ru.housekeeper.model.entity.payment
 
 import jakarta.persistence.*
 import ru.housekeeper.utils.FlaggedColorEnum

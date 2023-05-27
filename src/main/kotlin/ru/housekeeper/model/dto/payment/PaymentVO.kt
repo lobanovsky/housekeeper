@@ -1,7 +1,7 @@
-package ru.housekeeper.model.dto
+package ru.housekeeper.model.dto.payment
 
-import ru.housekeeper.model.entity.IncomingPayment
-import ru.housekeeper.model.entity.OutgoingPayment
+import ru.housekeeper.model.entity.payment.IncomingPayment
+import ru.housekeeper.model.entity.payment.OutgoingPayment
 import ru.housekeeper.utils.FlaggedColorEnum
 import java.math.BigDecimal
 import java.time.LocalDateTime

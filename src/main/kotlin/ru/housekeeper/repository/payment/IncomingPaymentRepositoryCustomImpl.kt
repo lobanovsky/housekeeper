@@ -3,9 +3,9 @@ package ru.housekeeper.repository.payment
 import jakarta.persistence.EntityManager
 import jakarta.persistence.PersistenceContext
 import org.springframework.data.domain.Page
-import ru.housekeeper.model.entity.IncomingPayment
+import ru.housekeeper.model.entity.payment.IncomingPayment
 import ru.housekeeper.model.filter.IncomingPaymentsFilter
-import ru.housekeeper.repository.getPage
+import ru.housekeeper.utils.getPage
 
 class IncomingPaymentRepositoryCustomImpl(
     @PersistenceContext private val entityManager: EntityManager,

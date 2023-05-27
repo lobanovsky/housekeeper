@@ -5,8 +5,8 @@ import org.springframework.data.jpa.repository.Query
 import org.springframework.data.repository.CrudRepository
 import org.springframework.data.repository.query.Param
 import org.springframework.stereotype.Repository
-import ru.housekeeper.model.entity.OutgoingPayment
-import ru.housekeeper.model.entity.Payment
+import ru.housekeeper.model.entity.payment.OutgoingPayment
+import ru.housekeeper.model.entity.payment.Payment
 
 @Repository
 interface OutgoingPaymentRepository : CrudRepository<Payment, Long>, OutgoingPaymentRepositoryCustom {

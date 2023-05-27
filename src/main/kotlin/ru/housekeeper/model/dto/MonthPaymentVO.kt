@@ -1,5 +1,6 @@
 package ru.housekeeper.model.dto
 
+import ru.housekeeper.model.dto.payment.PaymentVO
 import java.math.BigDecimal
 import java.time.Month
 

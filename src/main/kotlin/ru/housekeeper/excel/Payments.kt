@@ -3,7 +3,7 @@ package ru.housekeeper.excel
 import org.apache.poi.ss.usermodel.Row
 import org.apache.poi.ss.usermodel.Workbook
 import org.apache.poi.xssf.usermodel.XSSFWorkbook
-import ru.housekeeper.model.dto.PaymentVO
+import ru.housekeeper.model.dto.payment.PaymentVO
 import ru.housekeeper.utils.incomingSum
 import ru.housekeeper.utils.yyyyMMddDateFormat
 import java.io.ByteArrayOutputStream

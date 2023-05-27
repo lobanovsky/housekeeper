@@ -7,10 +7,10 @@ import org.springframework.transaction.annotation.Transactional
 import org.springframework.web.multipart.MultipartFile
 import ru.housekeeper.model.dto.AnnualPaymentVO
 import ru.housekeeper.model.dto.MonthPaymentVO
-import ru.housekeeper.model.dto.PaymentVO
-import ru.housekeeper.model.entity.IncomingPayment
-import ru.housekeeper.model.entity.OutgoingPayment
-import ru.housekeeper.model.entity.Payment
+import ru.housekeeper.model.dto.payment.PaymentVO
+import ru.housekeeper.model.entity.payment.IncomingPayment
+import ru.housekeeper.model.entity.payment.OutgoingPayment
+import ru.housekeeper.model.entity.payment.Payment
 import ru.housekeeper.model.filter.IncomingPaymentsFilter
 import ru.housekeeper.model.filter.OutgoingPaymentsFilter
 import ru.housekeeper.parser.PaymentParser

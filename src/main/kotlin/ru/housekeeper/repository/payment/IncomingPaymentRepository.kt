@@ -5,8 +5,8 @@ import org.springframework.data.jpa.repository.Query
 import org.springframework.data.repository.CrudRepository
 import org.springframework.data.repository.query.Param
 import org.springframework.stereotype.Repository
-import ru.housekeeper.model.entity.IncomingPayment
-import ru.housekeeper.model.entity.Payment
+import ru.housekeeper.model.entity.payment.IncomingPayment
+import ru.housekeeper.model.entity.payment.Payment
 import java.math.BigDecimal
 
 @Repository

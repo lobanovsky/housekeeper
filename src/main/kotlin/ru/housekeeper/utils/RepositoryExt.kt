@@ -1,4 +1,4 @@
-package ru.housekeeper.repository
+package ru.housekeeper.utils
 
 import jakarta.persistence.EntityManager
 import org.springframework.data.domain.Page

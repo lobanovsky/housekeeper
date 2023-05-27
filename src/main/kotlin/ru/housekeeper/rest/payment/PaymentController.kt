@@ -1,10 +1,10 @@
-package ru.housekeeper.rest
+package ru.housekeeper.rest.payment
 
 import io.swagger.v3.oas.annotations.Operation
 import org.springframework.data.domain.Page
 import org.springframework.web.bind.annotation.*
 import ru.housekeeper.model.dto.AnnualPaymentVO
-import ru.housekeeper.model.dto.PaymentVO
+import ru.housekeeper.model.dto.payment.PaymentVO
 import ru.housekeeper.model.filter.IncomingPaymentsFilter
 import ru.housekeeper.model.filter.OutgoingPaymentsFilter
 import ru.housekeeper.service.PaymentService

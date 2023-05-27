@@ -1,4 +1,4 @@
-package ru.housekeeper.model.entity
+package ru.housekeeper.model.entity.payment
 
 import jakarta.persistence.Entity
 import jakarta.persistence.Index
@@ -9,12 +9,12 @@ import java.time.LocalDateTime
 
 @Entity
 @Table(
-    name = "outgoing_payment",
-    indexes = [Index(name = "idx_out_uuid", columnList = "uuid"),
-        Index(name = "idx_out_fromInn", columnList = "fromInn"),
-        Index(name = "idx_out_toInn", columnList = "toInn")]
+    name = "incoming_payment",
+    indexes = [Index(name = "idx_in_uuid", columnList = "uuid"),
+        Index(name = "idx_in_fromInn", columnList = "fromInn"),
+        Index(name = "idx_in_toInn", columnList = "toInn")]
 )
-class OutgoingPayment(
+class IncomingPayment(
     id: Long? = null,
     uuid: String = "",
 
