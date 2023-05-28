@@ -3,6 +3,8 @@ package ru.housekeeper.repository.gate
 import org.springframework.data.domain.Page
 import ru.housekeeper.model.entity.gate.LogEntry
 import ru.housekeeper.model.filter.LogEntryFilter
+import ru.housekeeper.rest.gate.LogEntryController
+import java.time.LocalDate
 
 interface LogEntryRepositoryCustom {
 
@@ -11,4 +13,17 @@ interface LogEntryRepositoryCustom {
         pageSize: Int,
         filter: LogEntryFilter
     ): Page<LogEntry>
+
+    fun getTop(
+        gateId: Long,
+        fieldFilter: LogEntryController.FieldFilter,
+        startDate: LocalDate?,
+        endDate: LocalDate?,
+    ): List<TopRatingResponse>
+
+    data class TopRatingResponse(
+        val count: Long,
+        val flatNumber: String,
+        val userName: String? = null,
+    )
 }

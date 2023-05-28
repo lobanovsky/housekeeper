@@ -9,6 +9,7 @@ import ru.housekeeper.model.dto.gate.LogEntryResponse
 import ru.housekeeper.model.filter.LogEntryFilter
 import ru.housekeeper.service.gate.LogEntryService
 import ru.housekeeper.utils.toLogEntryResponse
+import java.time.LocalDate
 
 @CrossOrigin
 @RestController
@@ -54,5 +55,27 @@ class LogEntryController(
     ): Page<LogEntryResponse> =
         logEntryService.findAllWithFilter(pageNum, pageSize, filter).toLogEntryResponse(pageNum, pageSize)
 
+
+    @Operation(summary = "Get top by flat number")
+    @GetMapping("/flat-number/top")
+    fun getTopByFlatNumber(
+        @RequestParam(value = "gateId", required = true, defaultValue = "1") gateId: Long,
+        @RequestParam(value = "startDate", required = false) startDate: LocalDate?,
+        @RequestParam(value = "endDate", required = false) endDate: LocalDate?,
+    ) = logEntryService.getTop(gateId, FieldFilter.FLAT_NUMBER, startDate, endDate)
+
+    @Operation(summary = "Get top by phone number")
+    @GetMapping("/phone-number/top")
+    fun getTopByPhoneNumber(
+        @RequestParam(value = "gateId", required = true, defaultValue = "1") gateId: Long,
+        @RequestParam(value = "startDate", required = false) startDate: LocalDate?,
+        @RequestParam(value = "endDate", required = false) endDate: LocalDate?,
+    ) = logEntryService.getTop(gateId, FieldFilter.PHONE_NUMBER, startDate, endDate)
+
+
+    enum class FieldFilter(name: String) {
+        FLAT_NUMBER("flat-number"),
+        PHONE_NUMBER("phone-number")
+    }
 
 }

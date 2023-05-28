@@ -6,7 +6,9 @@ import ru.housekeeper.model.entity.gate.LogEntry
 import ru.housekeeper.model.filter.LogEntryFilter
 import ru.housekeeper.parser.gate.LogEntryParser
 import ru.housekeeper.repository.gate.LogEntryRepository
+import ru.housekeeper.rest.gate.LogEntryController
 import ru.housekeeper.utils.logger
+import java.time.LocalDate
 
 @Service
 class LogEntryService(
@@ -55,5 +57,12 @@ class LogEntryService(
         pageNum: Int,
         pageSize: Int, filter: LogEntryFilter
     ) = logEntryRepository.findAllWithFilter(pageNum, pageSize, filter)
+
+    fun getTop(
+        gateId: Long,
+        fieldFilter: LogEntryController.FieldFilter,
+        startDate: LocalDate?,
+        endDate: LocalDate?,
+    ) = logEntryRepository.getTop(gateId, fieldFilter, startDate, endDate)
 
 }
