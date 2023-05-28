@@ -11,4 +11,6 @@ class GateService(
 
     fun getGateByImei(imei: String): Gate? = gateRepository.findByImei(imei)
 
+    fun getAllGates(): List<Gate> = gateRepository.findAll().toList()
+
 }

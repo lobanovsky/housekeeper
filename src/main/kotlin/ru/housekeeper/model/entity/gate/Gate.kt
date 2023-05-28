@@ -25,4 +25,7 @@ class Gate(
     val phoneNumber: String?,
 
     val firmware: String,
+
+    @Column(nullable = true)
+    val active: Boolean = true,
 )

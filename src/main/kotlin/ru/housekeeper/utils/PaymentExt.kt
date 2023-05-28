@@ -21,7 +21,10 @@ enum class FlaggedColorEnum(val color: String, val description: String) {
     WHITE("#FFFFFF", "Белый"),
 }
 
-fun Payment.toPaymentVO(incomingSum: BigDecimal? = null, outgoingSum: BigDecimal? = null): PaymentVO = with(this) {
+fun Payment.toPaymentVO(
+    incomingSum: BigDecimal? = null,
+    outgoingSum: BigDecimal? = null
+): PaymentVO = with(this) {
     PaymentVO(
         uuid = uuid,
         date = date,
@@ -54,10 +57,16 @@ fun Payment.toPaymentVO(incomingSum: BigDecimal? = null, outgoingSum: BigDecimal
 }
 
 fun Page<IncomingPayment>.toIncomingPaymentResponse(pageNum: Int, pageSize: Int): Page<PaymentVO> =
-    PageableExecutionUtils.getPage(this.content.map { it.toPaymentVO(incomingSum = it.sum) }, PageRequest.of(pageNum, pageSize)) { this.totalElements }
+    PageableExecutionUtils.getPage(
+        this.content.map { it.toPaymentVO(incomingSum = it.sum) },
+        PageRequest.of(pageNum, pageSize)
+    ) { this.totalElements }
 
 fun Page<OutgoingPayment>.toOutgoingPaymentResponse(pageNum: Int, pageSize: Int): Page<PaymentVO> =
-    PageableExecutionUtils.getPage(this.content.map { it.toPaymentVO(incomingSum = it.sum) }, PageRequest.of(pageNum, pageSize)) { this.totalElements }
+    PageableExecutionUtils.getPage(
+        this.content.map { it.toPaymentVO(incomingSum = it.sum) },
+        PageRequest.of(pageNum, pageSize)
+    ) { this.totalElements }
 
 
 //Перечисление средств во вклад (депозит) по договору 1234567890.ПУ00 от 12.02.2021 . НДС не облагается.
@@ -67,6 +76,10 @@ fun String.getContractNumberFromDepositPurpose(): String {
     return s.substring(s.lastIndexOf(" ") + 1)
 }
 
-fun List<PaymentVO>.outgoingSum(): BigDecimal = this.fold(BigDecimal.ZERO) { acc, p -> acc + (p.outgoingSum ?: BigDecimal.ZERO) }
-fun List<PaymentVO>.incomingSum(): BigDecimal = this.fold(BigDecimal.ZERO) { acc, p -> acc + (p.incomingSum ?: BigDecimal.ZERO) }
+fun List<PaymentVO>.outgoingSum(): BigDecimal =
+    this.fold(BigDecimal.ZERO) { acc, p -> acc + (p.outgoingSum ?: BigDecimal.ZERO) }
+
+fun List<PaymentVO>.incomingSum(): BigDecimal =
+    this.fold(BigDecimal.ZERO) { acc, p -> acc + (p.incomingSum ?: BigDecimal.ZERO) }
+
 fun List<Payment>.sum(): BigDecimal = this.fold(BigDecimal.ZERO) { acc, p -> acc + (p.sum ?: BigDecimal.ZERO) }

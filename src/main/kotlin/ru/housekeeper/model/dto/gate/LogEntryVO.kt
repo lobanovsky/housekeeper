@@ -6,9 +6,11 @@ import ru.housekeeper.model.entity.gate.LogEntry
 import java.time.LocalDateTime
 
 class LogEntryVO(
+    val id: Long? = null,
     val dateTime: LocalDateTime,
     val status: LogEntryStatusEnum,
     val userName: String? = null,
+    val flatNumber: String? = null,
     val cell: String? = null,
     val method: LogEntryAccessMethodEnum? = null,
     val phoneNumber: String? = null,
@@ -18,6 +20,7 @@ class LogEntryVO(
 ) {
 
     fun toLogEntry(source: String, gateId: Long, gateName: String) = LogEntry(
+        id = id,
         source = source,
         gateId = gateId,
         gateName = gateName,
@@ -29,7 +32,7 @@ class LogEntryVO(
         method = method,
         phoneNumber = phoneNumber,
         line = line,
-        customId = customId,
+        uuid = customId,
     )
 
     private fun getStringBeforeDashIfAllNumbersOrOriginal(userName: String): String {

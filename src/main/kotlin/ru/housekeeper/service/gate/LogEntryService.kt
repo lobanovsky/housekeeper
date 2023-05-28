@@ -3,6 +3,7 @@ package ru.housekeeper.service.gate
 import org.springframework.stereotype.Service
 import org.springframework.web.multipart.MultipartFile
 import ru.housekeeper.model.entity.gate.LogEntry
+import ru.housekeeper.model.filter.LogEntryFilter
 import ru.housekeeper.parser.gate.LogEntryParser
 import ru.housekeeper.repository.gate.LogEntryRepository
 import ru.housekeeper.utils.logger
@@ -41,13 +42,18 @@ class LogEntryService(
     }
 
     private fun removeDuplicates(logEntries: List<LogEntry>, gateId: Long): List<LogEntry> {
-        val existed = logEntryRepository.findByGateId(gateId = gateId).map { it.customId }.toSet()
-        val uploaded = logEntries.map { it.customId }.toSet()
+        val existed = logEntryRepository.findByGateId(gateId = gateId).map { it.uuid }.toSet()
+        val uploaded = logEntries.map { it.uuid }.toSet()
         val duplicates = uploaded intersect existed
         logger().info("Uploaded ${logEntries.size}, unique -> ${(uploaded subtract existed).size}")
-        val grouped = logEntries.associateBy { it.customId }.toMutableMap()
+        val grouped = logEntries.associateBy { it.uuid }.toMutableMap()
         duplicates.forEach(grouped::remove)
         return grouped.values.toList()
     }
+
+    fun findAllWithFilter(
+        pageNum: Int,
+        pageSize: Int, filter: LogEntryFilter
+    ) = logEntryRepository.findAllWithFilter(pageNum, pageSize, filter)
 
 }

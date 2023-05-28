@@ -1,9 +1,9 @@
 package ru.housekeeper.enums.gate
 
-enum class LogEntryAccessMethodEnum {
-    CALL,
-    APP,
-    UNDEFINED;
+enum class LogEntryAccessMethodEnum(val description: String) {
+    CALL("Звонок"),
+    APP("Приложение"),
+    UNDEFINED("Не определено");
 
     companion object {
         fun fromString(value: String): LogEntryAccessMethodEnum {

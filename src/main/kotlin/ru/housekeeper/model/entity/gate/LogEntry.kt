@@ -12,8 +12,7 @@ import java.time.LocalDateTime
     indexes = [Index(name = "idx_in_date_time", columnList = "dateTime"),
         Index(name = "idx_in_status", columnList = "status"),
         Index(name = "idx_in_flat_number", columnList = "flatNumber"),
-        Index(name = "idx_in_phone_number", columnList = "phoneNumber"),
-        Index(name = "idx_in_custom_id", columnList = "customId")]
+        Index(name = "idx_in_phone_number", columnList = "phoneNumber")]
 )
 class LogEntry(
     @Id
@@ -50,5 +49,5 @@ class LogEntry(
     val line: String,
 
     @Column(updatable = false, unique = true)
-    val customId: String,
+    val uuid: String,
 )

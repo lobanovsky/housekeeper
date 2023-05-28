@@ -7,7 +7,7 @@ import org.springframework.stereotype.Repository
 import ru.housekeeper.model.entity.gate.LogEntry
 
 @Repository
-interface LogEntryRepository : CrudRepository<LogEntry, Long> {
+interface LogEntryRepository : CrudRepository<LogEntry, Long>, LogEntryRepositoryCustom {
 
     @Query("select l from LogEntry l where l.gateId = :gateId")
     fun findByGateId(
