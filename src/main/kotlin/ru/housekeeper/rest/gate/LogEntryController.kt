@@ -5,7 +5,7 @@ import org.springframework.data.domain.Page
 import org.springframework.web.bind.annotation.*
 import ru.housekeeper.enums.gate.LogEntryAccessMethodEnum
 import ru.housekeeper.enums.gate.LogEntryStatusEnum
-import ru.housekeeper.model.dto.gate.LogEntryVO
+import ru.housekeeper.model.dto.gate.LogEntryResponse
 import ru.housekeeper.model.filter.LogEntryFilter
 import ru.housekeeper.service.gate.LogEntryService
 import ru.housekeeper.utils.toLogEntryResponse
@@ -51,7 +51,7 @@ class LogEntryController(
         @RequestParam(value = "pageNum", required = false, defaultValue = "0") pageNum: Int,
         @RequestParam(value = "pageSize", required = false, defaultValue = "10") pageSize: Int,
         @RequestBody filter: LogEntryFilter,
-    ): Page<LogEntryVO> =
+    ): Page<LogEntryResponse> =
         logEntryService.findAllWithFilter(pageNum, pageSize, filter).toLogEntryResponse(pageNum, pageSize)
 
 
