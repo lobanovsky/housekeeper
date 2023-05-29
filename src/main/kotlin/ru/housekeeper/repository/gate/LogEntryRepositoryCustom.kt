@@ -23,7 +23,8 @@ interface LogEntryRepositoryCustom {
 
     data class TopRatingResponse(
         val count: Long,
-        val flatNumber: String,
+        val flatNumber: String? = null,
+        val phoneNumber: String? = null,
         val userName: String? = null,
     )
 }
