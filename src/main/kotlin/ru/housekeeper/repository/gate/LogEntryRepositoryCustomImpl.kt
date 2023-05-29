@@ -63,12 +63,12 @@ class LogEntryRepositoryCustomImpl(
                 LogEntryRepositoryCustom.TopRatingResponse(
                     count = it[0] as Long,
                     flatNumber = when (fieldFilter) {
-                        LogEntryController.FieldFilter.FLAT_NUMBER -> it[2] as String
+                        LogEntryController.FieldFilter.FLAT_NUMBER -> it[1] as String
                         LogEntryController.FieldFilter.PHONE_NUMBER -> null
                     },
                     phoneNumber = when (fieldFilter) {
                         LogEntryController.FieldFilter.FLAT_NUMBER -> null
-                        LogEntryController.FieldFilter.PHONE_NUMBER -> it[2] as String
+                        LogEntryController.FieldFilter.PHONE_NUMBER -> it[1] as String
                     },
                     userName = when (fieldFilter) {
                         LogEntryController.FieldFilter.FLAT_NUMBER -> null
