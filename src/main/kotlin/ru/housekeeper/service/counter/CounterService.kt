@@ -5,7 +5,7 @@ import org.springframework.web.multipart.MultipartFile
 import ru.housekeeper.model.entity.counter.Counter
 import ru.housekeeper.parser.counter.WaterCounterParser
 import ru.housekeeper.repository.counter.CounterRepository
-import ru.housekeeper.rest.FileController
+import ru.housekeeper.rest.FileImporterController
 import ru.housekeeper.service.RoomService
 import ru.housekeeper.utils.logger
 
@@ -15,7 +15,7 @@ class CounterService(
     private val roomService: RoomService,
 ) {
 
-    fun upload(file: MultipartFile, checkSum: String, filter: FileController.CounterValue): Int {
+    fun upload(file: MultipartFile, checkSum: String, filter: FileImporterController.CounterValue): Int {
         return 0
     }
 

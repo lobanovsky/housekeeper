@@ -133,7 +133,7 @@ class PaymentService(
 
     @Transactional
     fun removePaymentsByCheckSum(fileId: Long, checksum: String): Int {
-        fileService.deleteByid(fileId)
+        fileService.deleteById(fileId)
         val incomingSize = incomingPaymentRepository.countByPack(pack = checksum)
         val outgoingSize = outgoingPaymentRepository.countByPack(pack = checksum)
         logger().info("Try to remove $incomingSize incoming payments and $outgoingSize outgoing payments")

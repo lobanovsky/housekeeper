@@ -1,5 +1,6 @@
 package ru.housekeeper.repository.gate
 
+import org.springframework.data.jpa.repository.Modifying
 import org.springframework.data.jpa.repository.Query
 import org.springframework.data.repository.CrudRepository
 import org.springframework.data.repository.query.Param
@@ -13,4 +14,12 @@ interface LogEntryRepository : CrudRepository<LogEntry, Long>, LogEntryRepositor
     fun findByGateId(
         @Param("gateId") gateId: Long
     ): List<LogEntry>
+
+    @Modifying
+    @Query("DELETE FROM LogEntry p WHERE p.source = :source")
+    fun removeBySource(@Param("source") source: String)
+
+    @Query("SELECT COUNT(p) FROM LogEntry p WHERE p.source = :source")
+    fun countBySource(@Param("source") source: String): Int
+
 }

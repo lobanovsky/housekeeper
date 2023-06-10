@@ -1,4 +1,4 @@
-package ru.housekeeper.repository
+package ru.housekeeper.repository.file
 
 import org.springframework.data.jpa.repository.Modifying
 import org.springframework.data.jpa.repository.Query
@@ -8,7 +8,7 @@ import org.springframework.stereotype.Repository
 import ru.housekeeper.model.entity.File
 
 @Repository
-interface FileRepository : CrudRepository<File, Long> {
+interface FileRepository : CrudRepository<File, Long>, FileRepositoryCustom {
 
     @Query("select f from File f where lower(f.name) = :name")
     fun findByName(@Param("name") name: String): File?

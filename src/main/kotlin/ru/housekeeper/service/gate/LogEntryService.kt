@@ -1,22 +1,23 @@
 package ru.housekeeper.service.gate
 
 import org.springframework.stereotype.Service
+import org.springframework.transaction.annotation.Transactional
 import org.springframework.web.multipart.MultipartFile
 import ru.housekeeper.model.entity.gate.LogEntry
 import ru.housekeeper.model.filter.LogEntryFilter
 import ru.housekeeper.parser.gate.LogEntryParser
 import ru.housekeeper.repository.gate.LogEntryRepository
 import ru.housekeeper.rest.gate.LogEntryController
+import ru.housekeeper.service.FileService
 import ru.housekeeper.utils.logger
 import java.time.LocalDate
 
 @Service
 class LogEntryService(
-
     private val gateService: GateService,
     private val logEntryRepository: LogEntryRepository,
-
-    ) {
+    private val fileService: FileService,
+) {
 
     data class UploadLogEntriesInfo(
         val totalSize: Int,
@@ -65,4 +66,13 @@ class LogEntryService(
         endDate: LocalDate?,
     ) = logEntryRepository.getTop(gateId, fieldFilter, startDate, endDate)
 
+
+    @Transactional
+    fun removeByChecksum(fileId: Long, checksum: String): Int {
+        fileService.deleteById(fileId)
+        val size = logEntryRepository.countBySource(source = checksum)
+        logger().info("Try to remove $size log entries")
+        if (size > 0) logEntryRepository.removeBySource(source = checksum)
+        return size
+    }
 }

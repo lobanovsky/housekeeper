@@ -21,7 +21,7 @@ class File(
     val checksum: String,
 
     @Enumerated(EnumType.STRING)
-    val fileTypeEnum: FileTypeEnum? = null,
+    val fileType: FileTypeEnum? = null,
 
     @CreationTimestamp
     @Column(updatable = false)
