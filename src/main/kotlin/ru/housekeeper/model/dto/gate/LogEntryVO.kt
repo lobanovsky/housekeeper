@@ -15,9 +15,9 @@ class LogEntryVO(
     val method: LogEntryAccessMethodEnum? = null,
     val phoneNumber: String? = null,
     val line: String,
-    val customId: String,
+    val uuid: String,
 
-) {
+    ) {
 
     fun toLogEntry(source: String, gateId: Long, gateName: String) = LogEntry(
         id = id,
@@ -32,7 +32,7 @@ class LogEntryVO(
         method = method,
         phoneNumber = phoneNumber,
         line = line,
-        uuid = customId,
+        uuid = uuid,
     )
 
     private fun getStringBeforeDashIfAllNumbersOrOriginal(userName: String): String {

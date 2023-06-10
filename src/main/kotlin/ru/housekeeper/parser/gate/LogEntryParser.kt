@@ -36,7 +36,7 @@ class LogEntryParser(private val file: MultipartFile? = null) {
                     dateTime = dateTime,
                     status = LogEntryStatusEnum.UNDEFINED,
                     line = line,
-                    customId = makeCustomId(dateTime, line, gate),
+                    uuid = makeUUID(dateTime, line, gate),
                 )
             }
         }
@@ -59,7 +59,7 @@ class LogEntryParser(private val file: MultipartFile? = null) {
             userName = user,
             phoneNumber = phoneNumber,
             line = line,
-            customId = makeCustomId(dateTime, phoneNumber, gate),
+            uuid = makeUUID(dateTime, phoneNumber, gate),
         )
     }
 
@@ -75,7 +75,7 @@ class LogEntryParser(private val file: MultipartFile? = null) {
             method = LogEntryAccessMethodEnum.fromString(method),
             phoneNumber = phoneNumber,
             line = line,
-            customId = makeCustomId(dateTime, phoneNumber, gate),
+            uuid = makeUUID(dateTime, phoneNumber, gate),
         )
     }
 
@@ -89,7 +89,7 @@ class LogEntryParser(private val file: MultipartFile? = null) {
             status = LogEntryStatusEnum.NUM_DELETED,
             cell = cell,
             line = line,
-            customId = makeCustomId(dateTime, cell, gate),
+            uuid = makeUUID(dateTime, cell, gate),
         )
     }
 
@@ -107,11 +107,11 @@ class LogEntryParser(private val file: MultipartFile? = null) {
             phoneNumber = phoneNumber,
             cell = cell,
             line = line,
-            customId = makeCustomId(dateTime, phoneNumber, gate),
+            uuid = makeUUID(dateTime, phoneNumber, gate),
         )
     }
 
-    private fun makeCustomId(dateTime: LocalDateTime, phoneNumber: String, gate: Gate) =
+    private fun makeUUID(dateTime: LocalDateTime, phoneNumber: String, gate: Gate) =
         "${dateTime.year}_${dateTime.monthValue}_${dateTime.dayOfMonth}_${dateTime.hour}_${dateTime.minute}_${dateTime.second}_${phoneNumber}_gate_${gate.id}_${gate.id}"
 
     fun parseLogEntries(log: String): List<LogEntry> {
