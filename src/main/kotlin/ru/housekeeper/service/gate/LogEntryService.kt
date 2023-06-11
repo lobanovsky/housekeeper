@@ -8,7 +8,6 @@ import ru.housekeeper.model.filter.LogEntryFilter
 import ru.housekeeper.parser.gate.LogEntryParser
 import ru.housekeeper.repository.gate.LogEntryRepository
 import ru.housekeeper.rest.gate.LogEntryController
-import ru.housekeeper.service.FileService
 import ru.housekeeper.utils.logger
 import java.time.LocalDate
 
@@ -16,7 +15,6 @@ import java.time.LocalDate
 class LogEntryService(
     private val gateService: GateService,
     private val logEntryRepository: LogEntryRepository,
-    private val fileService: FileService,
 ) {
 
     data class UploadLogEntriesInfo(
@@ -68,10 +66,9 @@ class LogEntryService(
 
 
     @Transactional
-    fun removeByChecksum(fileId: Long, checksum: String): Int {
-        fileService.deleteById(fileId)
+    fun removeByChecksum(checksum: String): Int {
         val size = logEntryRepository.countBySource(source = checksum)
-        logger().info("Try to remove $size log entries")
+        logger().info("Try to remove $size log entries for file $checksum")
         if (size > 0) logEntryRepository.removeBySource(source = checksum)
         return size
     }

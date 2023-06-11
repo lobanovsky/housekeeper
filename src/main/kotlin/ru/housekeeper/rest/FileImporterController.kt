@@ -37,7 +37,7 @@ class FileImporterController(
         val imei = file.originalFilename?.substringAfter("IMEI")?.substringBefore("_")
             ?: throw IllegalArgumentException("File name must contain IMEI")
         val (totalSize) = logEntryService.parseAndSave(file, checkSum, imei)
-        fileService.saveFileInfo(file.originalFilename ?: "", file.size, checkSum, FileTypeEnum.ENTRY_LOG)
+        fileService.saveFileInfo(file.originalFilename ?: "", file.size, checkSum, FileTypeEnum.LOG_ENTRY)
         return EldesGateInfoResponse(file.originalFilename, totalSize)
     }
 

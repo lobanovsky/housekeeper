@@ -26,7 +26,6 @@ import java.time.LocalDateTime
 class PaymentService(
     private val incomingPaymentRepository: IncomingPaymentRepository,
     private val outgoingPaymentRepository: OutgoingPaymentRepository,
-    private val fileService: FileService,
 
     ) {
 
@@ -132,8 +131,7 @@ class PaymentService(
     }
 
     @Transactional
-    fun removePaymentsByCheckSum(fileId: Long, checksum: String): Int {
-        fileService.deleteById(fileId)
+    fun removePaymentsByCheckSum(checksum: String): Int {
         val incomingSize = incomingPaymentRepository.countByPack(pack = checksum)
         val outgoingSize = outgoingPaymentRepository.countByPack(pack = checksum)
         logger().info("Try to remove $incomingSize incoming payments and $outgoingSize outgoing payments")
