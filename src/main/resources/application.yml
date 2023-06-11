@@ -37,8 +37,8 @@ spring:
     properties:
       hibernate:
         #        format_sql: true
-        jdbc:
-          time_zone: "Europe/Moscow"
+#        jdbc:
+#          time_zone: "Europe/Moscow"
 
 server:
   error:
