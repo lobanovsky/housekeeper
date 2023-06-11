@@ -21,7 +21,7 @@ class LogEntryService(
         val totalSize: Int,
     )
 
-    fun parseAndSave(file: MultipartFile, checkSum: String, imei: String): UploadLogEntriesInfo {
+    @Synchronized fun parseAndSave(file: MultipartFile, checkSum: String, imei: String): UploadLogEntriesInfo {
         val gate = gateService.getGateByImei(imei)
         if (gate == null) {
             logger().error("Gate with IMEI $imei not found")

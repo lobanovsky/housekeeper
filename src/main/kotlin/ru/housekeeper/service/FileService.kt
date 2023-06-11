@@ -48,7 +48,7 @@ class FileService(
     }
 
     fun saveFileInfo(name: String, size: Long, checksum: String, fileType: FileTypeEnum): File {
-        logger().info("Try save file [${fileType.description}]: name: $name size: $size checksum: $checksum")
+        logger().info("Try to save file [${fileType.description}]: name: $name size: $size checksum: $checksum")
         return fileRepository.save(
             File(
                 name = name,

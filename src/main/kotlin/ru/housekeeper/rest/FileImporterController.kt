@@ -8,6 +8,7 @@ import ru.housekeeper.enums.counter.CounterTypeEnum
 import ru.housekeeper.service.*
 import ru.housekeeper.service.counter.CounterService
 import ru.housekeeper.service.gate.LogEntryService
+import ru.housekeeper.utils.logger
 import java.math.BigDecimal
 import java.time.LocalDate
 import java.time.Month
@@ -32,6 +33,7 @@ class FileImporterController(
     fun importEldesGate(
         @RequestPart file: MultipartFile,
     ): EldesGateInfoResponse {
+        logger().info("Try to upload [${file.originalFilename}]")
         fileService.isExtensionEqual(file, "log")
         val checkSum = fileService.isDuplicateAndGetChecksum(file)
         val imei = file.originalFilename?.substringAfter("IMEI")?.substringBefore("_")

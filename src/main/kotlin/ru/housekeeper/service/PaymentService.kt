@@ -84,7 +84,7 @@ class PaymentService(
     }
 
     @Transactional
-    fun parseAndSave(paymentsFile: MultipartFile, checksum: String): UploadFileInfo {
+    @Synchronized fun parseAndSave(paymentsFile: MultipartFile, checksum: String): UploadFileInfo {
         val payments = PaymentParser(paymentsFile).parse()
         logger().info("Parsed ${payments.size} payments")
         return savePayments(payments, paymentsFile.originalFilename ?: paymentsFile.name, checksum)
