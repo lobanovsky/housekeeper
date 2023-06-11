@@ -15,7 +15,8 @@ class LogEntryParser(private val file: MultipartFile? = null) {
     fun parse(gate: Gate): List<LogEntryVO> {
         logger().info("Start parsing log entries file")
         val content = String(file?.bytes ?: ByteArray(0))
-        return parseLogEntries(content).map { toLogEntryVO(it.dateTime, it.message, gate) }
+        return parseLogEntries(content)
+            .map { toLogEntryVO(it.dateTime, it.dateTimeString, it.message, gate) }
     }
 
     /**
@@ -24,19 +25,19 @@ class LogEntryParser(private val file: MultipartFile? = null) {
      * W: Num in 320 deleted
      * W: User 3-33 [79807210309] added in 140
      */
-    private fun toLogEntryVO(dateTime: LocalDateTime, line: String, gate: Gate): LogEntryVO {
+    private fun toLogEntryVO(dateTime: LocalDateTime, dateTimeString: String, line: String, gate: Gate): LogEntryVO {
         return when {
-            line.startsWith("Opened by user:") -> openParser(dateTime, line, gate)
-            line.startsWith("Auth. failed user(") -> authFailedParser(dateTime, line, gate)
-            line.startsWith("W: Num in ") -> numDeletedParser(dateTime, line, gate)
-            line.startsWith("W: User ") -> userAddedParser(dateTime, line, gate)
+            line.startsWith("Opened by user:") -> openParser(dateTime, dateTimeString, line, gate)
+            line.startsWith("Auth. failed user(") -> authFailedParser(dateTime, dateTimeString, line, gate)
+            line.startsWith("W: Num in ") -> numDeletedParser(dateTime, dateTimeString, line, gate)
+            line.startsWith("W: User ") -> userAddedParser(dateTime, dateTimeString, line, gate)
             else -> {
                 logger().warn("Unknown line: $line")
                 LogEntryVO(
                     dateTime = dateTime,
                     status = LogEntryStatusEnum.UNDEFINED,
                     line = line,
-                    uuid = makeUUID(dateTime, line, gate),
+                    uuid = makeUUID(dateTimeString, line, gate),
                 )
             }
         }
@@ -48,7 +49,7 @@ class LogEntryParser(private val file: MultipartFile? = null) {
      * Opened by user:tehnik-kotov(call R:1):+79271058868
      * Opened by user:16-2(APP R:1):+79636110726
      */
-    fun openParser(dateTime: LocalDateTime, line: String, gate: Gate): LogEntryVO {
+    fun openParser(dateTime: LocalDateTime, dateTimeString: String, line: String, gate: Gate): LogEntryVO {
         val user = line.removePrefix("Opened by user:").substringBefore('(')
         val method = line.substringAfter("(").substringBefore(" ")
         val phoneNumber = line.takeLast(11)
@@ -59,14 +60,14 @@ class LogEntryParser(private val file: MultipartFile? = null) {
             userName = user,
             phoneNumber = phoneNumber,
             line = line,
-            uuid = makeUUID(dateTime, phoneNumber, gate),
+            uuid = makeUUID(dateTimeString, phoneNumber, gate),
         )
     }
 
     /**
      * Auth. failed user(call):+79101654340
      */
-    fun authFailedParser(dateTime: LocalDateTime, line: String, gate: Gate): LogEntryVO {
+    fun authFailedParser(dateTime: LocalDateTime, dateTimeString: String, line: String, gate: Gate): LogEntryVO {
         val method = line.substringAfter("(").substringBefore(")")
         val phoneNumber = line.takeLast(11)
         return LogEntryVO(
@@ -75,28 +76,28 @@ class LogEntryParser(private val file: MultipartFile? = null) {
             method = LogEntryAccessMethodEnum.fromString(method),
             phoneNumber = phoneNumber,
             line = line,
-            uuid = makeUUID(dateTime, phoneNumber, gate),
+            uuid = makeUUID(dateTimeString, phoneNumber, gate),
         )
     }
 
     /**
      * W: Num in 320 deleted
      */
-    fun numDeletedParser(dateTime: LocalDateTime, line: String, gate: Gate): LogEntryVO {
+    fun numDeletedParser(dateTime: LocalDateTime, dateTimeString: String, line: String, gate: Gate): LogEntryVO {
         val cell = line.substringAfter("Num in ").substringBefore(" ")
         return LogEntryVO(
             dateTime = dateTime,
             status = LogEntryStatusEnum.NUM_DELETED,
             cell = cell,
             line = line,
-            uuid = makeUUID(dateTime, cell, gate),
+            uuid = makeUUID(dateTimeString, cell, gate),
         )
     }
 
     /**
      * W: User 3-33 [79807210309] added in 140
      */
-    fun userAddedParser(dateTime: LocalDateTime, line: String, gate: Gate): LogEntryVO {
+    fun userAddedParser(dateTime: LocalDateTime, dateTimeString: String, line: String, gate: Gate): LogEntryVO {
         val user = line.substringAfter("User ").substringBefore(" ")
         val phoneNumber = line.substringAfter("[").substringBefore("]")
         val cell = line.substringAfter("in ")
@@ -107,18 +108,19 @@ class LogEntryParser(private val file: MultipartFile? = null) {
             phoneNumber = phoneNumber,
             cell = cell,
             line = line,
-            uuid = makeUUID(dateTime, phoneNumber, gate),
+            uuid = makeUUID(dateTimeString, phoneNumber, gate),
         )
     }
 
-    private fun makeUUID(dateTime: LocalDateTime, phoneNumber: String, gate: Gate) =
-        "${dateTime.year}_${dateTime.monthValue}_${dateTime.dayOfMonth}_${dateTime.hour}_${dateTime.minute}_${dateTime.second}_${phoneNumber}_gate_${gate.id}_${gate.id}"
+    private fun makeUUID(dateTimeString: String, phoneNumber: String, gate: Gate) =
+        "${dateTimeString.replace(" ", "_")}_${phoneNumber}_gate_${gate.id}_${gate.id}"
 
     fun parseLogEntries(log: String): List<LogEntry> {
         val pattern = "yyyy.MM.dd HH:mm:ss"
         val lines = log.trim().split("\n")
         val entries = mutableListOf<LogEntry>()
         var visitedDateTime: LocalDateTime? = null
+        var visitedDateTimeString: String? = null
         var currentMessage = ""
 
         for (line in lines) {
@@ -126,25 +128,31 @@ class LogEntryParser(private val file: MultipartFile? = null) {
             val matcher = Regex("(\\d{4}\\.\\d{2}\\.\\d{2} \\d{2}:\\d{2}:\\d{2}) (.*)").matchEntire(trimLine)
 
             if (matcher != null) {
-                val dateTime = LocalDateTime.parse(matcher.groupValues[1], DateTimeFormatter.ofPattern(pattern))
+                val dateTimeString = matcher.groupValues[1]
+                val dateTime = LocalDateTime.parse(dateTimeString, DateTimeFormatter.ofPattern(pattern))
 
                 if (visitedDateTime != null) {
-                    entries.add(LogEntry(visitedDateTime, currentMessage))
+                    entries.add(LogEntry(visitedDateTime, dateTimeString, currentMessage))
                 }
 
                 visitedDateTime = dateTime
+                visitedDateTimeString = dateTimeString
                 currentMessage = matcher.groupValues[2]
             } else {
                 currentMessage += " $trimLine"
             }
         }
 
-        if (visitedDateTime != null) {
-            entries.add(LogEntry(visitedDateTime, currentMessage))
+        if (visitedDateTime != null && visitedDateTimeString != null) {
+            entries.add(LogEntry(visitedDateTime, visitedDateTimeString, currentMessage))
         }
         //remove duplicates and get unique entries (by dateTime)
         return entries.associateBy { it.dateTime }.values.toList()
     }
 
-    class LogEntry(val dateTime: LocalDateTime, val message: String)
+    class LogEntry(
+        val dateTime: LocalDateTime,
+        val dateTimeString: String,
+        val message: String
+    )
 }

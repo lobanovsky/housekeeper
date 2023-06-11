@@ -203,7 +203,6 @@ class FileImporterController(
     fun importPayments(
         @RequestPart file: MultipartFile
     ): PaymentInfoResponse {
-        println("check")
         fileService.isExtensionEqual(file)
         val checkSum = fileService.isDuplicateAndGetChecksum(file)
         val (totalSize, uniqTotalSize, incomingSize, outgoingSize, incomingSum, outgoingSum) = paymentService.parseAndSave(
