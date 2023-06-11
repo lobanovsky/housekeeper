@@ -131,19 +131,19 @@ class LogEntryParser(private val file: MultipartFile? = null) {
                 val dateTimeString = matcher.groupValues[1]
                 val dateTime = LocalDateTime.parse(dateTimeString, DateTimeFormatter.ofPattern(pattern))
 
-                if (visitedDateTime != null) {
-                    entries.add(LogEntry(visitedDateTime, dateTimeString, currentMessage))
+                if (visitedDateTime != null  && visitedDateTimeString?.isNotBlank() == true) {
+                    entries.add(LogEntry(visitedDateTime, visitedDateTimeString, currentMessage))
                 }
 
-                visitedDateTime = dateTime
                 visitedDateTimeString = dateTimeString
+                visitedDateTime = dateTime
                 currentMessage = matcher.groupValues[2]
             } else {
                 currentMessage += " $trimLine"
             }
         }
 
-        if (visitedDateTime != null && visitedDateTimeString != null) {
+        if (visitedDateTime != null && visitedDateTimeString?.isNotBlank() == true) {
             entries.add(LogEntry(visitedDateTime, visitedDateTimeString, currentMessage))
         }
         //remove duplicates and get unique entries (by dateTime)
