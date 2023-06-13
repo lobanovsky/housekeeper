@@ -22,7 +22,7 @@ class FileRepositoryCustomImpl(
         predicates["type"] = equalFilterBy("f.fileType", filter.fileType)
         val conditions = predicates.values.joinToString(separator = " ")
 
-        val sql = "SELECT f FROM File f WHERE true = true $conditions ORDER BY f.fileType"
+        val sql = "SELECT f FROM File f WHERE true = true $conditions ORDER BY f.createDate"
         val sqlCount = "SELECT count(f) FROM File f WHERE true = true $conditions"
 
         return getPage<File>(entityManager, sql, sqlCount, pageNum, pageSize)
