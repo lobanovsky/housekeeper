@@ -26,7 +26,8 @@ fun File.toFileVO(): FileVO {
         type = FileType(
             name = fileType.name,
             description = fileType.description
-        )
+        ),
+        createDate = createDate
     )
 }
 

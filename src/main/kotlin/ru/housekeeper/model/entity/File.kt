@@ -25,6 +25,6 @@ class File(
 
     @CreationTimestamp
     @Column(updatable = false)
-    val createDate: LocalDateTime? = LocalDateTime.now(),
+    val createDate: LocalDateTime = LocalDateTime.now(),
 
     )
