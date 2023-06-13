@@ -6,6 +6,7 @@ import org.springframework.data.support.PageableExecutionUtils
 import org.springframework.http.HttpHeaders
 import org.springframework.http.MediaType
 import org.springframework.http.ResponseEntity
+import ru.housekeeper.model.dto.FileType
 import ru.housekeeper.model.dto.FileVO
 import ru.housekeeper.model.entity.File
 
@@ -22,7 +23,10 @@ fun File.toFileVO(): FileVO {
         name = name,
         size = size,
         checksum = checksum,
-        fileType = fileType,
+        type = FileType(
+            name = fileType.name,
+            description = fileType.description
+        )
     )
 }
 
