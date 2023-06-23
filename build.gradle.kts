@@ -35,8 +35,6 @@ dependencies {
     //open-api (ex swagger)
     implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:2.1.0")
 
-    runtimeOnly("org.postgresql:postgresql")
-
     implementation("org.apache.poi:poi:5.2.3")
     implementation("org.apache.poi:poi-ooxml:5.2.3")
 
