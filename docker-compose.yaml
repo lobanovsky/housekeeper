@@ -23,9 +23,12 @@ services:
       - "8080:8080"
     volumes:
       - ./logs:/opt/app/logs
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.housekeeper.rule=Host(`housekeeper.docduck.io`) && PathPrefix(`/api`)"
     networks:
-      - housekeeper-network
+      - printdown-network
 
 networks:
-  housekeeper-network:
+  printdown-network:
     external: true
