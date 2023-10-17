@@ -6,33 +6,19 @@ import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
 import ru.housekeeper.model.dto.AccountResponse
+import ru.housekeeper.model.dto.toAccountResponse
+import ru.housekeeper.service.AccountService
 
 @CrossOrigin
 @RestController
 @RequestMapping("/accounts")
-class AccountController {
+class AccountController(
+    private val accountService: AccountService,
+) {
 
     @GetMapping
     @Operation(summary = "Find all accounts")
-    fun findAllAccounts(): List<AccountResponse> = listOf(
-        AccountResponse(
-            "40703810838000014811",
-            default = true,
-            special = false,
-            description = "До октября 2022"
-        ),
-        AccountResponse(
-            "40703810338000004376",
-            default = true,
-            special = false,
-            description = "С ноября 2022"
-        ),
-        AccountResponse(
-            "40705810238000000478",
-            default = false,
-            special = true,
-            description = "Специальный. Кап. ремонт"
-        ),
-    )
+    fun findAllAccounts(): List<AccountResponse> = accountService.getAll().map { it.toAccountResponse()}
+
 }
 
