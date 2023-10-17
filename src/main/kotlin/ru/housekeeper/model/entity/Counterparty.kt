@@ -13,6 +13,12 @@ class Counterparty(
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     val id: Long? = null,
 
+    @Column(unique = true)
+    var uuid: String = "",
+
+    @Column(nullable = false)
+    val originalName: String,
+
     @Column(nullable = false)
     val name: String,
 

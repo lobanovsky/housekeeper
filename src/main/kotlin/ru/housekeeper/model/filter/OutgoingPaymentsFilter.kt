@@ -3,10 +3,15 @@ package ru.housekeeper.model.filter
 import java.time.LocalDate
 
 data class OutgoingPaymentsFilter(
-    val toName: String?,
-    val toInn: String?,
-    val purpose: String?,
-    val taxable: Boolean?,
+    val toName: String? = null,
+    val toInn: String? = null,
+    val purpose: String? = null,
+    val taxable: Boolean? = null,
+    val startDate: LocalDate?,
+    val endDate: LocalDate?,
+)
+
+data class OutgoingGropingPaymentsFilter(
     val startDate: LocalDate?,
     val endDate: LocalDate?,
 )

@@ -7,18 +7,19 @@ import org.springframework.transaction.annotation.Transactional
 import org.springframework.web.multipart.MultipartFile
 import ru.housekeeper.model.dto.AnnualPaymentVO
 import ru.housekeeper.model.dto.MonthPaymentVO
+import ru.housekeeper.model.dto.payment.GroupOfPayment
 import ru.housekeeper.model.dto.payment.PaymentVO
+import ru.housekeeper.model.entity.Counterparty
 import ru.housekeeper.model.entity.payment.IncomingPayment
 import ru.housekeeper.model.entity.payment.OutgoingPayment
 import ru.housekeeper.model.entity.payment.Payment
 import ru.housekeeper.model.filter.IncomingPaymentsFilter
+import ru.housekeeper.model.filter.OutgoingGropingPaymentsFilter
 import ru.housekeeper.model.filter.OutgoingPaymentsFilter
 import ru.housekeeper.parser.PaymentParser
 import ru.housekeeper.repository.payment.IncomingPaymentRepository
 import ru.housekeeper.repository.payment.OutgoingPaymentRepository
-import ru.housekeeper.utils.logger
-import ru.housekeeper.utils.sum
-import ru.housekeeper.utils.toPaymentVO
+import ru.housekeeper.utils.*
 import java.math.BigDecimal
 import java.time.LocalDateTime
 
@@ -26,6 +27,7 @@ import java.time.LocalDateTime
 class PaymentService(
     private val incomingPaymentRepository: IncomingPaymentRepository,
     private val outgoingPaymentRepository: OutgoingPaymentRepository,
+    private val counterpartyService: CounterpartyService,
 
     ) {
 
@@ -84,7 +86,8 @@ class PaymentService(
     }
 
     @Transactional
-    @Synchronized fun parseAndSave(paymentsFile: MultipartFile, checksum: String): UploadFileInfo {
+    @Synchronized
+    fun parseAndSave(paymentsFile: MultipartFile, checksum: String): UploadFileInfo {
         val payments = PaymentParser(paymentsFile).parse()
         logger().info("Parsed ${payments.size} payments")
         return savePayments(payments, paymentsFile.originalFilename ?: paymentsFile.name, checksum)
@@ -103,6 +106,55 @@ class PaymentService(
         filter: OutgoingPaymentsFilter
     ): Page<OutgoingPayment> =
         outgoingPaymentRepository.findAllWithFilter(pageNum, pageSize, filter)
+
+    fun findAllOutgoingGroupingPaymentsByCounterparty(filter: OutgoingGropingPaymentsFilter): List<GroupOfPayment> {
+        val payments = outgoingPaymentRepository.findAllWithFilter(
+            pageNum = 0,
+            pageSize = MAX_SIZE_PER_PAGE_FOR_EXCEL,
+            filter = OutgoingPaymentsFilter(
+                startDate = filter.startDate,
+                endDate = filter.endDate
+            )
+        )
+        val counterpartyGroupByInn = counterpartyService.findAll().associateBy { it.inn }
+        val counterpartyGroupByName = counterpartyService.findAll().associateBy { it.name }
+        val groupOfPayment = mutableMapOf<String, GroupOfPayment>()
+        for (payment in payments) {
+            val counterparty = getCounterparty(counterpartyGroupByInn, counterpartyGroupByName, payment)
+            groupOfPayment[counterparty.uuid] =
+                groupOfPayment.getOrDefault(
+                    key = counterparty.uuid,
+                    defaultValue = GroupOfPayment(
+                        counterparty = counterparty,
+                        payments = mutableListOf(),
+                        total = BigDecimal.ZERO
+                    )
+                ).addPayment(payment)
+        }
+        return groupOfPayment.values.toList().sortedByDescending { it.total }
+    }
+
+    private fun getCounterparty(
+        counterpartyGroupByInn: Map<String, Counterparty>,
+        counterpartyGroupByName: Map<String, Counterparty>,
+        payment: OutgoingPayment
+    ): Counterparty {
+        val toInn = payment.toInn
+        val toName = payment.toName.simplify()
+        val counterparty = counterpartyGroupByInn[toInn]
+        if (counterparty != null) return counterparty
+        val counterpartyByName = counterpartyGroupByName[toName]
+        if (counterpartyByName != null) return counterpartyByName
+        logger().info("Unknown counterparty: ${payment.id}, ${payment.purpose}, $toName, $toInn")
+        return Counterparty(
+            name = "Unknown",
+            originalName = "Unknown",
+            inn = "0000-0000-0000",
+            bank = "",
+            bik = "",
+            sign = ""
+        )
+    }
 
     fun findAllDeposits(): List<OutgoingPayment> = outgoingPaymentRepository.findAllDeposits(myInn)
 

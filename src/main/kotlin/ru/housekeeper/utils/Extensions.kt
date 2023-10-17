@@ -7,7 +7,8 @@ import java.time.ZoneId
 import java.time.format.DateTimeFormatter
 import java.util.*
 
-inline fun <reified T> T.logger(): Logger = LoggerFactory.getLogger(if (T::class.isCompanion) T::class.java.enclosingClass else T::class.java)
+inline fun <reified T> T.logger(): Logger =
+    LoggerFactory.getLogger(if (T::class.isCompanion) T::class.java.enclosingClass else T::class.java)
 
 /**
  *You can use this method to get date time with zone id
@@ -17,7 +18,8 @@ fun LocalDateTime?.asDate() = this?.atZone(ZoneId.systemDefault())?.toInstant()?
 
 fun <T> printFirstFive(list: Collection<T>): String {
     val maxSize = 5
-    return if (list.size > maxSize) list.take(maxSize).toString() + "... and ${list.size - maxSize} items" else list.toString()
+    return if (list.size > maxSize) list.take(maxSize)
+        .toString() + "... and ${list.size - maxSize} items" else list.toString()
 }
 
 fun yyyyMMddDateFormat(): DateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd")
@@ -27,3 +29,14 @@ fun yyyyMMddHHmmssDateFormat(): DateTimeFormatter = DateTimeFormatter.ofPattern(
 fun String.onlyLettersAndNumber() = Regex("[^А-Яа-яA-Za-z0-9]").replace(this, "").lowercase()
 
 fun List<String>.sqlSeparator() = this.joinToString(separator = ",") { "'$it'" }
+
+/**
+ *
+ *
+ */
+fun String.simplify() = this
+    .replace("\"", "")
+    .replace("?", "")
+    .trim()
+    .lowercase()
+    .replace(" +".toRegex(), " ")

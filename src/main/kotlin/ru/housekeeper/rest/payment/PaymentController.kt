@@ -6,9 +6,13 @@ import org.springframework.web.bind.annotation.*
 import ru.housekeeper.model.dto.AnnualPaymentVO
 import ru.housekeeper.model.dto.payment.PaymentVO
 import ru.housekeeper.model.filter.IncomingPaymentsFilter
+import ru.housekeeper.model.filter.OutgoingGropingPaymentsFilter
 import ru.housekeeper.model.filter.OutgoingPaymentsFilter
 import ru.housekeeper.service.PaymentService
-import ru.housekeeper.utils.*
+import ru.housekeeper.utils.getContractNumberFromDepositPurpose
+import ru.housekeeper.utils.toIncomingPaymentResponse
+import ru.housekeeper.utils.toOutgoingPaymentResponse
+import ru.housekeeper.utils.toPaymentVO
 
 @CrossOrigin
 @RestController
@@ -52,5 +56,11 @@ class PaymentController(
         @RequestBody filter: OutgoingPaymentsFilter
     ): Page<PaymentVO> = paymentService.findAllOutgoingPaymentsWithFilter(pageNum, pageSize, filter)
         .toOutgoingPaymentResponse(pageNum, pageSize)
+
+    @PostMapping(path = ["/outgoing/grouping"])
+    @Operation(summary = "Find outgoing payments with filter and grouping by counterparty")
+    fun findOutgoingPaymentsGroupingByCounterparty(
+        @RequestBody filter: OutgoingGropingPaymentsFilter
+    ) = paymentService.findAllOutgoingGroupingPaymentsByCounterparty(filter)
 
 }

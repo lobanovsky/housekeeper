@@ -1,86 +1,47 @@
 package ru.housekeeper.service
 
-import org.apache.poi.ss.usermodel.WorkbookFactory
 import org.springframework.stereotype.Service
 import org.springframework.web.multipart.MultipartFile
+import ru.housekeeper.model.dto.CounterpartyInfo
+import ru.housekeeper.model.dto.toCounterparty
 import ru.housekeeper.model.entity.Counterparty
+import ru.housekeeper.parser.CounterpartyParser
 import ru.housekeeper.repository.CounterpartyRepository
 import ru.housekeeper.utils.logger
 
 @Service
 class CounterpartyService(
     private val counterpartyRepository: CounterpartyRepository,
-    private val paymentService: PaymentService,
 ) {
 
     data class FileInfo(val size: Int, val numberOfUnique: Int)
 
     fun parseAndSave(file: MultipartFile): FileInfo {
-        val counterpartiesInfo = parser(file)
+        val counterpartiesInfo = CounterpartyParser(file).parse()
         logger().info("Parsed ${counterpartiesInfo.size} counterparties")
 
-        val counterparties = mutableListOf<Counterparty>()
-        counterpartiesInfo.forEach {
-            counterparties.add(
-                Counterparty(
-                    name = it.name,
-                    inn = it.inn,
-                    bank = it.bank,
-                    bik = it.bik,
-                    sign = it.sign
-                )
-            )
-        }
+        val uniqueCounterparties = removeDuplicates(counterpartiesInfo, counterpartyRepository::findAllUUIDs)
+
+        val counterparties = uniqueCounterparties.map {it.toCounterparty()}
         logger().info("Try to save ${counterparties.size} counterparties")
         counterpartyRepository.saveAll(counterparties)
-        return FileInfo(counterparties.size, counterparties.filter { it.inn.isNotEmpty() }.map { it.inn }.toSet().size)
+        return FileInfo(counterpartiesInfo.size, uniqueCounterparties.size)
     }
 
-    private fun parser(file: MultipartFile): List<CounterpartyInfo> {
-        logger().info("Start parsing counterparties file")
-        val workbook = WorkbookFactory.create(file.inputStream)
-        val sheet = workbook.getSheetAt(0)
+    private fun removeDuplicates(counterparties: List<CounterpartyInfo>, savedUUIDs: () -> List<String>): List<CounterpartyInfo> {
+        val saved = savedUUIDs().toSet()
+        val uploaded = counterparties.map { it.uuid }.toSet()
+        val duplicates = uploaded intersect saved
+        logger().info("Uploaded ${uploaded.size}, unique -> ${(uploaded subtract saved).size}")
+        val groupedCounterparty = counterparties.associateBy { it.uuid }.toMutableMap()
+        duplicates.forEach(groupedCounterparty::remove)
+        //show unique
+        groupedCounterparty.values.forEach { logger().info("Unique: $it") }
+        return groupedCounterparty.values.toList()
 
-        val nameNum = 0
-        val innNum = 1
-        val bankNum = 2
-        val bikNum = 3
-        val signNum = 4
-
-        logger().info("Reading ${sheet.lastRowNum} rows from sheet: ${sheet.sheetName}")
-
-        val counterpartyInfos = mutableListOf<CounterpartyInfo>()
-        for (rowNum in 1..sheet.lastRowNum) {
-            val row = sheet.getRow(rowNum) ?: continue
-
-            val name = row.getCell(nameNum)?.toString() ?: ""
-            val inn = row.getCell(innNum)?.toString() ?: ""
-            val bank = row.getCell(bankNum)?.toString() ?: ""
-            val bik = row.getCell(bikNum)?.toString() ?: ""
-            val sign = row.getCell(signNum)?.toString() ?: ""
-            logger().info("$rowNum) $name $inn $bank $bik $sign")
-            if (inn.isBlank()) {
-                logger().info("Inn for $name is blank")
-            }
-            counterpartyInfos.add(
-                CounterpartyInfo(
-                    name = name,
-                    inn = inn,
-                    bank = bank,
-                    bik = bik,
-                    sign = sign,
-                )
-            )
-        }
-        return counterpartyInfos
     }
 
-    data class CounterpartyInfo(
-        val name: String,
-        val inn: String,
-        val bank: String,
-        val bik: String,
-        val sign: String,
-    )
+    fun findAll(): List<Counterparty> = counterpartyRepository.findAll().toList()
 
+    fun getGroupingByName(): Map<String, List<Counterparty>> = counterpartyRepository.findAll().toList().groupBy { it.name }
 }
