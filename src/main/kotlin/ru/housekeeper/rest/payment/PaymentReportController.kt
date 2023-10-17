@@ -5,8 +5,11 @@ import org.springframework.http.HttpHeaders
 import org.springframework.http.MediaType
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
-import ru.housekeeper.excel.*
+import ru.housekeeper.excel.toExcelAnnualPayments
+import ru.housekeeper.excel.toExcelGroupOfPayments
+import ru.housekeeper.excel.toExcelPayments
 import ru.housekeeper.model.filter.IncomingPaymentsFilter
+import ru.housekeeper.model.filter.OutgoingGropingPaymentsFilter
 import ru.housekeeper.model.filter.OutgoingPaymentsFilter
 import ru.housekeeper.service.PaymentService
 import ru.housekeeper.utils.*
@@ -18,6 +21,16 @@ import java.time.LocalDateTime
 class PaymentReportController(
     private val paymentService: PaymentService,
 ) {
+
+    @PostMapping(path = ["/payments/outgoing/grouping"])
+    @Operation(summary = "Export outgoing payments by filter to excel")
+    fun exportOutgoingGroupingPayments(
+        @RequestBody filter: OutgoingGropingPaymentsFilter,
+    ): ResponseEntity<ByteArray> {
+        val payments = paymentService.findAllOutgoingGroupingPaymentsByCounterparty(filter)
+        val fileName = "outgoing_group_payments_${LocalDateTime.now().format(yyyyMMddHHmmssDateFormat())}.xlsx"
+        return getExcelReport(fileName) { toExcelGroupOfPayments(payments = payments) }
+    }
 
     @PostMapping(path = ["/payments/outgoing"])
     @Operation(summary = "Export outgoing payments by filter to excel")
