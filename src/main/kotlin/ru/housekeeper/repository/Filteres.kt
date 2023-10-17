@@ -13,6 +13,9 @@ fun likeFilterBy(parameterName: String, value: String?) =
 
 fun equalFilterBy(parameterName: String, value: Boolean?) = if (value == true) "AND $parameterName = true" else ""
 
+fun equalFilterBy(parameterName: String, values: List<String>?) =
+    if (values?.isNotEmpty() == true) "AND $parameterName IN (${values.joinToString(separator = ",") { "'$it'" }})" else ""
+
 fun<T: Enum<T>> equalFilterBy(parameterName: String, enumValue: Enum<T>?) = if (enumValue != null) "AND $parameterName = '$enumValue'" else ""
 
 fun filterByDate(parameterName: String, startDate: LocalDate?, endDate: LocalDate?) =

@@ -15,9 +15,24 @@ class AccountController {
     @GetMapping
     @Operation(summary = "Find all accounts")
     fun findAllAccounts(): List<AccountResponse> = listOf(
-        AccountResponse("40703810838000014811", false, "До октября 2022"),
-        AccountResponse("40703810338000004376", false,  "С ноября 2022"),
-        AccountResponse("40705810238000000478", true, "Специальный. Кап. ремонт"),
+        AccountResponse(
+            "40703810838000014811",
+            default = true,
+            special = false,
+            description = "До октября 2022"
+        ),
+        AccountResponse(
+            "40703810338000004376",
+            default = true,
+            special = false,
+            description = "С ноября 2022"
+        ),
+        AccountResponse(
+            "40705810238000000478",
+            default = false,
+            special = true,
+            description = "Специальный. Кап. ремонт"
+        ),
     )
 }
 
