@@ -9,4 +9,5 @@ data class IncomingPaymentsFilter(
     val taxable: Boolean?,
     val startDate: LocalDate?,
     val endDate: LocalDate?,
+    val toAccount: String?,
 )

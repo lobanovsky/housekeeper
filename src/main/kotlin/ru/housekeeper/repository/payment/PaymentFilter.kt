@@ -13,6 +13,7 @@ fun incomingFilters(filter: IncomingPaymentsFilter): String {
     predicates["purpose"] = likeFilterBy("p.purpose", filter.purpose)
     predicates["taxable"] = equalFilterBy("p.taxable", filter.taxable)
     predicates["date"] = filterByDate("cast(p.date as date)", filter.startDate, filter.endDate)
+    predicates["toAccount"] = equalFilterBy("p.toAccount", filter.toAccount)
     return predicates.values.joinToString(separator = " ")
 }
 
