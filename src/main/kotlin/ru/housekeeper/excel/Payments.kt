@@ -30,6 +30,7 @@ fun createPaymentSheet(workBook: Workbook, sheetName: String, payments: List<Pay
         "От Наименование",
         "Кому ИНН",
         "Кому Наименование",
+        "Счёт поступления"
     )
     for (columnIndex in 0 until headers.size + 1) sheet.setColumnWidth(columnIndex, 256 * 25)
     val header: Row = sheet.createRow(0)
@@ -48,6 +49,7 @@ fun createPaymentSheet(workBook: Workbook, sheetName: String, payments: List<Pay
         row.createCell(5).setCellValue(payments[i].fromName)
         row.createCell(6).setCellValue(payments[i].toInn)
         row.createCell(7).setCellValue(payments[i].toName)
+        row.createCell(8).setCellValue(payments[i].toAccount)
     }
     val totalSum = payments.incomingSum()
     sheet.createRow(payments.size + 1).createCell(sumIndex).setCellValue(totalSum.toDouble())
