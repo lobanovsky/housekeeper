@@ -17,18 +17,21 @@ class Counterparty(
     var uuid: String = "",
 
     @Column(nullable = false)
-    val originalName: String,
+    var originalName: String,
 
     @Column(nullable = false)
-    val name: String = "",
+    var name: String = "",
 
-    val inn: String? = null,
+    var inn: String? = null,
 
-    val bank: String = "",
+    var bank: String = "",
 
-    val bik: String = "",
+    var bik: String = "",
 
     val sign: String = "",
+
+    @Column(nullable = true)
+    val manualCreated: Boolean? = false,
 
     @CreationTimestamp
     @Column(updatable = false)

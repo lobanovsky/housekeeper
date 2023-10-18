@@ -5,7 +5,7 @@ import org.apache.poi.ss.usermodel.CellType
 import org.apache.poi.ss.usermodel.Sheet
 import org.apache.poi.ss.usermodel.WorkbookFactory
 import org.springframework.web.multipart.MultipartFile
-import ru.housekeeper.model.dto.CounterpartyVO
+import ru.housekeeper.model.dto.payment.CounterpartyVO
 import ru.housekeeper.model.dto.payment.PaymentVO
 import ru.housekeeper.utils.logger
 import java.math.BigDecimal
