@@ -20,7 +20,7 @@ class CounterpartyController(
     @PostMapping
     fun create(
         @RequestBody counterpartyRequest: CounterpartyRequest
-    ): List<CounterpartyResponse> = counterpartyService.save(listOf(counterpartyRequest.toCounterparty()))
+    ): CounterpartyResponse = counterpartyService.save(listOf(counterpartyRequest.toCounterparty())).first()
 
     @PutMapping("/{counterpartyId}")
     fun update(
