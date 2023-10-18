@@ -57,6 +57,7 @@ class PaymentController(
     ): Page<PaymentVO> = paymentService.findAllOutgoingPaymentsWithFilter(pageNum, pageSize, filter)
         .toOutgoingPaymentResponse(pageNum, pageSize)
 
+
     @PostMapping(path = ["/outgoing/grouping"])
     @Operation(summary = "Find outgoing payments with filter and grouping by counterparty")
     fun findOutgoingPaymentsGroupingByCounterparty(

@@ -20,15 +20,15 @@ class Counterparty(
     val originalName: String,
 
     @Column(nullable = false)
-    val name: String,
+    val name: String = "",
 
-    val inn: String,
+    val inn: String? = null,
 
-    val bank: String,
+    val bank: String = "",
 
-    val bik: String,
+    val bik: String = "",
 
-    val sign: String,
+    val sign: String = "",
 
     @CreationTimestamp
     @Column(updatable = false)
