@@ -116,10 +116,10 @@ class PaymentService(
                 endDate = filter.endDate
             )
         )
-        val counterpartyGroupByName = counterpartyService.findAll().associateBy { it.name }
+        val counterpartyGroupByUUID = counterpartyService.findAll().associateBy { it.uuid }
         val groupOfPayment = mutableMapOf<String, GroupOfPayment>()
         for (payment in payments) {
-            val counterparty = getCounterparty(counterpartyGroupByName, payment)
+            val counterparty = getCounterparty(counterpartyGroupByUUID, payment)
             groupOfPayment[counterparty.uuid] =
                 groupOfPayment.getOrDefault(
                     key = counterparty.uuid,
@@ -134,15 +134,16 @@ class PaymentService(
     }
 
     private fun getCounterparty(
-        counterpartyGroupByName: Map<String, Counterparty>,
+        counterpartyGroupByUUID: Map<String, Counterparty>,
         payment: OutgoingPayment
     ): Counterparty {
-        val toInn = payment.toInn
-        val toName = payment.toName.simplify()
-        val counterpartyByName = counterpartyGroupByName[toName]
+        var counterpartyByName = counterpartyGroupByUUID[makeUUID(null, payment.toName)]
         if (counterpartyByName != null) return counterpartyByName
-        logger().info("Unknown counterparty: ${payment.id}, ${payment.purpose}, $toName, $toInn")
-        return Counterparty(originalName = "Остальное")
+        counterpartyByName = counterpartyGroupByUUID[makeUUID(payment.toInn, payment.toName)]
+        if (counterpartyByName != null) return counterpartyByName
+        logger().info("Unknown counterparty: ${payment.id}, ${payment.purpose}, ${payment.toName}, ${payment.toInn}")
+        val other = "Остальное"
+        return Counterparty(uuid = other.onlyCyrillicLettersAndNumbers(), name = other)
     }
 
     fun findAllDeposits(): List<OutgoingPayment> = outgoingPaymentRepository.findAllDeposits(myInn)

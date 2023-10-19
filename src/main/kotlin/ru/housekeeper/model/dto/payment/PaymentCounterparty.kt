@@ -1,6 +1,6 @@
 package ru.housekeeper.model.dto.payment
 
-data class CounterpartyVO(
+data class PaymentCounterparty(
     val account: String,
     val inn: String? = null,
     val name: String,

@@ -5,7 +5,7 @@ import org.apache.poi.ss.usermodel.CellType
 import org.apache.poi.ss.usermodel.Sheet
 import org.apache.poi.ss.usermodel.WorkbookFactory
 import org.springframework.web.multipart.MultipartFile
-import ru.housekeeper.model.dto.payment.CounterpartyVO
+import ru.housekeeper.model.dto.payment.PaymentCounterparty
 import ru.housekeeper.model.dto.payment.PaymentVO
 import ru.housekeeper.utils.logger
 import java.math.BigDecimal
@@ -102,15 +102,15 @@ class PaymentParser(private val file: MultipartFile) {
     //30233810642000600001
     //7707083893
     //ПАО СБЕРБАНК//Тверетнев Петр Петрович//1541619130338//115580,РОССИЯ,МОСКВА Г,Г МОСКВА,УЛ ШИПИЛОВСКАЯ,Д 55 КВ 81//
-    private fun counterpartyParser(payer: String): CounterpartyVO {
+    private fun counterpartyParser(payer: String): PaymentCounterparty {
         val split = payer.split("\n")
         val accountAndNameOnly = 2
         return when (split.size) {
-            accountAndNameOnly -> CounterpartyVO(
+            accountAndNameOnly -> PaymentCounterparty(
                 account = split[0], name = split[1]
             )
 
-            else -> CounterpartyVO(
+            else -> PaymentCounterparty(
                 account = split[0], inn = split[1], name = split[2]
             )
         }

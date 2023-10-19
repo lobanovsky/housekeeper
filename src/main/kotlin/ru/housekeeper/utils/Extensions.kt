@@ -28,12 +28,13 @@ fun yyyyMMddHHmmssDateFormat(): DateTimeFormatter = DateTimeFormatter.ofPattern(
 
 fun String.onlyLettersAndNumber() = Regex("[^А-Яа-яA-Za-z0-9]").replace(this, "").lowercase()
 
+fun String.onlyCyrillicLettersAndNumbers(): String = this
+    .replace("[^а-яА-Я0-9]".toRegex(), "")
+    .trim()
+    .lowercase()
+
 fun List<String>.sqlSeparator() = this.joinToString(separator = ",") { "'$it'" }
 
-/**
- *
- *
- */
 fun String.simplify() = this
     .replace("\"", "")
     .replace("?", "")

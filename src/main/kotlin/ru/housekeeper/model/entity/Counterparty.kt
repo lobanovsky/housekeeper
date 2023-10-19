@@ -13,22 +13,23 @@ class Counterparty(
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     val id: Long? = null,
 
-    @Column(unique = true)
-    var uuid: String = "",
+    /**
+     * UUID контрагента
+     * ИНН или упрощенное название, если ИНН не указан
+     */
+    @Column(unique = true, nullable = false)
+    var uuid: String,
 
     @Column(nullable = false)
-    var originalName: String,
-
-    @Column(nullable = false)
-    var name: String = "",
+    var name: String,
 
     var inn: String? = null,
 
-    var bank: String = "",
+    var bank: String? = null,
 
-    var bik: String = "",
+    var bik: String? = null,
 
-    val sign: String = "",
+    val sign: String? = null,
 
     @Column(nullable = true)
     val manualCreated: Boolean? = false,

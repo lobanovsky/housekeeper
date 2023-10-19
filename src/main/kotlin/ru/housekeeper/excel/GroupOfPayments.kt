@@ -15,7 +15,7 @@ fun toExcelGroupOfPayments(payments: List<GroupOfPayment>): ByteArray {
     createGroupOfPaymentSheet(workBook, sheetName = "Платежи", payments)
 
     for (payment in payments) {
-        val sheetName = payment.counterparty.originalName
+        val sheetName = payment.counterparty.name
         createDetailSheet(workBook, sheetName, payment.payments)
     }
 
@@ -43,7 +43,7 @@ fun createGroupOfPaymentSheet(workBook: Workbook, sheetName: String, payments: L
         val index = i + 1
         val row: Row = sheet.createRow(index)
         row.createCell(0).setCellValue(index.toString())
-        row.createCell(1).setCellValue(payments[i].counterparty.originalName)
+        row.createCell(1).setCellValue(payments[i].counterparty.name)
         row.createCell(2).setCellValue(payments[i].total.toDouble())
     }
     val totalSum = payments.sumOf { it.total }
