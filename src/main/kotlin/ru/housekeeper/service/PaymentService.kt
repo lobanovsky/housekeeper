@@ -113,12 +113,13 @@ class PaymentService(
             pageSize = MAX_SIZE_PER_PAGE_FOR_EXCEL,
             filter = OutgoingPaymentsFilter(
                 startDate = filter.startDate,
-                endDate = filter.endDate
+                endDate = filter.endDate,
             )
         )
         val counterpartyGroupByUUID = counterpartyService.findAll().associateBy { it.uuid }
         val groupOfPayment = mutableMapOf<String, GroupOfPayment>()
         for (payment in payments) {
+            if (payment.toInn == myInn) continue
             val counterparty = getCounterparty(counterpartyGroupByUUID, payment)
             groupOfPayment[counterparty.uuid] =
                 groupOfPayment.getOrDefault(

@@ -14,9 +14,11 @@ fun toExcelGroupOfPayments(payments: List<GroupOfPayment>): ByteArray {
     val workBook = XSSFWorkbook()
     createGroupOfPaymentSheet(workBook, sheetName = "Платежи", payments)
 
+    var i = 1
     for (payment in payments) {
-        val sheetName = payment.counterparty.name
+        val sheetName = "$i. ${payment.counterparty.name}"
         createDetailSheet(workBook, sheetName, payment.payments)
+        i++
     }
 
     val outputStream = ByteArrayOutputStream()
