@@ -1,5 +1,6 @@
 package ru.housekeeper.model.entity.payment
 
+import jakarta.persistence.Column
 import jakarta.persistence.Entity
 import jakarta.persistence.Index
 import jakarta.persistence.Table
@@ -44,5 +45,11 @@ class IncomingPayment(
 
     taxable: Boolean? = false,
     deposit: Boolean? = false,
+
+    @Column(nullable = true)
+    var account: String? = null,
+
+    @Column(nullable = true)
+    var updateAccountDateTime: String? = null,
 
 ) : Payment(id, uuid, date, fromAccount, fromInn, fromName, toAccount, toInn, toName, sum, docNumber, vo, bik, bankName, purpose, createDate, source, pack, flagged, taxable, deposit)

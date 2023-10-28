@@ -46,4 +46,9 @@ interface IncomingPaymentRepository : CrudRepository<Payment, Long>, IncomingPay
 
     @Query("SELECT COUNT(p) FROM IncomingPayment p WHERE p.pack = :pack")
     fun countByPack(@Param("pack") pack: String): Int
+
+    @Query("SELECT p FROM IncomingPayment p WHERE p.toAccount = :toAccount and p.account IS NULL")
+    fun findByToAccountAndAccountIsNull(
+        toAccount: String,
+    ): List<IncomingPayment>
 }

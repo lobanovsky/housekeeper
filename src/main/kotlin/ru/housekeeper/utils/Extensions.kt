@@ -35,6 +35,8 @@ fun String.onlyCyrillicLettersAndNumbers(): String = this
 
 fun List<String>.sqlSeparator() = this.joinToString(separator = ",") { "'$it'" }
 
+fun String.removeSpaces() = this.replace(" ", "")
+
 fun String.simplify() = this
     .replace("\"", "")
     .replace("?", "")

@@ -37,7 +37,8 @@ abstract class Payment(
 
     val source: String? = null,
 
-    val pack: String = "",
+    @Column(nullable = true)
+    val pack: String? = null,
 
     @Enumerated(EnumType.STRING)
     val flagged: FlaggedColorEnum?,
