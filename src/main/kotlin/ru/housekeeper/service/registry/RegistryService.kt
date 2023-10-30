@@ -25,7 +25,7 @@ class RegistryService(
     //Поиск Лицевого счета в строке назначения платежа и установка его в платеж
     private fun findAccountsForPayments(bankAccount: String): List<IncomingPayment> {
         val payments = paymentRepository.findByToAccountAndAccountIsNull(toAccount = bankAccount)
-            .filterNot { skipByRules(it.purpose) }
+            .filterNot { skipByRules(it) }
         var count = 0
         val updateAccountDateTime = LocalDateTime.now().format(yyyyMMddHHmmssDateFormat())
         val wrongAccounts = mutableListOf<String>()
@@ -74,6 +74,12 @@ class RegistryService(
         account = matchResult?.value?.substring(3)
         if (account != null) return account
 
+        //л/счет 0000500048
+        regex = Regex("""л/счет(\d+)""")
+        matchResult = regex.find(purpose)
+        account = matchResult?.value?.substring(3)
+        if (account != null) return account
+
         //find by rules
         account = findByRules(payment)
         if (account != null) return account
@@ -90,12 +96,22 @@ class RegistryService(
     }
 
     //Пропуск платежей по правилам
-    private fun skipByRules(purpose: String): Boolean {
-        if (purpose.contains("Доход от размещения на депозитном счете")) return true
-        if (purpose.contains("Пени по взносам на капремонт по жилпом в МКД")) return true
-        if (purpose.contains("Средства бюджета на возм выпадающих доход от предост льгот")) return true
-        if (purpose.contains("Взносы на капремонт по")) return true
-        if (purpose.contains("Уплачены проценты за период")) return true
+    private fun skipByRules(payment: IncomingPayment): Boolean {
+        if (ruleContains(payment, "Доход от размещения на депозитном счете")) return true
+        if (ruleContains(payment, "Пени по взносам на капремонт по жилпом в МКД")) return true
+        if (ruleContains(payment, "Средства бюджета на возм выпадающих доход от предост льгот")) return true
+        if (ruleContains(payment, "Взносы на капремонт по")) return true
+        if (ruleContains(payment, "Уплачены проценты за период")) return true
+        if (ruleContains(payment, "Взносы капремонт жилпом в МКД адрес Марьиной рощи 17-й пр. д.1 за период")) return true
+        if (ruleContains(payment, "Взносы капремонт нежилпом в МКД адрес Марьиной рощи 17-й пр. д.1 за период")) return true
+        return false
+    }
+
+    private fun ruleContains(payment: IncomingPayment, other: String): Boolean {
+        if (payment.purpose.contains(other, ignoreCase = true)) {
+            logger().info("Skip by rule: [${payment.id}], date[${payment.date}]: ${payment.purpose}")
+            return true
+        }
         return false
     }
 
