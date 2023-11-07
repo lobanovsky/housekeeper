@@ -16,7 +16,7 @@ fun toExcelGroupOfPayments(payments: List<GroupOfPayment>, filter: OutgoingGropi
     createGroupOfPaymentSheet(
         workBook,
         sheetName = "Платежи " +
-                "${filter.startDate?.format(yyyyMMddDateFormat())} - ${filter.endDate?.format(yyyyMMddDateFormat())}",
+                "${filter.startDate?.format(yyyyMMddDateFormat())}-${filter.endDate?.format(yyyyMMddDateFormat())}",
         payments
     )
 

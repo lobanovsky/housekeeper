@@ -28,7 +28,7 @@ class PaymentReportController(
         @RequestBody filter: OutgoingGropingPaymentsFilter,
     ): ResponseEntity<ByteArray> {
         val payments = paymentService.findAllOutgoingGroupingPaymentsByCounterparty(filter)
-        val fileName = "expense_${filter.startDate?.format(yyyyMMddDateFormat())} - ${filter.endDate?.format(yyyyMMddDateFormat())}_${LocalDateTime.now().format(yyyyMMddHHmmssDateFormat())}.xlsx"
+        val fileName = "expense_${filter.startDate?.format(yyyyMMddDateFormat())}-${filter.endDate?.format(yyyyMMddDateFormat())}_${LocalDateTime.now().format(yyyyMMddHHmmssDateFormat())}.xlsx"
         return getExcelReport(fileName) { toExcelGroupOfPayments(payments = payments, filter = filter) }
     }
 
