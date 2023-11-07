@@ -5,14 +5,20 @@ import org.apache.poi.ss.usermodel.Workbook
 import org.apache.poi.xssf.usermodel.XSSFWorkbook
 import ru.housekeeper.model.dto.payment.GroupOfPayment
 import ru.housekeeper.model.entity.payment.OutgoingPayment
+import ru.housekeeper.model.filter.OutgoingGropingPaymentsFilter
 import ru.housekeeper.utils.sum
 import ru.housekeeper.utils.yyyyMMddDateFormat
 import java.io.ByteArrayOutputStream
 
 
-fun toExcelGroupOfPayments(payments: List<GroupOfPayment>): ByteArray {
+fun toExcelGroupOfPayments(payments: List<GroupOfPayment>, filter: OutgoingGropingPaymentsFilter): ByteArray {
     val workBook = XSSFWorkbook()
-    createGroupOfPaymentSheet(workBook, sheetName = "Платежи", payments)
+    createGroupOfPaymentSheet(
+        workBook,
+        sheetName = "Платежи " +
+                "${filter.startDate?.format(yyyyMMddDateFormat())} - ${filter.endDate?.format(yyyyMMddDateFormat())}",
+        payments
+    )
 
     var i = 1
     for (payment in payments) {

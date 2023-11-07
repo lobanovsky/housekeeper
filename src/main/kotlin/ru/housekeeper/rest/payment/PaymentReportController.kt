@@ -29,7 +29,7 @@ class PaymentReportController(
     ): ResponseEntity<ByteArray> {
         val payments = paymentService.findAllOutgoingGroupingPaymentsByCounterparty(filter)
         val fileName = "outgoing_group_payments_${LocalDateTime.now().format(yyyyMMddHHmmssDateFormat())}.xlsx"
-        return getExcelReport(fileName) { toExcelGroupOfPayments(payments = payments) }
+        return getExcelReport(fileName) { toExcelGroupOfPayments(payments = payments, filter = filter) }
     }
 
     @PostMapping(path = ["/payments/outgoing"])
