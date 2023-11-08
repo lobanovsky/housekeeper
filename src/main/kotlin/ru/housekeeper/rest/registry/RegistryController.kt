@@ -20,7 +20,7 @@ class RegistryController(
 
     data class RegistryFilter(val bankAccount: String)
 
-    @GetMapping
+    @PostMapping
     @Operation(summary = "Check or create new registry")
     fun getRegistry(
         @RequestBody filter: RegistryFilter,
