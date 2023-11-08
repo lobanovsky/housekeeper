@@ -9,7 +9,6 @@ import ru.housekeeper.model.entity.registry.RegistrySum
 import ru.housekeeper.repository.payment.IncomingPaymentRepository
 import ru.housekeeper.utils.logger
 import ru.housekeeper.utils.removeSpaces
-import ru.housekeeper.utils.yyyyMMddHHmmssDateFormat
 import java.math.BigDecimal
 import java.math.RoundingMode
 import java.time.LocalDateTime
@@ -27,7 +26,7 @@ class RegistryService(
         val payments = paymentRepository.findByToAccountAndAccountIsNull(toAccount = bankAccount)
             .filterNot { skipByRules(it) }
         var count = 0
-        val updateAccountDateTime = LocalDateTime.now().format(yyyyMMddHHmmssDateFormat())
+        val updateAccountDateTime = LocalDateTime.now()
         val wrongAccounts = mutableListOf<String>()
         for (payment in payments) {
             val account = processAccount(findAccountNumberInString(payment))

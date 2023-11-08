@@ -50,6 +50,6 @@ class IncomingPayment(
     var account: String? = null,
 
     @Column(nullable = true)
-    var updateAccountDateTime: String? = null,
+    var updateAccountDateTime: LocalDateTime? = null,
 
 ) : Payment(id, uuid, date, fromAccount, fromInn, fromName, toAccount, toInn, toName, sum, docNumber, vo, bik, bankName, purpose, createDate, source, pack, flagged, taxable, deposit)

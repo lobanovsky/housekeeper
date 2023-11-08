@@ -5,14 +5,14 @@ import org.springframework.data.domain.Page
 import org.springframework.web.bind.annotation.*
 import ru.housekeeper.model.dto.AnnualPaymentVO
 import ru.housekeeper.model.dto.payment.PaymentVO
+import ru.housekeeper.model.dto.payment.toIncomingPaymentResponse
+import ru.housekeeper.model.dto.payment.toOutgoingPaymentResponse
+import ru.housekeeper.model.dto.payment.toPaymentVO
 import ru.housekeeper.model.filter.IncomingPaymentsFilter
 import ru.housekeeper.model.filter.OutgoingGropingPaymentsFilter
 import ru.housekeeper.model.filter.OutgoingPaymentsFilter
 import ru.housekeeper.service.PaymentService
 import ru.housekeeper.utils.getContractNumberFromDepositPurpose
-import ru.housekeeper.utils.toIncomingPaymentResponse
-import ru.housekeeper.utils.toOutgoingPaymentResponse
-import ru.housekeeper.utils.toPaymentVO
 
 @CrossOrigin
 @RestController

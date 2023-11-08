@@ -1,5 +1,8 @@
 package ru.housekeeper.model.dto.payment
 
+import org.springframework.data.domain.Page
+import org.springframework.data.domain.PageRequest
+import org.springframework.data.support.PageableExecutionUtils
 import ru.housekeeper.model.entity.payment.IncomingPayment
 import ru.housekeeper.model.entity.payment.OutgoingPayment
 import ru.housekeeper.utils.FlaggedColorEnum
@@ -34,6 +37,9 @@ class PaymentVO(
 
     val taxable: Boolean? = null,
     val deposit: Boolean? = null,
+
+    val account: String? = null,
+    val updateAccountDateTime: LocalDateTime? = null,
 ) {
     fun toIncomingPayment(
         createDate: LocalDateTime = LocalDateTime.now(),
@@ -85,3 +91,91 @@ class PaymentVO(
         flagged = tag
     )
 }
+
+
+fun OutgoingPayment.toPaymentVO(
+    incomingSum: BigDecimal? = null,
+    outgoingSum: BigDecimal? = null
+): PaymentVO = with(this) {
+    PaymentVO(
+        uuid = uuid,
+        date = date,
+
+        fromAccount = fromAccount,
+        fromInn = fromInn,
+        fromName = fromName,
+
+        toAccount = toAccount,
+        toInn = toInn,
+        toName = toName,
+
+        incomingSum = incomingSum,
+        outgoingSum = outgoingSum,
+
+        docNumber = docNumber,
+
+        vo = vo,
+
+        bik = bik,
+        bankName = bankName,
+
+        purpose = purpose,
+
+        tag = flagged,
+
+        taxable = taxable,
+        deposit = deposit
+    )
+}
+
+
+fun IncomingPayment.toPaymentVO(
+    incomingSum: BigDecimal? = null,
+    outgoingSum: BigDecimal? = null
+): PaymentVO = with(this) {
+    PaymentVO(
+        uuid = uuid,
+        date = date,
+
+        fromAccount = fromAccount,
+        fromInn = fromInn,
+        fromName = fromName,
+
+        toAccount = toAccount,
+        toInn = toInn,
+        toName = toName,
+
+        incomingSum = incomingSum,
+        outgoingSum = outgoingSum,
+
+        docNumber = docNumber,
+
+        vo = vo,
+
+        bik = bik,
+        bankName = bankName,
+
+        purpose = purpose,
+
+        tag = flagged,
+
+        taxable = taxable,
+        deposit = deposit,
+
+        account = account,
+        updateAccountDateTime = updateAccountDateTime,
+
+        )
+}
+
+fun Page<IncomingPayment>.toIncomingPaymentResponse(pageNum: Int, pageSize: Int): Page<PaymentVO> =
+    PageableExecutionUtils.getPage(
+        this.content.map { it.toPaymentVO(incomingSum = it.sum) },
+        PageRequest.of(pageNum, pageSize)
+    ) { this.totalElements }
+
+fun Page<OutgoingPayment>.toOutgoingPaymentResponse(pageNum: Int, pageSize: Int): Page<PaymentVO> =
+    PageableExecutionUtils.getPage(
+        this.content.map { it.toPaymentVO(incomingSum = it.sum) },
+        PageRequest.of(pageNum, pageSize)
+    ) { this.totalElements }
