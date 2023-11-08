@@ -25,7 +25,7 @@ class RegistryController(
         @RequestBody registryFilter: RegistryFilter,
     ): ResponseEntity<ByteArray> {
         val registry = registryService.make(registryFilter.bankAccount)
-        val fileName = "generated_${LocalDateTime.now().format(yyyyMMddHHmmssDateFormat())}.txt"
+        val fileName = "${LocalDateTime.now().format(yyyyMMddHHmmssDateFormat())}_registry.txt"
         return ResponseEntity.ok()
             .contentType(MediaType.APPLICATION_OCTET_STREAM)
             .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"$fileName\"")
