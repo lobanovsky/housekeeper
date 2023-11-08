@@ -1,11 +1,11 @@
 package ru.housekeeper.rest.registry
 
 import io.swagger.v3.oas.annotations.Operation
-import org.springframework.web.bind.annotation.*
+import org.springframework.web.bind.annotation.CrossOrigin
+import org.springframework.web.bind.annotation.GetMapping
+import org.springframework.web.bind.annotation.RequestMapping
+import org.springframework.web.bind.annotation.RestController
 import ru.housekeeper.service.registry.RegistryService
-import ru.housekeeper.utils.logger
-import ru.housekeeper.utils.yyyyMMddHHmmssDateFormat
-import java.time.LocalDateTime
 
 @CrossOrigin
 @RestController
@@ -19,12 +19,13 @@ class RegistryController(
     @GetMapping
     @Operation(summary = "Check or create new registry")
     fun getRegistry(
-        @RequestBody registryFilter: RegistryFilter,
+//        @RequestBody filter: RegistryFilter,
     ): Int {
-        val registry = registryService.make(registryFilter.bankAccount)
-        logger().info("Registry size: ${registry.size}")
-        val fileName = "${LocalDateTime.now().format(yyyyMMddHHmmssDateFormat())}_registry.txt"
-        return registry.size
+        return 42
+//        val registry = registryService.make(filter.bankAccount)
+//        logger().info("Registry size: ${registry.size}")
+//        val fileName = "${LocalDateTime.now().format(yyyyMMddHHmmssDateFormat())}_registry.txt"
+//        return registry.size
 //        return ResponseEntity.ok()
 //            .contentType(MediaType.APPLICATION_OCTET_STREAM)
 //            .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"$fileName\"")

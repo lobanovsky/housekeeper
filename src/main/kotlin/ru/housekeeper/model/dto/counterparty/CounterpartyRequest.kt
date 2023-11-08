@@ -3,7 +3,7 @@ package ru.housekeeper.model.dto.counterparty
 import ru.housekeeper.model.entity.Counterparty
 import ru.housekeeper.service.makeUUID
 
-class CounterpartyRequest(
+data class CounterpartyRequest(
     val name: String,
     val inn: String? = null,
 )
