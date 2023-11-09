@@ -109,6 +109,18 @@ class RegistryService(
         return null
     }
 
+    // 0000 - 4 нуля в начале, потому что иногда бывает меньше или больше
+    private fun processAccount(input: String?): String? {
+        if (input == null) return null
+        val firstIndexOf5 = input.indexOf('5')
+        if (firstIndexOf5 == -1) {
+            // Если в строке нет цифры 5, возвращаем исходную строку
+            return input
+        }
+        val withoutLeadingZeros = input.substring(firstIndexOf5)
+        return "0000$withoutLeadingZeros"
+    }
+
     //Пропуск платежей по правилам
     private fun skipByRules(payment: IncomingPayment): Boolean {
         val accounts = accountRepository.findBySpecial(true).map { it.number }.toSet()
@@ -131,18 +143,6 @@ class RegistryService(
             return true
         }
         return false
-    }
-
-    // 0000 - 4 нуля в начале, потому что иногда бывает меньше или больше
-    private fun processAccount(input: String?): String? {
-        if (input == null) return null
-        val firstIndexOf5 = input.indexOf('5')
-        if (firstIndexOf5 == -1) {
-            // Если в строке нет цифры 5, возвращаем исходную строку
-            return input
-        }
-        val withoutLeadingZeros = input.substring(firstIndexOf5)
-        return "0000$withoutLeadingZeros"
     }
 
     //Формирование Сбер реестр оплат
