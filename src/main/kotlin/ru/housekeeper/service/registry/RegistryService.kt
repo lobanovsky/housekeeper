@@ -7,6 +7,7 @@ import ru.housekeeper.model.entity.payment.IncomingPayment
 import ru.housekeeper.model.entity.registry.RegistryLastLine
 import ru.housekeeper.model.entity.registry.RegistryRow
 import ru.housekeeper.model.entity.registry.RegistrySum
+import ru.housekeeper.repository.AccountRepository
 import ru.housekeeper.repository.payment.IncomingPaymentRepository
 import ru.housekeeper.utils.logger
 import ru.housekeeper.utils.removeSpaces
@@ -18,6 +19,7 @@ import java.time.format.DateTimeFormatter
 @Service
 class RegistryService(
     private val paymentRepository: IncomingPaymentRepository,
+    private val accountRepository: AccountRepository,
 ) {
 
     fun make(bankAccount: String): List<String> = makeRegistry(findAccountsForPayments(bankAccount))
@@ -97,22 +99,28 @@ class RegistryService(
 
     //Поиск Лицевого счета в строке назначения платежа по правилам
     private fun findByRules(payment: IncomingPayment): String? {
-        if (payment.fromName.contains("Михайлова Елена Владимировна")) return "0000500017"
-        if (payment.fromName.contains("Бобровский Николай Эдуардович") && payment.purpose.contains("Квартира №30")) return "0000500030"
-        if (payment.fromName.contains("Казадаев Дмитрий Викторович") && payment.purpose.contains("кв.103")) return "0000500103"
-        if (payment.fromName.contains("Таланова Наталья Алексеевна") && payment.purpose.contains("Кап.Ремонт")) return "0000500011"
+        val accounts = accountRepository.findBySpecial(true).map { it.number }.toSet()
+        if (accounts.contains(payment.toAccount)) {
+            if (payment.fromName.contains("Михайлова Елена Владимировна")) return "0000500017"
+            if (payment.fromName.contains("Бобровский Николай Эдуардович") && payment.purpose.contains("Квартира №30")) return "0000500030"
+            if (payment.fromName.contains("Казадаев Дмитрий Викторович") && payment.purpose.contains("кв.103")) return "0000500103"
+            if (payment.fromName.contains("Таланова Наталья Алексеевна") && payment.purpose.contains("Кап.Ремонт")) return "0000500011"
+        }
         return null
     }
 
     //Пропуск платежей по правилам
     private fun skipByRules(payment: IncomingPayment): Boolean {
-        if (ruleContains(payment, "Доход от размещения на депозитном счете")) return true
-        if (ruleContains(payment, "Пени по взносам на капремонт по жилпом в МКД")) return true
-        if (ruleContains(payment, "Средства бюджета на возм выпадающих доход от предост льгот")) return true
-        if (ruleContains(payment, "Взносы на капремонт по")) return true
-        if (ruleContains(payment, "Уплачены проценты за период")) return true
-        if (ruleContains(payment, "Взносы капремонт жилпом в МКД адрес Марьиной рощи 17-й пр. д.1 за период")) return true
-        if (ruleContains(payment, "Взносы капремонт нежилпом в МКД адрес Марьиной рощи 17-й пр. д.1 за период")) return true
+        val accounts = accountRepository.findBySpecial(true).map { it.number }.toSet()
+        if (accounts.contains(payment.toAccount)) {
+            if (ruleContains(payment, "Доход от размещения на депозитном счете")) return true
+            if (ruleContains(payment, "Пени по взносам на капремонт по жилпом в МКД")) return true
+            if (ruleContains(payment, "Средства бюджета на возм выпадающих доход от предост льгот")) return true
+            if (ruleContains(payment, "Взносы на капремонт по")) return true
+            if (ruleContains(payment, "Уплачены проценты за период")) return true
+            if (ruleContains(payment, "Взносы капремонт жилпом в МКД адрес Марьиной рощи 17-й пр. д.1 за период")) return true
+            if (ruleContains(payment, "Взносы капремонт нежилпом в МКД адрес Марьиной рощи 17-й пр. д.1 за период")) return true
+        }
         return false
     }
 
