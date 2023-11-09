@@ -3,6 +3,7 @@ package ru.housekeeper.model.dto.payment
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.PageRequest
 import org.springframework.data.support.PageableExecutionUtils
+import ru.housekeeper.enums.IncomingPaymentTypeEnum
 import ru.housekeeper.model.entity.payment.IncomingPayment
 import ru.housekeeper.model.entity.payment.OutgoingPayment
 import ru.housekeeper.utils.FlaggedColorEnum
@@ -40,6 +41,8 @@ class PaymentVO(
 
     val account: String? = null,
     val updateAccountDateTime: LocalDateTime? = null,
+
+    val type: IncomingPaymentTypeEnum? = null
 ) {
     fun toIncomingPayment(
         createDate: LocalDateTime = LocalDateTime.now(),
@@ -165,7 +168,9 @@ fun IncomingPayment.toPaymentVO(
         account = account,
         updateAccountDateTime = updateAccountDateTime,
 
-        )
+        type = type
+
+    )
 }
 
 fun Page<IncomingPayment>.toIncomingPaymentResponse(pageNum: Int, pageSize: Int): Page<PaymentVO> =

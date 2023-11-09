@@ -1,6 +1,7 @@
 package ru.housekeeper.service.registry
 
 import org.springframework.stereotype.Service
+import ru.housekeeper.enums.IncomingPaymentTypeEnum
 import ru.housekeeper.enums.registry.RegistryChannelEnum
 import ru.housekeeper.model.entity.payment.IncomingPayment
 import ru.housekeeper.model.entity.registry.RegistryLastLine
@@ -31,8 +32,10 @@ class RegistryService(
         for (payment in payments) {
             val account = processAccount(findAccountNumberInString(payment))
             if (account == null) {
+                payment.type = IncomingPaymentTypeEnum.NOT_DETERMINATE
                 logger().error("Account not found for: UUID: ${payment.uuid}, FromName: ${payment.fromName}, Purpose: ${payment.purpose}")
             } else {
+                payment.type = IncomingPaymentTypeEnum.DETERMINATE_ACCOUNT
                 count++
             }
             validateAccountLength(account, wrongAccounts)
@@ -109,6 +112,7 @@ class RegistryService(
     private fun ruleContains(payment: IncomingPayment, other: String): Boolean {
         if (payment.purpose.contains(other, ignoreCase = true)) {
             logger().info("Skip by rule: [${payment.id}], date[${payment.date}]: ${payment.purpose}")
+            payment.type = IncomingPaymentTypeEnum.SKIP
             return true
         }
         return false
@@ -136,6 +140,7 @@ class RegistryService(
         val rows = mutableListOf<RegistryRow>()
         val sum = RegistrySum()
         for (payment in payments) {
+            if (payment.type == IncomingPaymentTypeEnum.NOT_DETERMINATE) continue
             rows.add(
                 RegistryRow(
                     date = payment.date.format(ddmmyyyyDateFormat()),

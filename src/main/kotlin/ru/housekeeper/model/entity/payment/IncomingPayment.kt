@@ -1,9 +1,7 @@
 package ru.housekeeper.model.entity.payment
 
-import jakarta.persistence.Column
-import jakarta.persistence.Entity
-import jakarta.persistence.Index
-import jakarta.persistence.Table
+import jakarta.persistence.*
+import ru.housekeeper.enums.IncomingPaymentTypeEnum
 import ru.housekeeper.utils.FlaggedColorEnum
 import java.math.BigDecimal
 import java.time.LocalDateTime
@@ -51,5 +49,8 @@ class IncomingPayment(
 
     @Column(nullable = true)
     var updateAccountDateTime: LocalDateTime? = null,
+
+    @Enumerated(EnumType.STRING)
+    var type: IncomingPaymentTypeEnum? = null
 
 ) : Payment(id, uuid, date, fromAccount, fromInn, fromName, toAccount, toInn, toName, sum, docNumber, vo, bik, bankName, purpose, createDate, source, pack, flagged, taxable, deposit)
