@@ -17,7 +17,7 @@ import ru.housekeeper.model.entity.payment.Payment
 import ru.housekeeper.model.filter.IncomingPaymentsFilter
 import ru.housekeeper.model.filter.OutgoingGropingPaymentsFilter
 import ru.housekeeper.model.filter.OutgoingPaymentsFilter
-import ru.housekeeper.parser.PaymentParser
+import ru.housekeeper.parser.Payment1CParser
 import ru.housekeeper.repository.payment.IncomingPaymentRepository
 import ru.housekeeper.repository.payment.OutgoingPaymentRepository
 import ru.housekeeper.utils.MAX_SIZE_PER_PAGE_FOR_EXCEL
@@ -92,7 +92,7 @@ class PaymentService(
     @Transactional
     @Synchronized
     fun parseAndSave(paymentsFile: MultipartFile, checksum: String): UploadFileInfo {
-        val payments = PaymentParser(paymentsFile).parse()
+        val payments = Payment1CParser(paymentsFile).parse()
         logger().info("Parsed ${payments.size} payments")
         return savePayments(payments, paymentsFile.originalFilename ?: paymentsFile.name, checksum)
     }

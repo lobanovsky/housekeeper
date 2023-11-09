@@ -34,7 +34,7 @@ class FileImporterController(
         @RequestPart file: MultipartFile,
     ): EldesGateInfoResponse {
         logger().info("Try to upload [${file.originalFilename}]")
-        fileService.isExtensionEqual(file, "log")
+        fileService.isExtensionEqual(file, setOf("log"))
         val checkSum = fileService.isDuplicateAndGetChecksum(file)
         val imei = file.originalFilename?.substringAfter("IMEI")?.substringBefore("_")
             ?: throw IllegalArgumentException("File name must contain IMEI")
@@ -135,7 +135,7 @@ class FileImporterController(
     fun importAccountsFromRegistry(
         @RequestPart file: MultipartFile,
     ): AccountRegistryResponse {
-        fileService.isExtensionEqual(file, "xls")
+        fileService.isExtensionEqual(file, setOf("xls"))
         val checkSum = fileService.isDuplicateAndGetChecksum(file)
         val (totalSize, flatsWithCertSize, garagesOrOfficesWithCertSize) = roomService.parseAndSaveRegistry(
             file,

@@ -26,10 +26,10 @@ class FileService(
     private val logEntryService: LogEntryService,
 ) {
 
-    fun isExtensionEqual(file: MultipartFile, extension: String = "xlsx") {
+    fun isExtensionEqual(file: MultipartFile, extensions: Set<String> = setOf("xlsx", "txt")) {
         logger().info("Upload file [name:${file.originalFilename}; type:${file.contentType}; size: ${file.size} bytes]")
         val originalExtension = FilenameUtils.getExtension(file.originalFilename)
-        if (!originalExtension.equals(extension, true)) {
+        if (!extensions.contains(originalExtension)) {
             throw FileException("Extension $originalExtension unsupported. File with name ${file.originalFilename} will not be uploaded")
         }
     }
