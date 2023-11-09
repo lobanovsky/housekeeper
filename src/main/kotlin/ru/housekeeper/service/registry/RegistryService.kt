@@ -82,6 +82,12 @@ class RegistryService(
         account = matchResult?.value?.substring(3)
         if (account != null) return account
 
+        //лс0000500021
+        regex = Regex("""лс(\d+)""")
+        matchResult = regex.find(purpose)
+        account = matchResult?.value?.substring(3)
+        if (account != null) return account
+
         //find by rules
         account = findByRules(payment)
         if (account != null) return account
@@ -94,6 +100,7 @@ class RegistryService(
         if (payment.fromName.contains("Михайлова Елена Владимировна")) return "0000500017"
         if (payment.fromName.contains("Бобровский Николай Эдуардович") && payment.purpose.contains("Квартира №30")) return "0000500030"
         if (payment.fromName.contains("Казадаев Дмитрий Викторович") && payment.purpose.contains("кв.103")) return "0000500103"
+        if (payment.fromName.contains("Таланова Наталья Алексеевна") && payment.purpose.contains("Кап.Ремонт")) return "0000500011"
         return null
     }
 
@@ -161,6 +168,7 @@ class RegistryService(
         logger().info("Sum: $sum")
 
         val lines = rows.map { it.toCSVLine() }.toMutableList()
+        if (lines.isEmpty()) return emptyList()
         lines.add(
             RegistryLastLine(
                 numberOfLine = rows.size,
