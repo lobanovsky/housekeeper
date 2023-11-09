@@ -4,8 +4,11 @@ import io.swagger.v3.oas.annotations.Operation
 import org.springframework.http.HttpHeaders
 import org.springframework.http.MediaType
 import org.springframework.http.ResponseEntity
-import org.springframework.web.bind.annotation.*
-import ru.housekeeper.service.registry.RegistryService
+import org.springframework.web.bind.annotation.CrossOrigin
+import org.springframework.web.bind.annotation.PostMapping
+import org.springframework.web.bind.annotation.RequestMapping
+import org.springframework.web.bind.annotation.RestController
+import ru.housekeeper.service.registry.SpecialAccountRegistryService
 import ru.housekeeper.utils.logger
 import ru.housekeeper.utils.yyyyMMddHHmmssDateFormat
 import java.nio.charset.Charset
@@ -15,17 +18,13 @@ import java.time.LocalDateTime
 @RestController
 @RequestMapping("/registries")
 class RegistryController(
-    private val registryService: RegistryService,
+    private val specialAccountRegistryService: SpecialAccountRegistryService,
 ) {
 
-    data class RegistryFilter(val bankAccount: String)
-
-    @PostMapping
+    @PostMapping(path = ["/special-account"])
     @Operation(summary = "Check or create new registry")
-    fun getRegistry(
-        @RequestBody filter: RegistryFilter,
-    ): ResponseEntity<ByteArray> {
-        val registry = registryService.make(filter.bankAccount)
+    fun getRegistry(): ResponseEntity<ByteArray> {
+        val registry = specialAccountRegistryService.make()
         logger().info("Registry size: ${registry.size}")
         val fileName = "${LocalDateTime.now().format(yyyyMMddHHmmssDateFormat())}_registry.txt"
         return ResponseEntity.ok()

@@ -17,16 +17,27 @@ import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 
 @Service
-class RegistryService(
+class SpecialAccountRegistryService(
     private val paymentRepository: IncomingPaymentRepository,
     private val accountRepository: AccountRepository,
 ) {
 
-    fun make(bankAccount: String): List<String> = makeRegistry(findAccountsForPayments(bankAccount))
+    fun make(): List<String> = makeRegistry(findAccountsForPayments())
 
     //Поиск Лицевого счета в строке назначения платежа и установка его в платеж
-    private fun findAccountsForPayments(bankAccount: String): List<IncomingPayment> {
-        val payments = paymentRepository.findByToAccountAndAccountIsNull(toAccount = bankAccount)
+    fun findAccountsForPayments(): List<IncomingPayment> {
+        val accounts = accountRepository.findBySpecial(true).map { it.number }.toSet()
+        if (accounts.isEmpty()) {
+            logger().warn("Специальные счета не найдены")
+            return emptyList()
+        }
+        if (accounts.size > 1) {
+            logger().warn("Найдено более одного специального счёта")
+            return emptyList()
+        }
+        val specialBankAccount = accounts.first()
+
+        val payments = paymentRepository.findByToAccountAndAccountIsNull(toAccount = specialBankAccount)
             .filterNot { skipByRules(it) }
         var count = 0
         val updateAccountDateTime = LocalDateTime.now()
@@ -57,13 +68,17 @@ class RegistryService(
     }
 
     //Поиск Лицевого счета в строке назначения платежа
-    private fun findAccountNumberInString(payment: IncomingPayment): String? {
+    fun findAccountNumberInString(payment: IncomingPayment): String? {
         val purpose = payment.purpose.removeSpaces().lowercase()
+
+        //find by rules
+        var account = findByRules(payment)
+        if (account != null) return account
 
         //ЛС:0000500111
         var regex = Regex("""лс:\d{10}""")
         var matchResult = regex.find(purpose)
-        var account = matchResult?.value?.substring(3)
+        account = matchResult?.value?.substring(3)
         if (account != null) return account
 
         //лси0000500111
@@ -90,49 +105,55 @@ class RegistryService(
         account = matchResult?.value?.substring(3)
         if (account != null) return account
 
-        //find by rules
-        account = findByRules(payment)
-        if (account != null) return account
-
         return null
     }
 
     //Поиск Лицевого счета в строке назначения платежа по правилам
     private fun findByRules(payment: IncomingPayment): String? {
-        val accounts = accountRepository.findBySpecial(true).map { it.number }.toSet()
-        if (accounts.contains(payment.toAccount)) {
-            if (payment.fromName.contains("Михайлова Елена Владимировна")) return "0000500017"
-            if (payment.fromName.contains("Бобровский Николай Эдуардович") && payment.purpose.contains("Квартира №30")) return "0000500030"
-            if (payment.fromName.contains("Казадаев Дмитрий Викторович") && payment.purpose.contains("кв.103")) return "0000500103"
-            if (payment.fromName.contains("Таланова Наталья Алексеевна") && payment.purpose.contains("Кап.Ремонт")) return "0000500011"
-        }
+        if (payment.fromName.contains("Михайлова Елена Владимировна", true)) return "0000500017"
+
+        if (payment.fromName.contains("Бобровский Николай Эдуардович", true)
+            && payment.purpose.contains("Квартира №30", true)
+        ) return "0000500030"
+
+        if (payment.fromName.contains("Казадаев Дмитрий Викторович", true)
+            && payment.purpose.contains("кв.103", true)
+        ) return "0000500103"
+
+        if (payment.fromName.contains("Таланова Наталья Алексеевна", true)
+            && payment.purpose.contains("Кап.Ремонт", true)
+        ) return "0000500011"
+
+        if (payment.fromName.contains("КОПЫЛОВА СВЕТЛАНА ГЕННАДЬ", true)
+            && payment.purpose.contains("КВ.104", true)
+        ) return "0000500104"
+
         return null
     }
 
     // 0000 - 4 нуля в начале, потому что иногда бывает меньше или больше
-    private fun processAccount(input: String?): String? {
+    fun processAccount(input: String?): String? {
         if (input == null) return null
         val firstIndexOf5 = input.indexOf('5')
         if (firstIndexOf5 == -1) {
             // Если в строке нет цифры 5, возвращаем исходную строку
-            return input
+            return null
         }
         val withoutLeadingZeros = input.substring(firstIndexOf5)
+        if (withoutLeadingZeros.length != 6) return null
         return "0000$withoutLeadingZeros"
     }
 
     //Пропуск платежей по правилам
     private fun skipByRules(payment: IncomingPayment): Boolean {
-        val accounts = accountRepository.findBySpecial(true).map { it.number }.toSet()
-        if (accounts.contains(payment.toAccount)) {
-            if (ruleContains(payment, "Доход от размещения на депозитном счете")) return true
-            if (ruleContains(payment, "Пени по взносам на капремонт по жилпом в МКД")) return true
-            if (ruleContains(payment, "Средства бюджета на возм выпадающих доход от предост льгот")) return true
-            if (ruleContains(payment, "Взносы на капремонт по")) return true
-            if (ruleContains(payment, "Уплачены проценты за период")) return true
-            if (ruleContains(payment, "Взносы капремонт жилпом в МКД адрес Марьиной рощи 17-й пр. д.1 за период")) return true
-            if (ruleContains(payment, "Взносы капремонт нежилпом в МКД адрес Марьиной рощи 17-й пр. д.1 за период")) return true
-        }
+        if (ruleContains(payment, "Доход от размещения на депозитном счете")) return true
+        if (ruleContains(payment, "Пени по взносам на капремонт по жилпом в МКД")) return true
+        if (ruleContains(payment, "Средства бюджета на возм выпадающих доход от предост льгот")) return true
+        if (ruleContains(payment, "Взносы на капремонт по")) return true
+        if (ruleContains(payment, "Уплачены проценты за период")) return true
+        if (ruleContains(payment, "Взносы капремонт жилпом в МКД адрес Марьиной рощи 17-й пр. д.1 за период")) return true
+        if (ruleContains(payment, "Взносы капремонт нежилпом в МКД адрес Марьиной рощи 17-й пр. д.1 за период")) return true
+
         return false
     }
 

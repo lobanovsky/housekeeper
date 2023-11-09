@@ -1,0 +1,9 @@
+MAIL_HOST: mail.example.com
+MAIL_USER_NAME: mail.username
+MAIL_USER_PASSWORD: mail.password
+POSTGRES_URL: jdbc:postgresql://localhost:5432/postgres
+POSTGRES_USER: postgres
+POSTGRES_PASSWORD: example
+MY_INN: inn
+MY_NAME: name
+MY_ACCOUNT: account
