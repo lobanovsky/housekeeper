@@ -107,6 +107,8 @@ class AccountRegistryService(
         if (ruleContains(payment, "ПУ00")) return true
         //ВТБ реестры
         if (ruleContains(payment, "_VTB_")) return true
+        //ЕГР, Возврат кредиторской задолженности
+        if (ruleContains(payment, "ЕГР")) return true
         return false
     }
 
