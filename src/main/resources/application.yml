@@ -16,6 +16,8 @@ spring:
       mail:
         smtp:
           auth: true
+          ssl:
+            enable: true
 
   jackson:
     default-property-inclusion: non_null
