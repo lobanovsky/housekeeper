@@ -51,4 +51,9 @@ interface IncomingPaymentRepository : CrudRepository<Payment, Long>, IncomingPay
     fun findByToAccountAndAccountIsNull(
         toAccount: String,
     ): List<IncomingPayment>
+
+    @Query("SELECT p FROM IncomingPayment p WHERE p.toAccount IN (:toAccounts) and p.account IS NULL")
+    fun findByToAccountsAndAccountIsNull(
+        toAccounts: Set<String>,
+    ): List<IncomingPayment>
 }

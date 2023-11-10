@@ -27,6 +27,9 @@ class PaymentReportController(
     private val paymentService: PaymentService,
 ) {
 
+    /**
+     * Выгрузка исходящих платежей в Excel, сгруппированных по контрагенту
+     */
     @PostMapping(path = ["/payments/outgoing/grouping"])
     @Operation(summary = "Export outgoing payments by filter to excel")
     fun exportOutgoingGroupingPayments(
@@ -37,6 +40,9 @@ class PaymentReportController(
         return getExcelReport(fileName) { toExcelGroupOfPayments(payments = payments, filter = filter) }
     }
 
+    /**
+     * Выгрузка исходящих платежей в Excel
+     */
     @PostMapping(path = ["/payments/outgoing"])
     @Operation(summary = "Export outgoing payments by filter to excel")
     fun exportOutgoingPayments(
@@ -48,6 +54,9 @@ class PaymentReportController(
         return getExcelReport(fileName) { toExcelPayments(payments = payments.content) }
     }
 
+    /**
+     * Выгрузка входящих платежей в Excel
+     */
     @PostMapping(path = ["/payments/incoming"])
     @Operation(summary = "Export incoming payments by filter to excel")
     fun exportIncomingPayments(
@@ -74,6 +83,11 @@ class PaymentReportController(
             .body(toExcelPayments(payments = payments.content))
     }
 
+    /**
+     * Выгрузка депозитов,
+     * платежей, которые облагаются налогами (платежи от компании),
+     * а так же платежей, которые не облагаются налогами в Excel
+     */
     @GetMapping(path = ["/incoming-payments/{year}"])
     @Operation(summary = "Getting taxable and tax-free payments for year (incoming payments)")
     fun findAnnualIncomingPayments(

@@ -9,16 +9,16 @@ import ru.housekeeper.model.entity.registry.RegistryRow
 import ru.housekeeper.model.entity.registry.RegistrySum
 import ru.housekeeper.repository.AccountRepository
 import ru.housekeeper.repository.payment.IncomingPaymentRepository
-import ru.housekeeper.utils.getSpecialAccount
+import ru.housekeeper.utils.getFlatAccount
+import ru.housekeeper.utils.getParkingAccount
 import ru.housekeeper.utils.logger
-import ru.housekeeper.utils.removeSpaces
 import java.math.BigDecimal
 import java.math.RoundingMode
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 
 @Service
-class SpecialAccountRegistryService(
+class AccountRegistryService(
     private val paymentRepository: IncomingPaymentRepository,
     private val accountRepository: AccountRepository,
 ) {
@@ -27,24 +27,18 @@ class SpecialAccountRegistryService(
 
     //Поиск Лицевого счета в строке назначения платежа и установка его в платеж
     fun findAccountsForPayments(): List<IncomingPayment> {
-        val accounts = accountRepository.findBySpecial(true).map { it.number }.toSet()
+        val accounts = accountRepository.findBySpecial(false).map { it.number }.toSet()
         if (accounts.isEmpty()) {
-            logger().warn("Специальные счета не найдены")
+            logger().warn("Cчета не найдены")
             return emptyList()
         }
-        if (accounts.size > 1) {
-            logger().warn("Найдено более одного специального счёта")
-            return emptyList()
-        }
-        val specialBankAccount = accounts.first()
-
-        val payments = paymentRepository.findByToAccountAndAccountIsNull(toAccount = specialBankAccount)
+        val payments = paymentRepository.findByToAccountsAndAccountIsNull(accounts)
             .filterNot { skipByRules(it) }
+
         var count = 0
         val updateAccountDateTime = LocalDateTime.now()
-        val wrongAccounts = mutableListOf<String>()
         for (payment in payments) {
-            val account = processAccount(findAccountNumberInString(payment))
+            val account = findAccountNumberInString(payment)
             if (account == null) {
                 payment.type = IncomingPaymentTypeEnum.NOT_DETERMINATE
                 logger().error("Account not found for: UUID: ${payment.uuid}, FromName: ${payment.fromName}, Purpose: ${payment.purpose}")
@@ -52,7 +46,6 @@ class SpecialAccountRegistryService(
                 payment.type = IncomingPaymentTypeEnum.DETERMINATE_ACCOUNT
                 count++
             }
-            validateAccountLength(account, wrongAccounts)
             //set account and updateAccountDateTime
             payment.account = account
             payment.updateAccountDateTime = updateAccountDateTime
@@ -61,49 +54,19 @@ class SpecialAccountRegistryService(
         return paymentRepository.saveAll(payments).toList()
     }
 
-    private fun validateAccountLength(account: String?, wrongAccounts: MutableList<String>) {
-        if (account != null && account.length != 10) {
-            wrongAccounts.add(account)
-            logger().error("Wrong account: $account")
-        }
-    }
 
     //Поиск Лицевого счета в строке назначения платежа
     fun findAccountNumberInString(payment: IncomingPayment): String? {
-        val purpose = payment.purpose.removeSpaces().lowercase()
+        val purpose = payment.purpose
 
         //find by rules
         var account = findByRules(payment)
         if (account != null) return account
 
-        //ЛС:0000500111
-        var regex = Regex("""лс:\d{10}""")
-        var matchResult = regex.find(purpose)
-        account = matchResult?.value?.substring(3)
-        if (account != null) return account
-
-        //лси0000500111
-        regex = Regex("""лси(\d+)""")
-        matchResult = regex.find(purpose)
-        account = matchResult?.value?.substring(3)
-        if (account != null) return account
-
-        //л/с 0000500111
-        regex = Regex("""л/с(\d+)""")
-        matchResult = regex.find(purpose)
-        account = matchResult?.value?.substring(3)
-        if (account != null) return account
-
-        //л/счет 0000500048
-        regex = Regex("""л/счет(\d+)""")
-        matchResult = regex.find(purpose)
-        account = matchResult?.value?.substring(3)
-        if (account != null) return account
-
-        //лс0000500021
-        regex = Regex("""лс(\d+)""")
-        matchResult = regex.find(purpose)
-        account = matchResult?.value?.substring(3)
+        //10 digits
+        val regex = Regex("\\d{10}")
+        val matchResult = regex.find(purpose)
+        account = matchResult?.value
         if (account != null) return account
 
         return null
@@ -111,50 +74,39 @@ class SpecialAccountRegistryService(
 
     //Поиск Лицевого счета в строке назначения платежа по правилам
     private fun findByRules(payment: IncomingPayment): String? {
-        if (payment.fromName.contains("Михайлова Елена Владимировна", true)) return getSpecialAccount(17)
 
-        if (payment.fromName.contains("Бобровский Николай Эдуардович", true)
-            && payment.purpose.contains("Квартира №30", true)
-        ) return getSpecialAccount(30)
+        if (payment.fromName.contains("ЕПИФАНОВА НАДЕЖДА ЕВГЕНЬЕВНА", true))
+            return getFlatAccount(4)
 
-        if (payment.fromName.contains("Казадаев Дмитрий Викторович", true)
-            && payment.purpose.contains("кв.103", true)
-        ) return getSpecialAccount(103)
+        if (payment.fromName.contains("Оболёшев Сергей Леонидович", true)
+            && payment.purpose.contains("ММ", true)
+        ) return getParkingAccount(42)
 
-        if (payment.fromName.contains("Таланова Наталья Алексеевна", true)
-            && payment.purpose.contains("Кап.Ремонт", true)
-        ) return getSpecialAccount(11)
+        if (payment.fromName.contains("ВИНОГРАДОВ ГЕННАДИЙ АНДРЕЕВИЧ", true)
+            && payment.purpose.contains("КВАРПЛАТА, М/М 79", true)
+        ) return getParkingAccount(79)
 
-        if (payment.fromName.contains("КОПЫЛОВА СВЕТЛАНА ГЕННАДЬ", true)
-            && payment.purpose.contains("КВ.104", true)
-        ) return getSpecialAccount(104)
+        if (payment.fromName.contains("ВИНОГРАДОВ ГЕННАДИЙ АНДРЕЕВИЧ", true)
+            && payment.purpose.contains("КВАРПЛАТА, КВ 68", true)
+        ) return getFlatAccount(68)
+
+        if (payment.fromName.contains("МУХТАРОВА НАТАЛЬЯ ТОФИКОВНА", true)
+            && payment.purpose.contains("КВАРПЛАТА, НДС НЕ ОБЛАГАЕТСЯ", true)
+        ) return getFlatAccount(76)
+
 
         return null
     }
 
-    // 0000 - 4 нуля в начале, потому что иногда бывает меньше или больше
-    fun processAccount(input: String?): String? {
-        if (input == null) return null
-        val firstIndexOf5 = input.indexOf('5')
-        if (firstIndexOf5 == -1) {
-            // Если в строке нет цифры 5, возвращаем исходную строку
-            return null
-        }
-        val withoutLeadingZeros = input.substring(firstIndexOf5)
-        if (withoutLeadingZeros.length != 6) return null
-        return "0000$withoutLeadingZeros"
-    }
 
     //Пропуск платежей по правилам
     private fun skipByRules(payment: IncomingPayment): Boolean {
-        if (ruleContains(payment, "Доход от размещения на депозитном счете")) return true
-        if (ruleContains(payment, "Пени по взносам на капремонт по жилпом в МКД")) return true
-        if (ruleContains(payment, "Средства бюджета на возм выпадающих доход от предост льгот")) return true
-        if (ruleContains(payment, "Взносы на капремонт по")) return true
-        if (ruleContains(payment, "Уплачены проценты за период")) return true
-        if (ruleContains(payment, "Взносы капремонт жилпом в МКД адрес Марьиной рощи 17-й пр. д.1 за период")) return true
-        if (ruleContains(payment, "Взносы капремонт нежилпом в МКД адрес Марьиной рощи 17-й пр. д.1 за период")) return true
-
+        //Сбер реестры
+        if (ruleContains(payment, "EPS")) return true
+        //Возврат депозита, выплата %% по депозиту
+        if (ruleContains(payment, "ПУ00")) return true
+        //ВТБ реестры
+        if (ruleContains(payment, "_VTB_")) return true
         return false
     }
 
@@ -166,6 +118,7 @@ class SpecialAccountRegistryService(
         }
         return false
     }
+
 
     //Формирование Сбер реестр оплат
     private fun makeRegistry(payments: List<IncomingPayment>): List<String> {

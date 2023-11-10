@@ -58,6 +58,9 @@ class PaymentController(
         .toOutgoingPaymentResponse(pageNum, pageSize)
 
 
+    /**
+     * Выгрузка исходящих платежей, сгруппированных по контрагенту
+     */
     @PostMapping(path = ["/outgoing/grouping"])
     @Operation(summary = "Find outgoing payments with filter and grouping by counterparty")
     fun findOutgoingPaymentsGroupingByCounterparty(

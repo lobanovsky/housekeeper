@@ -1,20 +1,16 @@
 package ru.housekeeper
 
 import org.junit.jupiter.api.Test
-import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.boot.test.context.SpringBootTest
-import org.springframework.test.context.TestPropertySource
 import ru.housekeeper.model.entity.payment.IncomingPayment
 import ru.housekeeper.service.registry.SpecialAccountRegistryService
 import ru.housekeeper.utils.FlaggedColorEnum
-import kotlin.test.Ignore
 
-@Ignore
-@TestPropertySource(locations = ["classpath:application-test.yml"])
-@SpringBootTest
+//@Ignore
+//@TestPropertySource(locations = ["classpath:application-test.yml"])
+//@SpringBootTest
 class AccountTest {
 
-    @Autowired
+//    @Autowired
     private lateinit var specialAccountRegistryService: SpecialAccountRegistryService
 
     @Test
