@@ -161,7 +161,7 @@ class SpecialAccountRegistryService(
     private fun ruleContains(payment: IncomingPayment, other: String): Boolean {
         if (payment.purpose.contains(other, ignoreCase = true)) {
             logger().info("Skip by rule: [${payment.id}], date[${payment.date}]: ${payment.purpose}")
-            payment.type = IncomingPaymentTypeEnum.SKIP
+            payment.type = IncomingPaymentTypeEnum.UNKOWN
             return true
         }
         return false

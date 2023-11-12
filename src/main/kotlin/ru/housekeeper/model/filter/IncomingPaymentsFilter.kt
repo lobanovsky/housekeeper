@@ -11,5 +11,5 @@ data class IncomingPaymentsFilter(
     val startDate: LocalDate?,
     val endDate: LocalDate?,
     val toAccounts: List<String>?,
-    val type: IncomingPaymentTypeEnum?= IncomingPaymentTypeEnum.NOT_DETERMINATE
+    val type: IncomingPaymentTypeEnum?
 )
