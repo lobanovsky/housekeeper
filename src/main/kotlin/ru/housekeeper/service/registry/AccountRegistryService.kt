@@ -38,7 +38,7 @@ class AccountRegistryService(
         for (payment in payments) {
             val account = findAccountNumberInString(payment)
             if (account == null) {
-                payment.type = IncomingPaymentTypeEnum.NOT_DETERMINATE
+                payment.type = IncomingPaymentTypeEnum.UNKOWN
                 logger().error("Account not found for: UUID: ${payment.uuid}, FromName: ${payment.fromName}, Purpose: ${payment.purpose}")
             } else {
                 payment.type = IncomingPaymentTypeEnum.DETERMINATE_ACCOUNT
@@ -79,7 +79,7 @@ class AccountRegistryService(
         val rows = mutableListOf<RegistryRow>()
         val sum = RegistrySum()
         for (payment in payments) {
-            if (payment.type == IncomingPaymentTypeEnum.NOT_DETERMINATE) continue
+            if (payment.type == IncomingPaymentTypeEnum.UNKOWN) continue
             rows.add(
                 RegistryRow(
                     date = payment.date.format(ddmmyyyyDateFormat()),

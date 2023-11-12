@@ -3,7 +3,6 @@ package ru.housekeeper.model.entity.payment
 import jakarta.persistence.Entity
 import jakarta.persistence.Index
 import jakarta.persistence.Table
-import ru.housekeeper.utils.FlaggedColorEnum
 import java.math.BigDecimal
 import java.time.LocalDateTime
 
@@ -40,9 +39,5 @@ class OutgoingPayment(
     source: String? = null,
 
     pack: String = "",
-    flagged: FlaggedColorEnum?,
 
-    taxable: Boolean? = false,
-    deposit: Boolean? = false,
-
-) : Payment(id, uuid, date, fromAccount, fromInn, fromName, toAccount, toInn, toName, sum, docNumber, vo, bik, bankName, purpose, createDate, source, pack, flagged, taxable, deposit)
+) : Payment(id, uuid, date, fromAccount, fromInn, fromName, toAccount, toInn, toName, sum, docNumber, vo, bik, bankName, purpose, createDate, source, pack)

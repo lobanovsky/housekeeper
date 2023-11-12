@@ -1,7 +1,6 @@
 package ru.housekeeper.model.entity.payment
 
 import jakarta.persistence.*
-import ru.housekeeper.utils.FlaggedColorEnum
 import java.math.BigDecimal
 import java.time.LocalDateTime
 
@@ -40,13 +39,4 @@ abstract class Payment(
     @Column(nullable = true)
     val pack: String? = null,
 
-    @Enumerated(EnumType.STRING)
-    val flagged: FlaggedColorEnum?,
-
-    @Column(name = "taxable")
-    val taxable: Boolean? = false,
-
-    @Column(name = "deposit")
-    val deposit: Boolean? = false,
-
-)
+    )

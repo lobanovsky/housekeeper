@@ -3,14 +3,13 @@ package ru.housekeeper
 import org.junit.jupiter.api.Test
 import ru.housekeeper.model.entity.payment.IncomingPayment
 import ru.housekeeper.service.registry.SpecialAccountRegistryService
-import ru.housekeeper.utils.FlaggedColorEnum
 
 //@Ignore
 //@TestPropertySource(locations = ["classpath:application-test.yml"])
 //@SpringBootTest
 class AccountTest {
 
-//    @Autowired
+    //    @Autowired
     private lateinit var specialAccountRegistryService: SpecialAccountRegistryService
 
     @Test
@@ -29,7 +28,11 @@ class AccountTest {
     }
 
     fun getAccount(purpose: String): String? {
-        val payment = IncomingPayment(purpose = purpose, flagged = FlaggedColorEnum.BLACK)
-        return specialAccountRegistryService.processAccount(specialAccountRegistryService.findAccountNumberInString(payment))
+        val payment = IncomingPayment(purpose = purpose)
+        return specialAccountRegistryService.processAccount(
+            specialAccountRegistryService.findAccountNumberInString(
+                payment
+            )
+        )
     }
 }

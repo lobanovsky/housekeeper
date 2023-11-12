@@ -6,7 +6,6 @@ import org.springframework.data.support.PageableExecutionUtils
 import ru.housekeeper.enums.IncomingPaymentTypeEnum
 import ru.housekeeper.model.entity.payment.IncomingPayment
 import ru.housekeeper.model.entity.payment.OutgoingPayment
-import ru.housekeeper.utils.FlaggedColorEnum
 import java.math.BigDecimal
 import java.time.LocalDateTime
 
@@ -34,15 +33,12 @@ class PaymentVO(
     val bankName: String,
 
     val purpose: String,
-    val tag: FlaggedColorEnum? = null,
-
-    val taxable: Boolean? = null,
-    val deposit: Boolean? = null,
 
     val account: String? = null,
     val updateAccountDateTime: LocalDateTime? = null,
 
-    val type: IncomingPaymentTypeEnum? = null
+    val type: IncomingPaymentTypeEnum? = null,
+    val typeColor: String? = null
 ) {
     fun toIncomingPayment(
         createDate: LocalDateTime = LocalDateTime.now(),
@@ -66,7 +62,6 @@ class PaymentVO(
         createDate = createDate,
         source = fileName,
         pack = pack,
-        flagged = tag
     )
 
     fun toOutgoingPayment(
@@ -91,7 +86,6 @@ class PaymentVO(
         createDate = createDate,
         source = fileName,
         pack = pack,
-        flagged = tag
     )
 }
 
@@ -123,11 +117,6 @@ fun OutgoingPayment.toPaymentVO(
         bankName = bankName,
 
         purpose = purpose,
-
-        tag = flagged,
-
-        taxable = taxable,
-        deposit = deposit
     )
 }
 
@@ -160,15 +149,12 @@ fun IncomingPayment.toPaymentVO(
 
         purpose = purpose,
 
-        tag = flagged,
-
-        taxable = taxable,
-        deposit = deposit,
-
         account = account,
         updateAccountDateTime = updateAccountDateTime,
 
-        type = type
+
+        type = type,
+        typeColor = type?.color?.color
 
     )
 }

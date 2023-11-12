@@ -3,6 +3,7 @@ package ru.housekeeper.rest.payment
 import io.swagger.v3.oas.annotations.Operation
 import org.springframework.data.domain.Page
 import org.springframework.web.bind.annotation.*
+import ru.housekeeper.enums.IncomingPaymentTypeEnum
 import ru.housekeeper.model.dto.AnnualPaymentVO
 import ru.housekeeper.model.dto.payment.PaymentVO
 import ru.housekeeper.model.dto.payment.toIncomingPaymentResponse
@@ -66,5 +67,16 @@ class PaymentController(
     fun findOutgoingPaymentsGroupingByCounterparty(
         @RequestBody filter: OutgoingGropingPaymentsFilter
     ) = paymentService.findAllOutgoingGroupingPaymentsByCounterparty(filter)
+
+    @GetMapping(path = ["/types"])
+    @Operation(summary = "Find all payment types")
+    fun findAllPaymentTypes(): List<PaymentTypeResponse> = IncomingPaymentTypeEnum.values()
+        .map { PaymentTypeResponse(it.name, it.description, it.color.color) }
+
+    data class PaymentTypeResponse(
+        val type: String,
+        val description: String,
+        val color: String,
+    )
 
 }
