@@ -38,7 +38,8 @@ class PaymentVO(
     val updateAccountDateTime: LocalDateTime? = null,
 
     val type: IncomingPaymentTypeEnum? = null,
-    val typeColor: String? = null
+    val typeColor: String? = null,
+    val typeName: String? = null,
 ) {
     fun toIncomingPayment(
         createDate: LocalDateTime = LocalDateTime.now(),
@@ -154,7 +155,8 @@ fun IncomingPayment.toPaymentVO(
 
 
         type = type,
-        typeColor = type?.color?.color
+        typeColor = type?.color?.color,
+        typeName = type?.name
 
     )
 }
