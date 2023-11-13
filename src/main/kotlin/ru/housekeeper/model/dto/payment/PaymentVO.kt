@@ -156,7 +156,7 @@ fun IncomingPayment.toPaymentVO(
 
         type = type,
         typeColor = type?.color?.color,
-        typeName = type?.name
+        typeName = type?.description
 
     )
 }
