@@ -1,15 +1,17 @@
 package ru.housekeeper.enums
 
 enum class IncomingPaymentTypeEnum(val description: String, val color: ColorEnum) {
+    //реестры
     SBER_REGISTRY("Сбер реестр", ColorEnum.BLUE),
     VTB_REGISTRY("ВТб реестр", ColorEnum.BLUE),
+    //депозиты
     DEPOSIT_PERCENTAGES("Проценты по депозиту", ColorEnum.YELLOW),
     DEPOSIT_REFUND("Возврат депозита", ColorEnum.YELLOW),
-
+    //налоги
     TAXABLE("Налогооблагаемый доход", ColorEnum.ORANGE),
-
-    DETERMINATE_ACCOUNT("Платёж от лицевого счёта", ColorEnum.GREEN),
-    NOT_DETERMINATE("Неопределенный платёж", ColorEnum.RED),
-    UNKOWN("Пропущенный по правилу", ColorEnum.RED)
-
+    //лицевые счета
+    ACCOUNT("Л/с", ColorEnum.GREEN),
+    UNKNOWN_ACCOUNT("Неопределенный л/с", ColorEnum.RED),
+    //неопознанные
+    UNKNOWN("Неопознанный", ColorEnum.PURPLE)
 }

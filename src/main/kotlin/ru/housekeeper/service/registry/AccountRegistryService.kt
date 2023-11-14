@@ -36,12 +36,12 @@ class AccountRegistryService(
         var count = 0
         val updateAccountDateTime = LocalDateTime.now()
         for (payment in payments) {
-            val account = findAccountNumberInString(payment)
+            val account = findAccount(payment)
             if (account == null) {
-                payment.type = IncomingPaymentTypeEnum.UNKOWN
+                payment.type = IncomingPaymentTypeEnum.UNKNOWN
                 logger().error("Account not found for: UUID: ${payment.uuid}, FromName: ${payment.fromName}, Purpose: ${payment.purpose}")
             } else {
-                payment.type = IncomingPaymentTypeEnum.DETERMINATE_ACCOUNT
+                payment.type = IncomingPaymentTypeEnum.ACCOUNT
                 count++
             }
             //set account and updateAccountDateTime
@@ -54,7 +54,7 @@ class AccountRegistryService(
 
 
     //Поиск Лицевого счета в строке назначения платежа
-    fun findAccountNumberInString(payment: IncomingPayment): String? {
+    fun findAccount(payment: IncomingPayment): String? {
         //find by rules
         var account = findAccountByRules(payment)
         if (account != null) return account
@@ -79,7 +79,7 @@ class AccountRegistryService(
         val rows = mutableListOf<RegistryRow>()
         val sum = RegistrySum()
         for (payment in payments) {
-            if (payment.type == IncomingPaymentTypeEnum.UNKOWN) continue
+            if (payment.type == IncomingPaymentTypeEnum.UNKNOWN) continue
             rows.add(
                 RegistryRow(
                     date = payment.date.format(ddmmyyyyDateFormat()),

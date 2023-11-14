@@ -3,6 +3,35 @@ package ru.housekeeper.service.registry
 import ru.housekeeper.model.entity.payment.IncomingPayment
 import ru.housekeeper.utils.getFlatAccount
 import ru.housekeeper.utils.getParkingAccount
+import ru.housekeeper.utils.getSpecialAccount
+
+//Поиск специального лицевого счета в строке назначения платежа по правилам
+fun findSpecialAccountByRules(payment: IncomingPayment): String? {
+    if (payment.fromName.contains("Михайлова Елена Владимировна", true))
+        return getSpecialAccount(17)
+
+    if (payment.fromName.contains("Бобровский Николай Эдуардович", true)
+        && payment.purpose.contains("Квартира №30", true)
+    ) return getSpecialAccount(30)
+
+    if (payment.fromName.contains("Казадаев Дмитрий Викторович", true)
+        && payment.purpose.contains("кв.103", true)
+    ) return getSpecialAccount(103)
+
+    if (payment.fromName.contains("Таланова Наталья Алексеевна", true)
+        && payment.purpose.contains("Кап.Ремонт", true)
+    ) return getSpecialAccount(11)
+
+    if (payment.fromName.contains("КОПЫЛОВА СВЕТЛАНА ГЕННАДЬ", true)
+        && payment.purpose.contains("КВ.104", true)
+    ) return getSpecialAccount(104)
+
+    if (payment.fromName.contains("АБРАМЕНКОВ ДМИТРИЙ АЛЕКСАНДРОВИЧ", true)
+        && payment.purpose.contains("000500130", true)
+    ) return getSpecialAccount(130)
+
+    return null
+}
 
 //Поиск Лицевого счета в строке назначения платежа по правилам
 fun findAccountByRules(payment: IncomingPayment): String? {

@@ -29,10 +29,6 @@ class AccountTest {
 
     fun getAccount(purpose: String): String? {
         val payment = IncomingPayment(purpose = purpose)
-        return specialAccountRegistryService.processAccount(
-            specialAccountRegistryService.findAccountNumberInString(
-                payment
-            )
-        )
+        return specialAccountRegistryService.findSpecialAccount(payment)
     }
 }

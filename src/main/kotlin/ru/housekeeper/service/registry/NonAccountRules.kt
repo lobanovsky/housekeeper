@@ -6,6 +6,19 @@ import ru.housekeeper.model.entity.payment.IncomingPayment
 import ru.housekeeper.utils.getOfficeAccount
 
 
+//Пропуск специальных платежей по правилам
+fun nonSpecialAccountRules(payment: IncomingPayment): Boolean {
+    if (purposeContains(payment, "Доход от размещения на депозитном счете", UNKNOWN)) return true
+    if (purposeContains(payment, "Пени по взносам на капремонт по жилпом в МКД", UNKNOWN)) return true
+    if (purposeContains(payment, "Средства бюджета на возм выпадающих доход от предост льгот", UNKNOWN)) return true
+    if (purposeContains(payment, "Взносы на капремонт по", UNKNOWN)) return true
+    if (purposeContains(payment, "Уплачены проценты за период", UNKNOWN)) return true
+    if (purposeContains(payment, "Взносы капремонт жилпом в МКД адрес Марьиной рощи 17-й пр. д.1 за период", UNKNOWN)) return true
+    if (purposeContains(payment, "Взносы капремонт нежилпом в МКД адрес Марьиной рощи 17-й пр. д.1 за период", UNKNOWN)) return true
+
+    return false
+}
+
 //Пропуск платежей по правилам
 fun nonAccountRules(payment: IncomingPayment): Boolean {
 
@@ -25,7 +38,7 @@ fun nonAccountRules(payment: IncomingPayment): Boolean {
     if (purposeContains(payment, "_VTB_", VTB_REGISTRY)) return true
 
     //ЕГР, Возврат кредиторской задолженности
-    if (purposeContains(payment, "ЕГР", UNKOWN)) return true
+    if (purposeContains(payment, "ЕГР", UNKNOWN)) return true
 
     //Налогооблагаемые платежи
 
@@ -58,4 +71,3 @@ private fun purposeContains(payment: IncomingPayment, other: String, type: Incom
     }
     return false
 }
-
