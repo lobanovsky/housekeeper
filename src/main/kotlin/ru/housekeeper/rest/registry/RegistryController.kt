@@ -4,10 +4,7 @@ import io.swagger.v3.oas.annotations.Operation
 import org.springframework.http.HttpHeaders
 import org.springframework.http.MediaType
 import org.springframework.http.ResponseEntity
-import org.springframework.web.bind.annotation.CrossOrigin
-import org.springframework.web.bind.annotation.PostMapping
-import org.springframework.web.bind.annotation.RequestMapping
-import org.springframework.web.bind.annotation.RestController
+import org.springframework.web.bind.annotation.*
 import ru.housekeeper.service.registry.RegistryService
 import ru.housekeeper.utils.logger
 import ru.housekeeper.utils.yyyyMMddHHmmssDateFormat
@@ -23,8 +20,10 @@ class RegistryController(
 
     @PostMapping(path = ["/special-account"])
     @Operation(summary = "Check and create new registry for special account")
-    fun getRegistry(): ResponseEntity<ByteArray> {
-        val registry = registryService.make(specialAccount = true)
+    fun getSpecialRegistry(
+        @RequestParam(value = "useInactiveAccount", required = false, defaultValue = "false") useInactiveAccount: Boolean,
+    ): ResponseEntity<ByteArray> {
+        val registry = registryService.make(specialAccount = true, useInactiveAccount)
         logger().info("Registry size: ${registry.size}")
         val fileName = "${LocalDateTime.now().format(yyyyMMddHHmmssDateFormat())}_special_registry.txt"
         return ResponseEntity.ok()
@@ -36,8 +35,10 @@ class RegistryController(
 
     @PostMapping(path = ["/account"])
     @Operation(summary = "Check and create new registry for account")
-    fun getRegistryForAccount(): ResponseEntity<ByteArray> {
-        val registry = registryService.make(specialAccount = false)
+    fun getRegistry(
+        @RequestParam(value = "useInactiveAccount", required = false, defaultValue = "false") useInactiveAccount: Boolean,
+    ): ResponseEntity<ByteArray> {
+        val registry = registryService.make(specialAccount = false, useInactiveAccount)
         logger().info("Registry size: ${registry.size}")
         val fileName = "${LocalDateTime.now().format(yyyyMMddHHmmssDateFormat())}_registry.txt"
         return ResponseEntity.ok()

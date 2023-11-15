@@ -8,9 +8,13 @@ import ru.housekeeper.model.entity.Account
 @Repository
 interface AccountRepository : CrudRepository<Account, Long> {
 
-    @Query("select a from Account a where a.special = :special and a.active = :active")
-    fun findActiveAndSpecial(
+    @Query("select a from Account a where a.special = :special and a.active = true")
+    fun findActiveBySpecial(
         special: Boolean,
-        active: Boolean = true,
+    ): List<Account>
+
+    @Query("select a from Account a where a.special = :special")
+    fun findBySpecial(
+        special: Boolean,
     ): List<Account>
 }

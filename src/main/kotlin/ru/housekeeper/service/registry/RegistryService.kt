@@ -18,7 +18,7 @@ class RegistryService(
     private val ruleService: RuleService,
 ) {
 
-    fun make(specialAccount: Boolean) = makeRegistry(ruleService.recognizePayments(specialAccount))
+    fun make(specialAccount: Boolean, useInactiveAccount: Boolean) = makeRegistry(ruleService.recognizePayments(specialAccount, useInactiveAccount))
 
     //Формирование Сбер реестр оплат
     fun makeRegistry(payments: List<IncomingPayment>): List<String> {
