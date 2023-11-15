@@ -40,6 +40,15 @@ fun nonAccountRules(payment: IncomingPayment): Boolean {
     //ЕГР, Возврат кредиторской задолженности
     if (purposeContains(payment, "ЕГР", UNKNOWN)) return true
 
+    //Возврат платежа
+    if (purposeContains(payment, "Возврат п/п", UNKNOWN)) return true
+
+    //Возврат платежа
+    if (purposeContains(payment, "Возврат п/п", UNKNOWN)) return true
+
+    //Исполнительный лист
+    if (purposeContains(payment, "ИЛ ФС", UNKNOWN)) return true
+
     //Налогооблагаемые платежи
 
     //ПАО "Ростелеком"

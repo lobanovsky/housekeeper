@@ -30,6 +30,9 @@ fun findSpecialAccountByRules(payment: IncomingPayment): String? {
         && payment.purpose.contains("000500130", true)
     ) return getSpecialAccount(130)
 
+    if (payment.fromName.contains("Кольцов Юрий Игоревич", true)
+    ) return getSpecialAccount(72)
+
     return null
 }
 
@@ -94,10 +97,43 @@ fun findAccountByRules(payment: IncomingPayment): String? {
         && payment.purpose.contains("Коммунальные платежи", true)
     ) return getFlatAccount(41)
 
+    if (payment.fromName.contains("ЯНИЧЕВ АЛЕКСЕЙ СЕРГЕЕВИЧ", true)
+    ) return getFlatAccount(118)
+
+    if (payment.fromName.contains("ПРОХНОВСКИЙ АЛЕКСАНДР ГРИГОРЬЕВИЧ", true)
+    ) return getFlatAccount(116)
+
+    if (payment.fromName.contains("Болышева Ксения Максимовна", true)
+        && payment.purpose.contains("кв 109", true)
+    ) return getFlatAccount(109)
+
+    if (payment.fromName.contains("ВАНЮШКИНА АННА НИКОЛАЕВНА", true)
+        && payment.purpose.contains("000011137", true)
+    ) return getFlatAccount(137)
+
+    if (payment.fromName.contains("СИДОРЕНКОВ АЛЕКСАНДР ВЛАДИМИРОВИЧ", true)
+    ) return getFlatAccount(119)
+
+    if (payment.fromName.contains("САНТАЛОВА ЕЛЕНА ЮРЬЕВНА", true)
+        && payment.purpose.contains("КВ.132", true)
+    ) return getFlatAccount(132)
+
+    if (payment.fromName.contains("САНТАЛОВА ЕЛЕНА ЮРЬЕВНА", true)
+        && payment.purpose.contains("КВ.131", true)
+    ) return getFlatAccount(131)
+
 
     //parking
     if (payment.fromName.contains("Оболёшев Сергей Леонидович", true)
         && payment.purpose.contains("ММ", true)
+    ) return getParkingAccount(42)
+
+    if (payment.fromName.contains("Оболёшев Сергей Леонидович", true)
+        && payment.purpose.contains("М/М", true)
+    ) return getParkingAccount(42)
+
+    if (payment.fromName.contains("Оболёшев Сергей Леонидович", true)
+        && payment.purpose.contains("Машиноместо", true)
     ) return getParkingAccount(42)
 
     if (payment.fromName.contains("ВИНОГРАДОВ ГЕННАДИЙ АНДРЕЕВИЧ", true)
@@ -174,6 +210,30 @@ fun findAccountByRules(payment: IncomingPayment): String? {
 
     if (payment.fromName.contains("Хайбулаев Заур Магомеддибирович", true)
     ) return getParkingAccount(97)
+
+    if (payment.fromName.contains("Тверетнев Петр Петрович", true)
+        && payment.purpose.contains("133", true)
+    ) return getParkingAccount(133)
+
+    if (payment.fromName.contains("ДОНСКИХ ДЕНИС ГЕННАДЬЕВИЧ", true)
+        && payment.purpose.contains("20", true)
+    ) return getParkingAccount(20)
+
+    if (payment.fromName.contains("КОСЯЧЕНКО ЮЛИЯ ЕВГЕНЬЕВН", true)
+        && payment.purpose.contains("А/м 2", true)
+    ) return getParkingAccount(2)
+
+    if (payment.fromName.contains("Болышева Ксения Максимовна", true)
+        && payment.purpose.contains("ММ63", true)
+    ) return getParkingAccount(63)
+
+    if (payment.fromName.contains("Болышева Ксения Максимовна", true)
+        && payment.purpose.contains("ММ55", true)
+    ) return getParkingAccount(55)
+
+    if (payment.fromName.contains("Болышева Ксения Максимовна", true)
+        && payment.purpose.contains("ММ64", true)
+    ) return getParkingAccount(64)
 
     return null
 }

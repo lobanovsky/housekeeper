@@ -2,7 +2,7 @@ package ru.housekeeper
 
 import org.junit.jupiter.api.Test
 import ru.housekeeper.model.entity.payment.IncomingPayment
-import ru.housekeeper.service.registry.SpecialAccountRegistryService
+import ru.housekeeper.service.registry.RuleService
 
 //@Ignore
 //@TestPropertySource(locations = ["classpath:application-test.yml"])
@@ -10,7 +10,7 @@ import ru.housekeeper.service.registry.SpecialAccountRegistryService
 class AccountTest {
 
     //    @Autowired
-    private lateinit var specialAccountRegistryService: SpecialAccountRegistryService
+    private lateinit var specialRuleService: RuleService
 
     @Test
     fun findAccountFromPurpose1() {
@@ -29,6 +29,6 @@ class AccountTest {
 
     fun getAccount(purpose: String): String? {
         val payment = IncomingPayment(purpose = purpose)
-        return specialAccountRegistryService.findSpecialAccount(payment)
+        return specialRuleService.findAccount(payment, true)
     }
 }

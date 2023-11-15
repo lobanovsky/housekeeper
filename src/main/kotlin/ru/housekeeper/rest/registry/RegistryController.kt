@@ -8,8 +8,7 @@ import org.springframework.web.bind.annotation.CrossOrigin
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
-import ru.housekeeper.service.registry.AccountRegistryService
-import ru.housekeeper.service.registry.SpecialAccountRegistryService
+import ru.housekeeper.service.registry.RegistryService
 import ru.housekeeper.utils.logger
 import ru.housekeeper.utils.yyyyMMddHHmmssDateFormat
 import java.nio.charset.Charset
@@ -19,14 +18,13 @@ import java.time.LocalDateTime
 @RestController
 @RequestMapping("/registries")
 class RegistryController(
-    private val specialAccountRegistryService: SpecialAccountRegistryService,
-    private val accountRegistryService: AccountRegistryService,
+    private val registryService: RegistryService,
 ) {
 
     @PostMapping(path = ["/special-account"])
     @Operation(summary = "Check and create new registry for special account")
     fun getRegistry(): ResponseEntity<ByteArray> {
-        val registry = specialAccountRegistryService.make()
+        val registry = registryService.make(specialAccount = true)
         logger().info("Registry size: ${registry.size}")
         val fileName = "${LocalDateTime.now().format(yyyyMMddHHmmssDateFormat())}_special_registry.txt"
         return ResponseEntity.ok()
@@ -39,7 +37,7 @@ class RegistryController(
     @PostMapping(path = ["/account"])
     @Operation(summary = "Check and create new registry for account")
     fun getRegistryForAccount(): ResponseEntity<ByteArray> {
-        val registry = accountRegistryService.make()
+        val registry = registryService.make(specialAccount = false)
         logger().info("Registry size: ${registry.size}")
         val fileName = "${LocalDateTime.now().format(yyyyMMddHHmmssDateFormat())}_registry.txt"
         return ResponseEntity.ok()
