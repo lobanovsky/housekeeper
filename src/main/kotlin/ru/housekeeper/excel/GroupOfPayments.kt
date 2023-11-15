@@ -1,5 +1,7 @@
 package ru.housekeeper.excel
 
+import org.apache.poi.ss.usermodel.FillPatternType
+import org.apache.poi.ss.usermodel.IndexedColors
 import org.apache.poi.ss.usermodel.Row
 import org.apache.poi.ss.usermodel.Workbook
 import org.apache.poi.xssf.usermodel.XSSFWorkbook
@@ -42,6 +44,11 @@ fun createGroupOfPaymentSheet(workBook: Workbook, sheetName: String, payments: L
     var index = 1
     for (i in payments.indices) {
         val row: Row = sheet.createRow(index)
+        //set row color
+        row.rowStyle = workBook.createCellStyle().apply {
+            fillForegroundColor = IndexedColors.GREY_25_PERCENT.index
+            fillPattern = FillPatternType.SOLID_FOREGROUND
+        }
         row.createCell(0).setCellValue(index.toString())
         row.createCell(1).setCellValue(payments[i].counterparty.name)
         row.createCell(sumIndex).setCellValue(payments[i].total.toDouble())
