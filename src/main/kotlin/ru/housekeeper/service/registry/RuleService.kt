@@ -16,7 +16,7 @@ class RuleService(
 
     //Поиск Лицевого счета в строке назначения платежа и установка его в платеж
     fun recognizePayments(specialAccount: Boolean): List<IncomingPayment> {
-        val accounts = accountRepository.findBySpecial(special = specialAccount).map { it.number }.toSet()
+        val accounts = accountRepository.findActiveAndSpecial(special = specialAccount).map { it.number }.toSet()
         if (accounts.isEmpty()) {
             logger().warn("Cчета не найдены")
             return emptyList()

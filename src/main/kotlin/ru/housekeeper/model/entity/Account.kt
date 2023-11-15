@@ -16,4 +16,7 @@ class Account(
     val special: Boolean = false,
 
     val description: String,
+
+    @Column(nullable = true)
+    val active: Boolean = true,
 )
