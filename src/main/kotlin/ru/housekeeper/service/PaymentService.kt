@@ -5,6 +5,7 @@ import org.springframework.data.domain.Page
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import org.springframework.web.multipart.MultipartFile
+import ru.housekeeper.enums.payment.CategoryOfPaymentEnum
 import ru.housekeeper.model.dto.AnnualPaymentVO
 import ru.housekeeper.model.dto.MonthPaymentVO
 import ru.housekeeper.model.dto.payment.GroupOfPayment
@@ -125,10 +126,15 @@ class PaymentService(
         for (payment in payments) {
             if (payment.toInn == myInn) continue
             val counterparty = getCounterparty(counterpartyMap, payment)
-            groupOfPayment[counterparty.uuid] =
+            val name =
+                if (payment.purpose.contains("Под отчёт", true)) {
+                    CategoryOfPaymentEnum.UNDER_THE_REPORT.description
+                } else counterparty.category?.description
+                    ?: CategoryOfPaymentEnum.OTHER.description
+            groupOfPayment[name] =
                 groupOfPayment.getOrDefault(
-                    key = counterparty.uuid,
-                    defaultValue = GroupOfPayment(counterparty.name, mutableListOf(), BigDecimal.ZERO)
+                    key = name,
+                    defaultValue = GroupOfPayment(name, mutableListOf(), BigDecimal.ZERO)
                 ).addPayment(payment)
         }
         return groupOfPayment.values.toList().sortedByDescending { it.total }
@@ -144,7 +150,11 @@ class PaymentService(
         if (counterpartyByName != null) return counterpartyByName
         logger().info("Unknown counterparty: ${payment.id}, ${payment.purpose}, ${payment.toName}, ${payment.toInn}")
         val other = "Остальное"
-        return Counterparty(uuid = other.onlyCyrillicLettersAndNumbers(), name = other)
+        return Counterparty(
+            uuid = other.onlyCyrillicLettersAndNumbers(),
+            name = other,
+            category = CategoryOfPaymentEnum.OTHER
+        )
     }
 
     fun findAllDeposits(): List<OutgoingPayment> = outgoingPaymentRepository.findAllDeposits(myInn)

@@ -2,6 +2,7 @@ package ru.housekeeper.model.entity
 
 import jakarta.persistence.*
 import org.hibernate.annotations.CreationTimestamp
+import ru.housekeeper.enums.payment.CategoryOfPaymentEnum
 import java.time.LocalDateTime
 
 
@@ -37,5 +38,9 @@ class Counterparty(
     @CreationTimestamp
     @Column(updatable = false)
     var createDate: LocalDateTime = LocalDateTime.now(),
+
+    @Column(nullable = true)
+    @Enumerated(EnumType.STRING)
+    val category: CategoryOfPaymentEnum? = null,
 
     )
