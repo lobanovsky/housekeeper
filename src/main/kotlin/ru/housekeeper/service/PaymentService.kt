@@ -120,19 +120,15 @@ class PaymentService(
                 endDate = filter.endDate,
             )
         )
-        val counterpartyGroupByUUID = counterpartyService.findAll().associateBy { it.uuid }
+        val counterpartyMap = counterpartyService.findAll().associateBy { it.uuid }
         val groupOfPayment = mutableMapOf<String, GroupOfPayment>()
         for (payment in payments) {
             if (payment.toInn == myInn) continue
-            val counterparty = getCounterparty(counterpartyGroupByUUID, payment)
+            val counterparty = getCounterparty(counterpartyMap, payment)
             groupOfPayment[counterparty.uuid] =
                 groupOfPayment.getOrDefault(
                     key = counterparty.uuid,
-                    defaultValue = GroupOfPayment(
-                        counterparty = counterparty,
-                        payments = mutableListOf(),
-                        total = BigDecimal.ZERO
-                    )
+                    defaultValue = GroupOfPayment(counterparty.name, mutableListOf(), BigDecimal.ZERO)
                 ).addPayment(payment)
         }
         return groupOfPayment.values.toList().sortedByDescending { it.total }

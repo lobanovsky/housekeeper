@@ -1,11 +1,10 @@
 package ru.housekeeper.model.dto.payment
 
-import ru.housekeeper.model.entity.Counterparty
 import ru.housekeeper.model.entity.payment.OutgoingPayment
 import java.math.BigDecimal
 
 data class GroupOfPayment(
-    val counterparty: Counterparty,
+    val name: String,
     val payments: MutableList<OutgoingPayment>,
     var total: BigDecimal
 ) {

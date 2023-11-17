@@ -14,4 +14,10 @@ data class OutgoingPaymentsFilter(
 data class OutgoingGropingPaymentsFilter(
     val startDate: LocalDate?,
     val endDate: LocalDate?,
+    val groupBy: GroupByEnum? = GroupByEnum.COUNTERPARTY,
 )
+
+enum class GroupByEnum(val description: String) {
+    COUNTERPARTY("Контрагент"),
+    CATEGORY("Категория"),
+}
