@@ -1,5 +1,6 @@
 package ru.housekeeper.model.filter
 
+import ru.housekeeper.enums.GroupPaymentByEnum
 import java.time.LocalDate
 
 data class OutgoingPaymentsFilter(
@@ -14,10 +15,5 @@ data class OutgoingPaymentsFilter(
 data class OutgoingGropingPaymentsFilter(
     val startDate: LocalDate?,
     val endDate: LocalDate?,
-    val groupBy: GroupByEnum? = GroupByEnum.COUNTERPARTY,
+    val groupBy: GroupPaymentByEnum? = GroupPaymentByEnum.CATEGORY,
 )
-
-enum class GroupByEnum(val description: String) {
-    COUNTERPARTY("Контрагент"),
-    CATEGORY("Категория"),
-}
