@@ -135,36 +135,45 @@ class PaymentService(
             //custom rules
             val (key, name) = when (filter.groupBy) {
                 GroupingPaymentByEnum.CATEGORY ->
-                    if (payment.purpose.contains("Под отчет на приобретение посадочного материала", true)) {
+                    if (payment.purpose.contains("Аккумуляторные батареи для диспетчеризация", true)) {
                         Pair(
-                            CategoryOfPaymentEnum.GARDEN.description,
+                            CategoryOfPaymentEnum.DISPATCHING.name,
+                            CategoryOfPaymentEnum.DISPATCHING.description
+                        )
+                    } else if (payment.purpose.contains("Под отчет на приобретение посадочного материала", true)) {
+                        Pair(
+                            CategoryOfPaymentEnum.GARDEN.name,
                             CategoryOfPaymentEnum.GARDEN.description
                         )
                     } else if (payment.purpose.contains("ИД взыск", true)) {
                         Pair(
-                            CategoryOfPaymentEnum.COURT_COSTS.description,
+                            CategoryOfPaymentEnum.COURT_COSTS.name,
                             CategoryOfPaymentEnum.COURT_COSTS.description
                         )
                     } else if (payment.toName.equals("Лобановский Евгений Владимирович", true)
-                        && payment.purpose.contains("Оплата за предоставление услуг по договору с самозанятым", true)
+                        && payment.purpose.contains(
+                            "Оплата за предоставление услуг по договору с самозанятым",
+                            true
+                        )
                     ) {
                         Pair(
-                            CategoryOfPaymentEnum.STAFF_SALARY.description,
+                            CategoryOfPaymentEnum.STAFF_SALARY.name,
                             CategoryOfPaymentEnum.STAFF_SALARY.description
                         )
                     } else if (payment.purpose.contains("Под отчёт", true)
                         || payment.purpose.contains("Под отчет", true)
                     ) {
                         Pair(
-                            CategoryOfPaymentEnum.UNDER_THE_REPORT.description,
+                            CategoryOfPaymentEnum.UNDER_THE_REPORT.name,
                             CategoryOfPaymentEnum.UNDER_THE_REPORT.description
                         )
                     } else {
                         Pair(
-                            counterparty.category.description,
+                            counterparty.category.name,
                             counterparty.category.description
                         )
                     }
+
                 GroupingPaymentByEnum.COUNTERPARTY -> Pair(counterparty.uuid, counterparty.name)
             }
             groupOfPayment[key] =
