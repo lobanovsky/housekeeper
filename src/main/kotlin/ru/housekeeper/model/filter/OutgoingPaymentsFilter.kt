@@ -15,5 +15,5 @@ data class OutgoingPaymentsFilter(
 data class OutgoingGropingPaymentsFilter(
     val startDate: LocalDate?,
     val endDate: LocalDate?,
-    val groupBy: GroupingPaymentByEnum? = GroupingPaymentByEnum.CATEGORY,
+    val groupBy: GroupingPaymentByEnum = GroupingPaymentByEnum.CATEGORY,
 )

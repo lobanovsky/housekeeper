@@ -6,6 +6,7 @@ import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import org.springframework.web.multipart.MultipartFile
 import ru.housekeeper.enums.payment.CategoryOfPaymentEnum
+import ru.housekeeper.enums.payment.GroupingPaymentByEnum
 import ru.housekeeper.model.dto.AnnualPaymentVO
 import ru.housekeeper.model.dto.MonthPaymentVO
 import ru.housekeeper.model.dto.payment.GroupOfPayment
@@ -126,16 +127,45 @@ class PaymentService(
         for (payment in payments) {
             if (payment.toInn == myInn) continue
             val counterparty = getCounterparty(counterpartyMap, payment)
-            val name =
-                if (payment.purpose.contains("Под отчёт", true)) {
-                    CategoryOfPaymentEnum.UNDER_THE_REPORT.description
-                } else counterparty.category?.description
-                    ?: CategoryOfPaymentEnum.OTHER.description
-            groupOfPayment[name] =
-                groupOfPayment.getOrDefault(
-                    key = name,
-                    defaultValue = GroupOfPayment(name, mutableListOf(), BigDecimal.ZERO)
-                ).addPayment(payment)
+
+            //custom rules
+            val (key, name) = when (filter.groupBy) {
+                GroupingPaymentByEnum.CATEGORY ->
+                    if (payment.purpose.contains("Под отчет на приобретение посадочного материала", true)) {
+                        Pair(
+                            CategoryOfPaymentEnum.GARDEN.description,
+                            CategoryOfPaymentEnum.GARDEN.description
+                        )
+                    } else if (payment.purpose.contains("ИД взыск", true)) {
+                        Pair(
+                            CategoryOfPaymentEnum.COURT_COSTS.description,
+                            CategoryOfPaymentEnum.COURT_COSTS.description
+                        )
+                    } else if (payment.toName.equals("Лобановский Евгений Владимирович", true)
+                        && payment.purpose.contains("Оплата за предоставление услуг по договору с самозанятым", true)
+                    ) {
+                        Pair(
+                            CategoryOfPaymentEnum.STAFF_SALARY.description,
+                            CategoryOfPaymentEnum.STAFF_SALARY.description
+                        )
+                    } else if (payment.purpose.contains("Под отчёт", true)
+                        || payment.purpose.contains("Под отчет", true)
+                    ) {
+                        Pair(
+                            CategoryOfPaymentEnum.UNDER_THE_REPORT.description,
+                            CategoryOfPaymentEnum.UNDER_THE_REPORT.description
+                        )
+                    } else {
+                        Pair(
+                            counterparty.category.description,
+                            counterparty.category.description
+                        )
+                    }
+                GroupingPaymentByEnum.COUNTERPARTY -> Pair(counterparty.uuid, counterparty.name)
+            }
+            groupOfPayment[key] =
+                groupOfPayment.getOrDefault(key, GroupOfPayment(name, mutableListOf(), BigDecimal.ZERO))
+                    .addPayment(payment)
         }
         return groupOfPayment.values.toList().sortedByDescending { it.total }
     }

@@ -1,5 +1,6 @@
 package ru.housekeeper.model.dto.counterparty
 
+import ru.housekeeper.enums.payment.CategoryOfPaymentEnum
 import ru.housekeeper.model.entity.Counterparty
 import ru.housekeeper.service.makeUUID
 
@@ -13,4 +14,5 @@ fun CounterpartyRequest.toCounterparty() = Counterparty(
     name = name,
     inn = inn,
     manualCreated = true,
+    category = CategoryOfPaymentEnum.UNKNOWN
 )

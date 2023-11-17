@@ -1,5 +1,6 @@
 package ru.housekeeper.model.dto.counterparty
 
+import ru.housekeeper.enums.payment.CategoryOfPaymentEnum
 import ru.housekeeper.model.entity.Counterparty
 
 data class CounterpartyVO(
@@ -18,4 +19,5 @@ fun CounterpartyVO.toCounterparty() = Counterparty(
     bank = bank,
     bik = bik,
     sign = sign,
+    category = CategoryOfPaymentEnum.UNKNOWN
 )

@@ -11,7 +11,12 @@ import java.io.ByteArrayOutputStream
 
 fun toExcelGroupOfPayments(payments: List<GroupOfPayment>, filter: OutgoingGropingPaymentsFilter): ByteArray {
     val workBook = XSSFWorkbook()
-    createGroupOfPaymentSheet(
+    createGroupSheet(
+        workBook,
+        sheetName = "Категории",
+        payments
+    )
+    createDetailsSheet(
         workBook,
         sheetName = "Платежи " +
                 "${filter.startDate?.format(yyyyMMddDateFormat())}-${filter.endDate?.format(yyyyMMddDateFormat())}",
@@ -24,7 +29,34 @@ fun toExcelGroupOfPayments(payments: List<GroupOfPayment>, filter: OutgoingGropi
     return outputStream.toByteArray()
 }
 
-fun createGroupOfPaymentSheet(workBook: Workbook, sheetName: String, groups: List<GroupOfPayment>) {
+fun createGroupSheet(workBook: Workbook, sheetName: String, groups: List<GroupOfPayment>) {
+    val sheet = workBook.createSheet(sheetName)
+
+    val headers = listOf(
+        "№",
+        "Категория",
+        "Сумма",
+    )
+    for (columnIndex in 0 until headers.size + 1) sheet.setColumnWidth(columnIndex, 256 * 25)
+    val header: Row = sheet.createRow(0)
+    for (index in headers.indices) {
+        header.createCell(index).setCellValue(headers[index])
+    }
+
+    val sumIndex = 2
+    var index = 1
+    for (i in groups.indices) {
+        val row: Row = sheet.createRow(index)
+        row.createCell(0).setCellValue(index.toString())
+        row.createCell(1).setCellValue(groups[i].name)
+        row.createCell(sumIndex).setCellValue(groups[i].total.toDouble())
+        index++
+    }
+    val totalSum = groups.sumOf { it.total }
+    sheet.createRow(index + 1).createCell(sumIndex).setCellValue(totalSum.toDouble())
+}
+
+fun createDetailsSheet(workBook: Workbook, sheetName: String, groups: List<GroupOfPayment>) {
     val sheet = workBook.createSheet(sheetName)
 
     val headers = listOf(

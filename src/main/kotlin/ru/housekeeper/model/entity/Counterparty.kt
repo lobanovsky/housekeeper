@@ -39,8 +39,7 @@ class Counterparty(
     @Column(updatable = false)
     var createDate: LocalDateTime = LocalDateTime.now(),
 
-    @Column(nullable = true)
     @Enumerated(EnumType.STRING)
-    val category: CategoryOfPaymentEnum? = null,
+    val category: CategoryOfPaymentEnum,
 
     )
