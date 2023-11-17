@@ -63,6 +63,10 @@ enum class CategoryOfPaymentEnum(val description: String) {
 
     CLEANING_PARKING("Уборка паркинга"),
 
+    AIR_FILTERS("Воздушные фильтры"),
+
+    OPERATIONAL_TESTS("Эксплуатационные испытания"),
+
     OTHER("Остальное"),
 
     UNKNOWN("Неизвестно")

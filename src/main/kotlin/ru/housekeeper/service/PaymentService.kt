@@ -134,51 +134,7 @@ class PaymentService(
 
             //custom rules
             val (key, name) = when (filter.groupBy) {
-                GroupingPaymentByEnum.CATEGORY ->
-                    if (payment.purpose.contains("теплообменник", true)) {
-                        Pair(
-                            CategoryOfPaymentEnum.INDIVIDUAL_HEAT_POINT.name,
-                            CategoryOfPaymentEnum.INDIVIDUAL_HEAT_POINT.description
-                        )
-                    } else if (payment.purpose.contains("Аккумуляторные батареи для диспетчеризация", true)) {
-                        Pair(
-                            CategoryOfPaymentEnum.DISPATCHING.name,
-                            CategoryOfPaymentEnum.DISPATCHING.description
-                        )
-                    } else if (payment.purpose.contains("Под отчет на приобретение посадочного материала", true)) {
-                        Pair(
-                            CategoryOfPaymentEnum.GARDEN.name,
-                            CategoryOfPaymentEnum.GARDEN.description
-                        )
-                    } else if (payment.purpose.contains("ИД взыск", true)) {
-                        Pair(
-                            CategoryOfPaymentEnum.COURT_COSTS.name,
-                            CategoryOfPaymentEnum.COURT_COSTS.description
-                        )
-                    } else if (payment.toName.equals("Лобановский Евгений Владимирович", true)
-                        && payment.purpose.contains(
-                            "Оплата за предоставление услуг по договору с самозанятым",
-                            true
-                        )
-                    ) {
-                        Pair(
-                            CategoryOfPaymentEnum.STAFF_SALARY.name,
-                            CategoryOfPaymentEnum.STAFF_SALARY.description
-                        )
-                    } else if (payment.purpose.contains("Под отчёт", true)
-                        || payment.purpose.contains("Под отчет", true)
-                    ) {
-                        Pair(
-                            CategoryOfPaymentEnum.UNDER_THE_REPORT.name,
-                            CategoryOfPaymentEnum.UNDER_THE_REPORT.description
-                        )
-                    } else {
-                        Pair(
-                            counterparty.category.name,
-                            counterparty.category.description
-                        )
-                    }
-
+                GroupingPaymentByEnum.CATEGORY -> customRuleForPayments(payment, counterparty)
                 GroupingPaymentByEnum.COUNTERPARTY -> Pair(counterparty.uuid, counterparty.name)
             }
             groupOfPayment[key] =
@@ -187,6 +143,39 @@ class PaymentService(
         }
         return groupOfPayment.values.toList().sortedByDescending { it.total }
     }
+
+    private fun customRuleForPayments(payment: OutgoingPayment, counterparty: Counterparty): Pair<String, String> {
+
+        if (payment.purpose.contains("огнетушител", true))
+            return getPair(CategoryOfPaymentEnum.FIRE_SAFETY)
+
+        if (payment.purpose.contains("теплообменник", true))
+            return getPair(CategoryOfPaymentEnum.INDIVIDUAL_HEAT_POINT)
+
+        if (payment.purpose.contains("Аккумуляторные батареи для диспетчеризация", true))
+            return getPair(CategoryOfPaymentEnum.DISPATCHING)
+
+        if (payment.purpose.contains("Под отчет на приобретение посадочного материала", true))
+            return getPair(CategoryOfPaymentEnum.GARDEN)
+
+        if (payment.purpose.contains("ИД взыск", true))
+            return getPair(CategoryOfPaymentEnum.COURT_COSTS)
+
+        if (payment.toName.equals("Лобановский Евгений Владимирович", true)
+            && payment.purpose.contains("Оплата за предоставление услуг по договору с самозанятым", true)
+        ) return getPair(CategoryOfPaymentEnum.STAFF_SALARY)
+
+        if (payment.purpose.contains("Под отчёт", true) || payment.purpose.contains("Под отчет", true))
+            return getPair(CategoryOfPaymentEnum.UNDER_THE_REPORT)
+
+        return Pair(
+            counterparty.category.name,
+            counterparty.category.description
+        )
+    }
+
+
+    private fun getPair(category: CategoryOfPaymentEnum) = Pair(category.name, category.description)
 
     private fun getCounterparty(
         counterpartyGroupByUUID: Map<String, Counterparty>,
