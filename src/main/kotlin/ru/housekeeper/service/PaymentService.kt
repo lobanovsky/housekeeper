@@ -135,7 +135,12 @@ class PaymentService(
             //custom rules
             val (key, name) = when (filter.groupBy) {
                 GroupingPaymentByEnum.CATEGORY ->
-                    if (payment.purpose.contains("Аккумуляторные батареи для диспетчеризация", true)) {
+                    if (payment.purpose.contains("теплообменник", true)) {
+                        Pair(
+                            CategoryOfPaymentEnum.INDIVIDUAL_HEAT_POINT.name,
+                            CategoryOfPaymentEnum.INDIVIDUAL_HEAT_POINT.description
+                        )
+                    } else if (payment.purpose.contains("Аккумуляторные батареи для диспетчеризация", true)) {
                         Pair(
                             CategoryOfPaymentEnum.DISPATCHING.name,
                             CategoryOfPaymentEnum.DISPATCHING.description
