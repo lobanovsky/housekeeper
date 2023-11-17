@@ -125,7 +125,11 @@ class PaymentService(
         val counterpartyMap = counterpartyService.findAll().associateBy { it.uuid }
         val groupOfPayment = mutableMapOf<String, GroupOfPayment>()
         for (payment in payments) {
+            //skip self
             if (payment.toInn == myInn) continue
+            //skip technical payment
+            if (payment.purpose.contains("Перевод средств в связи с закрытием счета", true)) continue
+
             val counterparty = getCounterparty(counterpartyMap, payment)
 
             //custom rules
