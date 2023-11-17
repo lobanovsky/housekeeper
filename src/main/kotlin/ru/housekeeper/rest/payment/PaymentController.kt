@@ -3,8 +3,8 @@ package ru.housekeeper.rest.payment
 import io.swagger.v3.oas.annotations.Operation
 import org.springframework.data.domain.Page
 import org.springframework.web.bind.annotation.*
-import ru.housekeeper.enums.GroupPaymentByEnum
-import ru.housekeeper.enums.IncomingPaymentTypeEnum
+import ru.housekeeper.enums.payment.GroupingPaymentByEnum
+import ru.housekeeper.enums.payment.IncomingPaymentTypeEnum
 import ru.housekeeper.model.dto.AnnualPaymentVO
 import ru.housekeeper.model.dto.payment.PaymentVO
 import ru.housekeeper.model.dto.payment.toIncomingPaymentResponse
@@ -82,7 +82,7 @@ class PaymentController(
 
     @GetMapping(path = ["/group-by"])
     @Operation(summary = "Find all payments grouped by {groupBy}")
-    fun findAllPaymentsGroupedBy() = GroupPaymentByEnum.values().map { GroupPaymentByResponse(it.name, it.description) }
+    fun findAllGroupingPaymentBy() = GroupingPaymentByEnum.values().map { GroupPaymentByResponse(it.name, it.description) }
 
     data class GroupPaymentByResponse(
         val type: String,

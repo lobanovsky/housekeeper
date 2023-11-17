@@ -1,7 +1,7 @@
 package ru.housekeeper.service.registry
 
 import org.springframework.stereotype.Service
-import ru.housekeeper.enums.IncomingPaymentTypeEnum
+import ru.housekeeper.enums.payment.IncomingPaymentTypeEnum
 import ru.housekeeper.model.entity.payment.IncomingPayment
 import ru.housekeeper.repository.AccountRepository
 import ru.housekeeper.repository.payment.IncomingPaymentRepository

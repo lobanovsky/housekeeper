@@ -1,6 +1,6 @@
 package ru.housekeeper.model.filter
 
-import ru.housekeeper.enums.IncomingPaymentTypeEnum
+import ru.housekeeper.enums.payment.IncomingPaymentTypeEnum
 import java.time.LocalDate
 
 data class IncomingPaymentsFilter(

@@ -1,4 +1,6 @@
-package ru.housekeeper.enums
+package ru.housekeeper.enums.payment
+
+import ru.housekeeper.enums.ColorEnum
 
 enum class IncomingPaymentTypeEnum(val description: String, val color: ColorEnum) {
     //реестры

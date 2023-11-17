@@ -1,7 +1,7 @@
 package ru.housekeeper.model.entity.payment
 
 import jakarta.persistence.*
-import ru.housekeeper.enums.IncomingPaymentTypeEnum
+import ru.housekeeper.enums.payment.IncomingPaymentTypeEnum
 import java.math.BigDecimal
 import java.time.LocalDateTime
 

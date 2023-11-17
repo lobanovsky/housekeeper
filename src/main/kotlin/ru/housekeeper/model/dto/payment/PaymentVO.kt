@@ -3,7 +3,7 @@ package ru.housekeeper.model.dto.payment
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.PageRequest
 import org.springframework.data.support.PageableExecutionUtils
-import ru.housekeeper.enums.IncomingPaymentTypeEnum
+import ru.housekeeper.enums.payment.IncomingPaymentTypeEnum
 import ru.housekeeper.model.entity.payment.IncomingPayment
 import ru.housekeeper.model.entity.payment.OutgoingPayment
 import java.math.BigDecimal

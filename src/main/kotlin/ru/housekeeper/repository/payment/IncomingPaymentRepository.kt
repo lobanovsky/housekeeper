@@ -5,7 +5,7 @@ import org.springframework.data.jpa.repository.Query
 import org.springframework.data.repository.CrudRepository
 import org.springframework.data.repository.query.Param
 import org.springframework.stereotype.Repository
-import ru.housekeeper.enums.IncomingPaymentTypeEnum
+import ru.housekeeper.enums.payment.IncomingPaymentTypeEnum
 import ru.housekeeper.model.entity.payment.IncomingPayment
 import ru.housekeeper.model.entity.payment.Payment
 import java.math.BigDecimal
