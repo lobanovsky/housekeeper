@@ -61,6 +61,8 @@ enum class CategoryOfPaymentEnum(val description: String) {
 
     COURT_COSTS("Судебные издержки"),
 
+    CLEANING_PARKING("Уборка паркинга"),
+
     OTHER("Остальное"),
 
     UNKNOWN("Неизвестно")
