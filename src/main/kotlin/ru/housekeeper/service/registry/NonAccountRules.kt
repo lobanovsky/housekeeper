@@ -5,6 +5,9 @@ import ru.housekeeper.enums.payment.IncomingPaymentTypeEnum.*
 import ru.housekeeper.model.entity.payment.IncomingPayment
 import ru.housekeeper.utils.getOfficeAccount
 
+/**
+ * Правила для платежей не от жителей.
+ */
 
 //Пропуск специальных платежей по правилам
 fun nonSpecialAccountRules(payment: IncomingPayment): Boolean {

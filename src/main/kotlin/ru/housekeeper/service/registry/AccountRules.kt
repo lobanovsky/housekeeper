@@ -5,7 +5,11 @@ import ru.housekeeper.utils.getFlatAccount
 import ru.housekeeper.utils.getParkingAccount
 import ru.housekeeper.utils.getSpecialAccount
 
-//Поиск специального лицевого счета в строке назначения платежа по правилам
+/**
+ * Правила для платежей от жителей
+ */
+
+//Поиск специального лицевого счета в строке назначения платежа по правилам для спец-счёта
 fun findSpecialAccountByRules(payment: IncomingPayment): String? {
     if (payment.fromName.contains("Михайлова Елена Владимировна", true))
         return getSpecialAccount(17)
@@ -30,13 +34,15 @@ fun findSpecialAccountByRules(payment: IncomingPayment): String? {
         && payment.purpose.contains("000500130", true)
     ) return getSpecialAccount(130)
 
-    if (payment.fromName.contains("Кольцов Юрий Игоревич", true)
-    ) return getSpecialAccount(72)
+    if (payment.fromName.contains("Кольцов Юрий Игоревич", true))
+        return getSpecialAccount(72)
 
+    if (payment.fromName.contains("БЕССОНОВА ОЛЬГА ПАВЛОВНА", true))
+        return getSpecialAccount(21)
     return null
 }
 
-//Поиск Лицевого счета в строке назначения платежа по правилам
+//Поиск Лицевого счета в строке назначения платежа по правилам для обычного счёта для квартир и машиномест
 fun findAccountByRules(payment: IncomingPayment): String? {
 
     //flats
