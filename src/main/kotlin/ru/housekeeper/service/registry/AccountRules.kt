@@ -6,10 +6,10 @@ import ru.housekeeper.utils.getParkingAccount
 import ru.housekeeper.utils.getSpecialAccount
 
 /**
- * Правила для платежей от жителей
+ * Определение платежей от жителей
  */
 
-//Поиск специального лицевого счета в строке назначения платежа по правилам для спец-счёта
+//Поиск лицевого счета для спец-счёта
 fun findSpecialAccountByRules(payment: IncomingPayment): String? {
     if (payment.fromName.contains("Михайлова Елена Владимировна", true))
         return getSpecialAccount(17)
@@ -42,7 +42,7 @@ fun findSpecialAccountByRules(payment: IncomingPayment): String? {
     return null
 }
 
-//Поиск Лицевого счета в строке назначения платежа по правилам для обычного счёта для квартир и машиномест
+//Поиск лицевого счета для обычного счёта для квартир и машиномест
 fun findAccountByRules(payment: IncomingPayment): String? {
 
     //flats

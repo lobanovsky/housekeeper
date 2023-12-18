@@ -6,11 +6,12 @@ import ru.housekeeper.model.entity.payment.IncomingPayment
 import ru.housekeeper.utils.getOfficeAccount
 
 /**
- * Правила для платежей не от жителей.
+ * Определение платежей не от жителей (от юридических лиц, от банков и т.д.)
  */
 
-//Пропуск специальных платежей по правилам
+//Правила пропуска платежей для спец-счёта
 fun nonSpecialAccountRules(payment: IncomingPayment): Boolean {
+    if (fromContains(payment,"Департамент финансов города", UNKNOWN)) return true
     if (purposeContains(payment, "Доход от размещения на депозитном счете", UNKNOWN)) return true
     if (purposeContains(payment, "Пени по взносам на капремонт по жилпом в МКД", UNKNOWN)) return true
     if (purposeContains(payment, "Средства бюджета на возм выпадающих доход от предост льгот", UNKNOWN)) return true
@@ -22,7 +23,7 @@ fun nonSpecialAccountRules(payment: IncomingPayment): Boolean {
     return false
 }
 
-//Пропуск платежей по правилам
+//Правила пропуска платежей для обычного счёта для квартир и машиномест
 fun nonAccountRules(payment: IncomingPayment): Boolean {
 
     //Сбер реестры
@@ -78,6 +79,14 @@ private fun taxableEqInn(payment: IncomingPayment, inn: String): Boolean {
 
 private fun purposeContains(payment: IncomingPayment, other: String, type: IncomingPaymentTypeEnum): Boolean {
     if (payment.purpose.contains(other, ignoreCase = true)) {
+        payment.type = type
+        return true
+    }
+    return false
+}
+
+private fun fromContains(payment: IncomingPayment, other: String, type: IncomingPaymentTypeEnum): Boolean {
+    if (payment.fromName.contains(other, ignoreCase = true)) {
         payment.type = type
         return true
     }
