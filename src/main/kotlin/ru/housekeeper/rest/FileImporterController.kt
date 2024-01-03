@@ -135,7 +135,7 @@ class FileImporterController(
     fun importAccountsFromRegistry(
         @RequestPart file: MultipartFile,
     ): AccountRegistryResponse {
-        fileService.isExtensionEqual(file, "xls")
+        fileService.isExtensionEqual(file)
         val checkSum = fileService.isDuplicateAndGetChecksum(file)
         val (totalSize, flatsWithCertSize, garagesOrOfficesWithCertSize) = roomService.parseAndSaveRegistry(
             file,

@@ -9,22 +9,28 @@ import ru.housekeeper.utils.getOfficeAccount
  * Определение платежей не от жителей (от юридических лиц, от банков и т.д.)
  */
 
-//Правила пропуска платежей для спец-счёта
-fun nonSpecialAccountRules(payment: IncomingPayment): Boolean {
-    if (fromContains(payment,"Департамент финансов города", UNKNOWN)) return true
-    if (purposeContains(payment, "Доход от размещения на депозитном счете", UNKNOWN)) return true
-    if (purposeContains(payment, "Пени по взносам на капремонт по жилпом в МКД", UNKNOWN)) return true
-    if (purposeContains(payment, "Средства бюджета на возм выпадающих доход от предост льгот", UNKNOWN)) return true
-    if (purposeContains(payment, "Взносы на капремонт по", UNKNOWN)) return true
-    if (purposeContains(payment, "Уплачены проценты за период", UNKNOWN)) return true
-    if (purposeContains(payment, "Взносы капремонт жилпом в МКД адрес Марьиной рощи 17-й пр. д.1 за период", UNKNOWN)) return true
-    if (purposeContains(payment, "Взносы капремонт нежилпом в МКД адрес Марьиной рощи 17-й пр. д.1 за период", UNKNOWN)) return true
-
-    return false
-}
-
 //Правила пропуска платежей для обычного счёта для квартир и машиномест
-fun nonAccountRules(payment: IncomingPayment): Boolean {
+fun rules(payment: IncomingPayment): Boolean {
+    //--- специальный счёт ---
+    if (purposeAndFromContains(
+            payment = payment,
+            from = "Департамент финансов города",
+            purpose = "0313064",
+            type = SUBSIDY
+        )
+    ) return true
+    if (purposeAndFromContains(
+            payment = payment,
+            from = "Департамент финансов города",
+            purpose = "0313068",
+            type = SUBSIDY_FOR_CAPITAL_REPAIR
+        )
+    ) return true
+
+    if (fromContains(payment, "Департамент финансов города", UNKNOWN)) return true
+    if (purposeContains(payment, "Уплачены проценты за период", UNKNOWN)) return true
+
+    //--- обычный счёт ---
 
     //Сбер реестры
     if (purposeContains(payment, "EPS", SBER_REGISTRY)) return true
@@ -53,7 +59,7 @@ fun nonAccountRules(payment: IncomingPayment): Boolean {
     //Исполнительный лист
     if (purposeContains(payment, "ИЛ ФС", UNKNOWN)) return true
 
-    //Налогооблагаемые платежи
+    //--- Налогооблагаемые платежи ---
 
     //ПАО "Ростелеком"
     if (taxableEqInn(payment, "7707049388")) return true
@@ -87,6 +93,23 @@ private fun purposeContains(payment: IncomingPayment, other: String, type: Incom
 
 private fun fromContains(payment: IncomingPayment, other: String, type: IncomingPaymentTypeEnum): Boolean {
     if (payment.fromName.contains(other, ignoreCase = true)) {
+        payment.type = type
+        return true
+    }
+    return false
+}
+
+private fun purposeAndFromContains(
+    payment: IncomingPayment,
+    from: String,
+    purpose: String,
+    type: IncomingPaymentTypeEnum
+): Boolean {
+    if (payment.fromName.contains(other = from, ignoreCase = true) && payment.purpose.contains(
+            purpose,
+            ignoreCase = true
+        )
+    ) {
         payment.type = type
         return true
     }

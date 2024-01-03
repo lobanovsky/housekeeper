@@ -14,6 +14,10 @@ enum class IncomingPaymentTypeEnum(val description: String, val color: ColorEnum
     //лицевые счета
     ACCOUNT("Л/с", ColorEnum.GREEN),
     UNKNOWN_ACCOUNT("Неопределенный л/с", ColorEnum.RED),
+    //субсидии и компенсации
+    SUBSIDY("Субсидия", ColorEnum.GRAY),
+    //субсидии за капитальный ремонт
+    SUBSIDY_FOR_CAPITAL_REPAIR("Субсидия на капремонт", ColorEnum.GRAY),
     //неопознанные
     UNKNOWN("Неопознанный", ColorEnum.PURPLE)
 }

@@ -3,7 +3,7 @@ package ru.housekeeper.service.registry
 import org.springframework.stereotype.Service
 import ru.housekeeper.enums.payment.IncomingPaymentTypeEnum
 import ru.housekeeper.model.entity.payment.IncomingPayment
-import ru.housekeeper.repository.AccountRepository
+import ru.housekeeper.repository.account.AccountRepository
 import ru.housekeeper.repository.payment.IncomingPaymentRepository
 import ru.housekeeper.utils.logger
 import java.time.LocalDateTime
@@ -19,17 +19,14 @@ class RuleService(
         specialAccount: Boolean,
         useInactiveAccount: Boolean = false
     ): List<IncomingPayment> {
-        val accounts = (if (useInactiveAccount) {
-            accountRepository.findBySpecial(specialAccount)
-        } else {
-            accountRepository.findActiveBySpecial(specialAccount)
-        }).map { it.number }.toSet()
+        val accounts = accountRepository.findBySpecialAndActive(specialAccount, useInactiveAccount)
+            .map { it.number }.toSet()
         if (accounts.isEmpty()) {
             logger().warn("Cчета не найдены")
             return emptyList()
         }
         val payments = paymentRepository.findByToAccountsAndAccountIsNull(accounts)
-            .filterNot { if (specialAccount) nonSpecialAccountRules(it) else nonAccountRules(it) }
+            .filterNot { rules(it) }
 
         var count = 0
         val updateAccountDateTime = LocalDateTime.now()
