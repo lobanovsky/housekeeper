@@ -30,7 +30,7 @@ class IncomingPayment(
     docNumber: String = "",
     vo: String = "",
     bik: String = "",
-    bankName: String = "",
+    bankName: String? = null,
     purpose: String = "",
 
     createDate: LocalDateTime = LocalDateTime.now(),

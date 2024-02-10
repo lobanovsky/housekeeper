@@ -28,7 +28,7 @@ abstract class Payment(
     val docNumber: String = "",
     val vo: String = "",
     val bik: String = "",
-    val bankName: String = "",
+    val bankName: String? = null,
     val purpose: String = "",
 
     @Column(updatable = false)
