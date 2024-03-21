@@ -25,7 +25,7 @@ class PaymentsTest {
     @Test
     fun bikAndName() {
         val bikAndName = "БИК 044525232 ПАО \"МТС-Банк\", г.Москва"
-        val (bik, name) = PaymentParser(MockMultipartFile("fileName", "".byteInputStream())).bikAndNameParserV2(
+        val (bik, name) = PaymentParser(MockMultipartFile("fileName", "".byteInputStream())).bikAndNameParserV2orV3(
             bikAndName
         )
         assert(bik == "044525232")

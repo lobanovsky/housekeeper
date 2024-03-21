@@ -11,7 +11,6 @@ import ru.housekeeper.model.dto.payment.PaymentVO
 import ru.housekeeper.utils.logger
 import java.math.BigDecimal
 import java.time.LocalDate
-import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 
 class PaymentParser(private val file: MultipartFile) {
@@ -20,8 +19,9 @@ class PaymentParser(private val file: MultipartFile) {
         val row = sheet.getRow(1)
         val version = row.getCell(5).stringCellValue
         if (version.startsWith("СберБизнес 41.")) return SberVersionEnum.V1
-        if (version.startsWith("СберБизнес. 03")) return SberVersionEnum.V2
-        return SberVersionEnum.UNKNOWN
+        if (version.startsWith("СберБизнес. 03.001.02-15")) return SberVersionEnum.V2
+        if (version.startsWith("СберБизнес. 03.001.02-18")) return SberVersionEnum.V3
+        throw IllegalArgumentException("Unknown version of excel document")
     }
 
     fun parse(): List<PaymentVO> {
@@ -39,15 +39,21 @@ class PaymentParser(private val file: MultipartFile) {
     }
 
     private fun sheetParser(sheet: Sheet, version: SberVersionEnum): List<PaymentVO> {
-        val dateNum = if (version == SberVersionEnum.V1) 1 else 2
+        val dateNum = when (version) {
+            SberVersionEnum.V1, SberVersionEnum.V3 -> 1
+            SberVersionEnum.V2 -> 2
+        }
         val payerNum = 4
         val recipientNum = 8
         val outgoingSumNum = 9
         val incomingSumNum = 13
         val docNumberNum = 14
         val voNum = 16
-        val binAndNameNum = 17
-        val purposeNum = if (version == SberVersionEnum.V1) 20 else 19
+        val bikAndNameNum = 17
+        val purposeNum = when (version) {
+            SberVersionEnum.V1, SberVersionEnum.V3 -> 20
+            SberVersionEnum.V2 -> 19
+        }
 
         logger().info("Reading ${sheet.lastRowNum} rows from sheet: ${sheet.sheetName}")
 
@@ -62,18 +68,15 @@ class PaymentParser(private val file: MultipartFile) {
             val payer = counterpartyParser(row.getCell(payerNum).stringCellValue.trim())
             val recipient = counterpartyParser(row.getCell(recipientNum).stringCellValue.trim())
             val (bik, bankName) = when (version) {
-                SberVersionEnum.V1 -> bikAndNameParser(row.getCell(binAndNameNum).stringCellValue.trim())
-                SberVersionEnum.V2 -> bikAndNameParserV2(row.getCell(binAndNameNum).stringCellValue.trim())
-                SberVersionEnum.UNKNOWN -> Pair("", "")
+                SberVersionEnum.V1 -> bikAndNameParser(row.getCell(bikAndNameNum).stringCellValue.trim())
+                SberVersionEnum.V2, SberVersionEnum.V3 -> bikAndNameParserV2orV3(row.getCell(bikAndNameNum).stringCellValue.trim())
             }
             val date = when (version) {
                 SberVersionEnum.V1 -> row.getCell(dateNum).localDateTimeCellValue
-                SberVersionEnum.V2 -> LocalDate.parse(
+                SberVersionEnum.V2, SberVersionEnum.V3 -> LocalDate.parse(
                     row.getCell(dateNum).stringCellValue.toString().trim(),
                     DateTimeFormatter.ofPattern("dd.MM.yyyy")
                 ).atStartOfDay()
-
-                SberVersionEnum.UNKNOWN -> LocalDateTime.now()
             }
             val docNumber = row.getCell(docNumberNum).stringCellValue.trim()
             val vo = row.getCell(voNum).stringCellValue.trim()
@@ -125,7 +128,7 @@ class PaymentParser(private val file: MultipartFile) {
     }
 
     //БИК 044525232 ПАО "МТС-Банк", г.Москва
-    fun bikAndNameParserV2(bikAndName: String): Pair<String, String?> {
+    fun bikAndNameParserV2orV3(bikAndName: String): Pair<String, String?> {
         val split = bikAndName.split(" ", limit = 3)
         val bik = split[1]
         val name = if (split.size > 2) split[2] else null
