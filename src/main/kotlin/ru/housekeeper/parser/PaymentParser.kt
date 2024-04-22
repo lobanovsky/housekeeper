@@ -22,6 +22,7 @@ class PaymentParser(private val file: MultipartFile) {
         if (version.startsWith("СберБизнес 41.")) return V1
         if (version.startsWith("СберБизнес. 03.001.02-15")) return V2
         if (version.startsWith("СберБизнес. 03.001.02-18")) return V3
+        if (version.startsWith("СберБизнес. 03.001.02-20")) return V4
         throw IllegalArgumentException("Unknown version of excel document")
     }
 
