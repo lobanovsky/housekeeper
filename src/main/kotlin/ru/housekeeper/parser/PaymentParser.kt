@@ -6,6 +6,7 @@ import org.apache.poi.ss.usermodel.Sheet
 import org.apache.poi.ss.usermodel.WorkbookFactory
 import org.springframework.web.multipart.MultipartFile
 import ru.housekeeper.enums.registry.SberVersionEnum
+import ru.housekeeper.enums.registry.SberVersionEnum.*
 import ru.housekeeper.model.dto.payment.PaymentCounterparty
 import ru.housekeeper.model.dto.payment.PaymentVO
 import ru.housekeeper.utils.logger
@@ -18,9 +19,9 @@ class PaymentParser(private val file: MultipartFile) {
     private fun getVersion(sheet: Sheet): SberVersionEnum {
         val row = sheet.getRow(1)
         val version = row.getCell(5).stringCellValue
-        if (version.startsWith("СберБизнес 41.")) return SberVersionEnum.V1
-        if (version.startsWith("СберБизнес. 03.001.02-15")) return SberVersionEnum.V2
-        if (version.startsWith("СберБизнес. 03.001.02-18")) return SberVersionEnum.V3
+        if (version.startsWith("СберБизнес 41.")) return V1
+        if (version.startsWith("СберБизнес. 03.001.02-15")) return V2
+        if (version.startsWith("СберБизнес. 03.001.02-18")) return V3
         throw IllegalArgumentException("Unknown version of excel document")
     }
 
@@ -40,8 +41,8 @@ class PaymentParser(private val file: MultipartFile) {
 
     private fun sheetParser(sheet: Sheet, version: SberVersionEnum): List<PaymentVO> {
         val dateNum = when (version) {
-            SberVersionEnum.V1, SberVersionEnum.V3 -> 1
-            SberVersionEnum.V2 -> 2
+            V1, V3, V4 -> 1
+            V2 -> 2
         }
         val payerNum = 4
         val recipientNum = 8
@@ -51,14 +52,14 @@ class PaymentParser(private val file: MultipartFile) {
         val voNum = 16
         val bikAndNameNum = 17
         val purposeNum = when (version) {
-            SberVersionEnum.V1, SberVersionEnum.V3 -> 20
-            SberVersionEnum.V2 -> 19
+            V1, V3, V4 -> 20
+            V2 -> 19
         }
 
         logger().info("Reading ${sheet.lastRowNum} rows from sheet: ${sheet.sheetName}")
 
         val payments = mutableListOf<PaymentVO>()
-        val numberOfSkippingRows = if (version == SberVersionEnum.V1) 11 else 16
+        val numberOfSkippingRows = if (version == V1) 11 else 16
         for (i in numberOfSkippingRows..sheet.lastRowNum) {
             val row = sheet.getRow(i) ?: continue
             if (row.getCell(voNum).stringCellValue.trim().isEmpty()) {
@@ -68,12 +69,12 @@ class PaymentParser(private val file: MultipartFile) {
             val payer = counterpartyParser(row.getCell(payerNum).stringCellValue.trim())
             val recipient = counterpartyParser(row.getCell(recipientNum).stringCellValue.trim())
             val (bik, bankName) = when (version) {
-                SberVersionEnum.V1 -> bikAndNameParser(row.getCell(bikAndNameNum).stringCellValue.trim())
-                SberVersionEnum.V2, SberVersionEnum.V3 -> bikAndNameParserV2orV3(row.getCell(bikAndNameNum).stringCellValue.trim())
+                V1 -> bikAndNameParser(row.getCell(bikAndNameNum).stringCellValue.trim())
+                V2, V3, V4 -> bikAndNameParserV2orV3(row.getCell(bikAndNameNum).stringCellValue.trim())
             }
             val date = when (version) {
-                SberVersionEnum.V1 -> row.getCell(dateNum).localDateTimeCellValue
-                SberVersionEnum.V2, SberVersionEnum.V3 -> LocalDate.parse(
+                V1, V4 -> row.getCell(dateNum).localDateTimeCellValue
+                V2, V3 -> LocalDate.parse(
                     row.getCell(dateNum).stringCellValue.toString().trim(),
                     DateTimeFormatter.ofPattern("dd.MM.yyyy")
                 ).atStartOfDay()
