@@ -4,6 +4,7 @@ import ru.housekeeper.model.entity.payment.IncomingPayment
 import ru.housekeeper.utils.getFlatAccount
 import ru.housekeeper.utils.getParkingAccount
 import ru.housekeeper.utils.getSpecialAccount
+import ru.housekeeper.utils.getSpecialParkingAccount
 
 /**
  * Определение платежей от жителей
@@ -11,6 +12,7 @@ import ru.housekeeper.utils.getSpecialAccount
 
 //Поиск лицевого счета для спец-счёта
 fun findSpecialAccountByRules(payment: IncomingPayment): String? {
+    //flats
     if (payment.fromName.contains("Михайлова Елена Владимировна", true))
         return getSpecialAccount(17)
 
@@ -39,6 +41,29 @@ fun findSpecialAccountByRules(payment: IncomingPayment): String? {
 
     if (payment.fromName.contains("БЕССОНОВА ОЛЬГА ПАВЛОВНА", true))
         return getSpecialAccount(21)
+
+    //paring
+    if (payment.fromName.contains("БОЕВ РОМАН БОРИСОВИЧ", true)
+        && payment.purpose.contains("700105", true)) {
+        return getSpecialParkingAccount(75)
+    }
+    if (payment.fromName.contains("Бобровский Николай Эдуардович", true)
+        && payment.purpose.contains("Машиноместо №34", true)) {
+        return getSpecialParkingAccount(68)
+    }
+    if (payment.fromName.contains("Бобровский Николай Эдуардович", true)
+        && payment.purpose.contains("Машиноместо №35", true)) {
+        return getSpecialParkingAccount(68)
+    }
+    if (payment.fromName.contains("Бобровский Николай Эдуардович", true)
+        && payment.purpose.contains("Машиноместо №67", true)) {
+        return getSpecialParkingAccount(68)
+    }
+    if (payment.fromName.contains("Бобровский Николай Эдуардович", true)
+        && payment.purpose.contains("Машиноместо №68", true)) {
+        return getSpecialParkingAccount(68)
+    }
+
     return null
 }
 
