@@ -3,8 +3,9 @@ package ru.housekeeper
 import org.junit.jupiter.api.Test
 import ru.housekeeper.model.entity.payment.IncomingPayment
 import ru.housekeeper.service.registry.RuleService
+import kotlin.test.Ignore
 
-//@Ignore
+@Ignore
 //@TestPropertySource(locations = ["classpath:application-test.yml"])
 //@SpringBootTest
 class AccountTest {

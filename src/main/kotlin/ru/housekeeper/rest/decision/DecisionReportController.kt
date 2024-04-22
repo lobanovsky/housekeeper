@@ -4,10 +4,14 @@ import io.swagger.v3.oas.annotations.Operation
 import org.springframework.http.HttpHeaders
 import org.springframework.http.MediaType
 import org.springframework.http.ResponseEntity
-import org.springframework.web.bind.annotation.*
-import ru.housekeeper.excel.*
+import org.springframework.web.bind.annotation.CrossOrigin
+import org.springframework.web.bind.annotation.GetMapping
+import org.springframework.web.bind.annotation.RequestMapping
+import org.springframework.web.bind.annotation.RestController
+import ru.housekeeper.excel.toExcelDecisions
+import ru.housekeeper.excel.toExcelForTemplate
 import ru.housekeeper.service.DecisionService
-import ru.housekeeper.utils.*
+import ru.housekeeper.utils.yyyyMMddHHmmssDateFormat
 import java.time.LocalDateTime
 
 @CrossOrigin
@@ -17,17 +21,17 @@ class DecisionReportController(
     private val decisionService: DecisionService,
 ) {
 
-    @GetMapping(path = ["/decisions/not-voted"])
+    @GetMapping(path = ["/not-voted"])
     @Operation(summary = "Print not voted decisions")
     fun makeNotVotedDecisionsReport(): Int =
         decisionService.printDecision("/not-voted") { decisionService.getNotVoted() }
 
-    @GetMapping(path = ["/decisions/selected-to-print"])
+    @GetMapping(path = ["/selected-to-print"])
     @Operation(summary = "Print selected decisions")
     fun printSelectedDecisionsReport(): Int =
         decisionService.printDecision("/selected-to-print") { decisionService.getPrint() }
 
-    @GetMapping(path = ["/decisions"])
+    @GetMapping()
     @Operation(summary = "Export all decisions")
     fun makeDecisionReport(): ResponseEntity<ByteArray> {
         val decisions = decisionService.findAll()

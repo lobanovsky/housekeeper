@@ -52,6 +52,7 @@ fun findAccountByRules(payment: IncomingPayment): String? {
 
     if (payment.fromName.contains("Таланова Наталья Алексеевна", true))
         return getFlatAccount(11)
+    //!!!, (ЛСИ00005000116;ПРД02.2024) 0000 50011 а должно 0000 0000 500116
 
     if (payment.fromName.contains("БЕССОНОВА ОЛЬГА ПАВЛОВНА", true))
         return getFlatAccount(21)

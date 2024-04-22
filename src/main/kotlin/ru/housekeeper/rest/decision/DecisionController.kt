@@ -19,7 +19,7 @@ class DecisionController(
     @Operation(summary = "Sent decisions to mail")
     @PostMapping("/send")
     fun sendDecisions(): MailingResponse {
-        val (totalDecisions, totalEmails, sentDecisions, sentEmails) = decisionService.sendDecisions(3L) {decisionService.findNotVoted()}
+        val (totalDecisions, totalEmails, sentDecisions, sentEmails) = decisionService.sendDecisions(6L) {decisionService.findNotVoted()}
         return MailingResponse(totalDecisions, totalEmails, sentDecisions, sentEmails)
     }
 

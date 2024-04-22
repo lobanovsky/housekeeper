@@ -29,7 +29,7 @@ class DecisionService(
 
     fun getPrint(): List<Decision> = decisionRepository.findByPrint(print = true).sortedByDescending { it.percentage }
 
-    fun printDecision(destination: String, f: () -> List<Decision>): Int {
+    fun printDecision(path: String, f: () -> List<Decision>): Int {
         val notVotedDecisions = f.invoke()
         logger().info("notVotedDecisions: ${notVotedDecisions.size}")
         val allDecisionLines = mutableListOf<String>()
@@ -41,9 +41,9 @@ class DecisionService(
         }
         val fileName = "Decisions_${LocalDateTime.now().format(yyyyMMddHHmmssDateFormat())}"
         docFileService.doIt(
-            rootPath = "~/etc",
+            rootPath = "etc",
             lines = allDecisionLines,
-            path = destination,
+            path = path,
             fileName = fileName
         )
         return notVotedDecisions.size
@@ -74,8 +74,8 @@ class DecisionService(
         getDecisions.invoke().forEach { decision ->
             val subject = "ТСН МР17дом1. Решение собственника ${decision.fullName}. (${decision.numbersOfRooms})"
             val file = ru.housekeeper.docs.SimpleDocFileService().doIt(decision.blank.split("\n"))
-            val attachmentFilename = "Решение собственника ${decision.fullName} (${decision.numbersOfRooms}).docx"
-            val attachmentFile = File("~/etc/blanks/$attachmentFilename")
+            val attachmentFilename = "Решение собственника (${decision.numbersOfRooms}) ${decision.fullName}.docx"
+            val attachmentFile = File("etc/blanks/$attachmentFilename")
             attachmentFile.writeBytes(file.toByteArray())
             decision.emails.forEach { email ->
                 logger().info("Send ${numberOfMailsSent + 1} of $totalEmails")
@@ -107,7 +107,7 @@ class DecisionService(
 
     //TODO to add skip duplicate
     fun prepareDecision(): DecisionInfo {
-        val template = templateService.findTemplateById(1L)
+        val template = templateService.findTemplateById(5L)
         val header = template?.header?.split("\n") ?: emptyList()
         val footer = template?.footer?.split("\n") ?: emptyList()
 
