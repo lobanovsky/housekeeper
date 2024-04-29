@@ -39,9 +39,10 @@ class AnswerParser(private val file: MultipartFile) {
 
             val result = mutableListOf<AnswerEnum>()
             for (j in 0 until NUMBER_OF_QUESTIONS) {
-                val answer = when (row.getCell(j + firstQuestionNum).cellType) {
-                    CellType.NUMERIC -> row.getCell(j + firstQuestionNum).numericCellValue.toInt().toString()
-                    CellType.STRING -> row.getCell(j + firstQuestionNum).stringCellValue
+                val cell = row.getCell(j + firstQuestionNum) ?: break
+                val answer = when (cell.cellType) {
+                    CellType.NUMERIC -> cell.numericCellValue.toInt().toString()
+                    CellType.STRING -> cell.stringCellValue
                     else -> ""
                 }
                 if (answer.isBlank()) break

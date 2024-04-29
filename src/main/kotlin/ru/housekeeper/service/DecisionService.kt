@@ -10,7 +10,6 @@ import ru.housekeeper.parser.AnswerParser
 import ru.housekeeper.repository.DecisionRepository
 import ru.housekeeper.service.email.MailService
 import ru.housekeeper.utils.logger
-import ru.housekeeper.utils.yyyyMMddHHmmssDateFormat
 import java.io.File
 import java.math.BigDecimal
 import java.time.LocalDateTime
@@ -25,28 +24,27 @@ class DecisionService(
     private val docFileService: ru.housekeeper.docs.DocFileService,
 ) {
 
-    fun getNotVoted(): List<Decision> = decisionRepository.findByVoted(voted = false).sortedByDescending { it.percentage }
+    fun getNotVoted(): List<Decision> =
+        decisionRepository.findByVoted(voted = false).sortedByDescending { it.percentage }
 
     fun getPrint(): List<Decision> = decisionRepository.findByPrint(print = true).sortedByDescending { it.percentage }
 
-    fun printDecision(path: String, f: () -> List<Decision>): Int {
-        val notVotedDecisions = f.invoke()
-        logger().info("notVotedDecisions: ${notVotedDecisions.size}")
-        val allDecisionLines = mutableListOf<String>()
+    fun printDecision(path: String, getDecisions: () -> List<Decision>): Int {
+        val decisions = getDecisions.invoke()
+        logger().info("Number of printing decisions: ${decisions.size}")
 
-        notVotedDecisions.forEach { decision ->
+        decisions.forEach { decision ->
             val blank = decision.blank
             val decisionLines = blank.split("\n")
-            allDecisionLines.addAll(decisionLines)
+            val fileName = "Решение собственника (${decision.numbersOfRooms}) ${decision.fullName}.docx"
+            docFileService.doIt(
+                rootPath = "etc",
+                lines = decisionLines,
+                path = path,
+                fileName = fileName
+            )
         }
-        val fileName = "Decisions_${LocalDateTime.now().format(yyyyMMddHHmmssDateFormat())}"
-        docFileService.doIt(
-            rootPath = "etc",
-            lines = allDecisionLines,
-            path = path,
-            fileName = fileName
-        )
-        return notVotedDecisions.size
+        return decisions.size
     }
 
 
@@ -54,7 +52,8 @@ class DecisionService(
 
     fun findNotVoted(): List<Decision> = decisionRepository.findNotVoted()
 
-    fun findNotNotifiedAndNotVoted(): List<Decision> = decisionRepository.findByNotifiedAndVoted(notified = false, voted = false)
+    fun findNotNotifiedAndNotVoted(): List<Decision> =
+        decisionRepository.findByNotifiedAndVoted(notified = false, voted = false)
 
     data class MailingInfo(
         val totalDecisions: Int,
@@ -127,7 +126,8 @@ class DecisionService(
                     percentage = percentageSquare,
                     rooms = owner.rooms,
                     emails = owner.emails.toMutableSet(),
-                    blank = listOf(header, makeBlank(owner.rooms.toList(), existRooms), footer).flatten().joinToString("\n"),
+                    blank = listOf(header, makeBlank(owner.rooms.toList(), existRooms), footer).flatten()
+                        .joinToString("\n"),
                     numbersOfRooms = getRoomNumbers(owner.rooms.toList(), existRooms),
                     createDate = createDate,
                 )
@@ -169,9 +169,11 @@ class DecisionService(
         return lines.sortedBy { it }
     }
 
-    private fun getTotalSquare(rooms: List<Long?>, existRooms: Map<Long?, Room>) = rooms.map { existRooms[it]?.square }.sumOf { it ?: BigDecimal.ZERO }
+    private fun getTotalSquare(rooms: List<Long?>, existRooms: Map<Long?, Room>) =
+        rooms.map { existRooms[it]?.square }.sumOf { it ?: BigDecimal.ZERO }
 
-    private fun getPercentageSquare(rooms: List<Long?>, existRooms: Map<Long?, Room>) = rooms.map { existRooms[it]?.percentage }.sumOf { it ?: BigDecimal.ZERO }
+    private fun getPercentageSquare(rooms: List<Long?>, existRooms: Map<Long?, Room>) =
+        rooms.map { existRooms[it]?.percentage }.sumOf { it ?: BigDecimal.ZERO }
 
     fun parseAndSave(file: MultipartFile, checkSum: String): Int {
         val answers = AnswerParser(file).parse()
@@ -179,6 +181,7 @@ class DecisionService(
         for (answer in answers) {
             val decision = decisionRepository.findByIdOrNull(answer.decisionId)
             decision?.answers = answer.answers
+            decision?.voted = true
             decision?.let { decisionRepository.save(it) }
         }
         return answers.size

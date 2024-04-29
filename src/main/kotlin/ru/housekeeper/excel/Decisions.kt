@@ -47,10 +47,31 @@ private fun createPercentageSheet(workBook: Workbook, sheetName: String, decisio
     headers.createCell(3).setCellValue("Воздержался")
     headers.createCell(4).setCellValue("Кворум пройден (более $QUORUM%)")
 
+    val descriptionOfQuestions = mapOf(
+        1 to "Председатель",
+        2 to "Счётная комиссия",
+        3 to "Фин.план 2023",
+        4 to "Фин.план 2024",
+        5 to "Депозит на спец.счёт",
+        6 to "Ремонт швов",
+        7 to "Срок кап.ремонта",
+        8 to "3,5млн на кап.ремонт",
+        9 to "Источник - спец.счёт",
+        10 to "Приёмка председателем кап.ремонта",
+        11 to "Сод. и ремонт: 38.6р/мес -> 42р/мес с кв.м.",
+        12 to "Консьерж 300р/мес -> 325р/мес",
+        13 to "Садовник за 325р/мес",
+        14 to "Индексация/инфляция",
+        15 to "Забор за 210р/кв.м.",
+        16 to "Домофон за 112р/мес",
+        17 to "Игорь -> Анатолий",
+        18 to "Хранение бланков",
+    )
+
     for (i in questions.indices) {
         val index = i + 1
         val row: Row = percentageSheet.createRow(index)
-        row.createCell(0).setCellValue(index.toString())
+        row.createCell(0).setCellValue("$index (${descriptionOfQuestions[index]})")
         val percentageOfYes = questions[i].percentOfYes
         val percentageOfNo = questions[i].percentOfNo
         val percentageOfUndefined = questions[i].percentOfUndefined

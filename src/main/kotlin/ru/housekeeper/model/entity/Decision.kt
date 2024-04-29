@@ -39,7 +39,7 @@ class Decision(
     var dateOfNotified: LocalDateTime? = null,
 
     @Column(name = "voted")
-    val voted: Boolean = false,
+    var voted: Boolean = false,
 
     @Column(name = "print")
     val print: Boolean = false,
