@@ -23,6 +23,7 @@ class PaymentParser(private val file: MultipartFile) {
         if (version.startsWith("СберБизнес. 03.001.02-15")) return V2
         if (version.startsWith("СберБизнес. 03.001.02-18")) return V3
         if (version.startsWith("СберБизнес. 03.001.02-20")) return V4
+        if (version.startsWith("СберБизнес. 03.001.02-21")) return V5
         throw IllegalArgumentException("Unknown version of excel document")
     }
 
@@ -42,7 +43,7 @@ class PaymentParser(private val file: MultipartFile) {
 
     private fun sheetParser(sheet: Sheet, version: SberVersionEnum): List<PaymentVO> {
         val dateNum = when (version) {
-            V1, V3, V4 -> 1
+            V1, V3, V4, V5 -> 1
             V2 -> 2
         }
         val payerNum = 4
@@ -53,7 +54,7 @@ class PaymentParser(private val file: MultipartFile) {
         val voNum = 16
         val bikAndNameNum = 17
         val purposeNum = when (version) {
-            V1, V3, V4 -> 20
+            V1, V3, V4, V5 -> 20
             V2 -> 19
         }
 
@@ -71,10 +72,10 @@ class PaymentParser(private val file: MultipartFile) {
             val recipient = counterpartyParser(row.getCell(recipientNum).stringCellValue.trim())
             val (bik, bankName) = when (version) {
                 V1 -> bikAndNameParser(row.getCell(bikAndNameNum).stringCellValue.trim())
-                V2, V3, V4 -> bikAndNameParserV2orV3(row.getCell(bikAndNameNum).stringCellValue.trim())
+                V2, V3, V4, V5 -> bikAndNameParserV2orV3(row.getCell(bikAndNameNum).stringCellValue.trim())
             }
             val date = when (version) {
-                V1, V4 -> row.getCell(dateNum).localDateTimeCellValue
+                V1, V4, V5 -> row.getCell(dateNum).localDateTimeCellValue
                 V2, V3 -> LocalDate.parse(
                     row.getCell(dateNum).stringCellValue.toString().trim(),
                     DateTimeFormatter.ofPattern("dd.MM.yyyy")
