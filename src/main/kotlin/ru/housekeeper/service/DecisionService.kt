@@ -70,7 +70,9 @@ class DecisionService(
 
         var numberOfMailsSent = 0
         var numberOfDecisionsSent = 0
-        getDecisions.invoke().forEach { decision ->
+        val decisions = getDecisions.invoke()
+        logger().info("Number of decistions for email sending: ${decisions.size}")
+        decisions.forEach { decision ->
             val subject = "ТСН МР17дом1. Решение собственника ${decision.fullName}. (${decision.numbersOfRooms})"
             val file = ru.housekeeper.docs.SimpleDocFileService().doIt(decision.blank.split("\n"))
             val attachmentFilename = "Решение собственника (${decision.numbersOfRooms}) ${decision.fullName}.docx"

@@ -22,6 +22,6 @@
 
 ### Загрузка новых решений
 1. Очистить решения в БД: update decision set answers = null, voted=false;
-2. Загрузить новые решения (указать файл с решениями): http://{{host}}/api/files/answers/importer
-3. Удалить из БД предыдущий загруженный файл с решениями: delete from file where name='Template_2024-04-25-01-28-24.xlsx';
+2. Удалить из БД предыдущий загруженный файл с решениями: delete from file where name='Template_2024-04-25-01-28-24.xlsx';
+3. Загрузить новые решения (указать файл с решениями): http://{{host}}/api/files/answers/importer
 4. Скачать файл с ответами: http://{{host}}/api/reports/decisions
