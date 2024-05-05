@@ -49,15 +49,15 @@ fun findSpecialAccountByRules(payment: IncomingPayment): String? {
     }
     if (payment.fromName.contains("Бобровский Николай Эдуардович", true)
         && payment.purpose.contains("Машиноместо №34", true)) {
-        return getSpecialParkingAccount(68)
+        return getSpecialParkingAccount(34)
     }
     if (payment.fromName.contains("Бобровский Николай Эдуардович", true)
         && payment.purpose.contains("Машиноместо №35", true)) {
-        return getSpecialParkingAccount(68)
+        return getSpecialParkingAccount(35)
     }
     if (payment.fromName.contains("Бобровский Николай Эдуардович", true)
         && payment.purpose.contains("Машиноместо №67", true)) {
-        return getSpecialParkingAccount(68)
+        return getSpecialParkingAccount(67)
     }
     if (payment.fromName.contains("Бобровский Николай Эдуардович", true)
         && payment.purpose.contains("Машиноместо №68", true)) {
