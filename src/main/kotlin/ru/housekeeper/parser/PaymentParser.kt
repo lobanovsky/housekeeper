@@ -5,8 +5,6 @@ import org.apache.poi.ss.usermodel.CellType
 import org.apache.poi.ss.usermodel.Sheet
 import org.apache.poi.ss.usermodel.WorkbookFactory
 import org.springframework.web.multipart.MultipartFile
-import ru.housekeeper.enums.registry.SberVersionEnum
-import ru.housekeeper.enums.registry.SberVersionEnum.*
 import ru.housekeeper.model.dto.payment.PaymentCounterparty
 import ru.housekeeper.model.dto.payment.PaymentVO
 import ru.housekeeper.utils.logger
@@ -16,18 +14,6 @@ import java.time.format.DateTimeFormatter
 
 class PaymentParser(private val file: MultipartFile) {
 
-    private fun getVersion(sheet: Sheet): SberVersionEnum {
-        val row = sheet.getRow(1)
-        val version = row.getCell(5).stringCellValue
-        if (version.startsWith("СберБизнес 41.")) return V1
-        if (version.startsWith("СберБизнес. 03.001.02-15")) return V2
-        if (version.startsWith("СберБизнес. 03.001.02-18")) return V3
-        if (version.startsWith("СберБизнес. 03.001.02-20")) return V4
-        if (version.startsWith("СберБизнес. 03.001.02-21")) return V5
-        if (version.startsWith("СберБизнес. 03.001.02-22")) return V6
-        throw IllegalArgumentException("Unknown version of excel document")
-    }
-
     fun parse(): List<PaymentVO> {
         logger().info("Start parsing payments file ${file.originalFilename}")
         val workbook = WorkbookFactory.create(file.inputStream)
@@ -35,18 +21,12 @@ class PaymentParser(private val file: MultipartFile) {
         val payments = mutableListOf<PaymentVO>()
         sheetIterator.forEach { sheet ->
             logger().info("Sheet: ${sheet.sheetName}")
-            val version = getVersion(sheet)
-            logger().info("Parse version $version")
-            payments.addAll(sheetParser(sheet, version))
+            payments.addAll(sheetParser(sheet))
         }
         return payments
     }
 
-    private fun sheetParser(sheet: Sheet, version: SberVersionEnum): List<PaymentVO> {
-        val dateNum = when (version) {
-            V1, V3, V4, V5, V6 -> 1
-            V2 -> 2
-        }
+    private fun sheetParser(sheet: Sheet): List<PaymentVO> {
         val payerNum = 4
         val recipientNum = 8
         val outgoingSumNum = 9
@@ -54,16 +34,13 @@ class PaymentParser(private val file: MultipartFile) {
         val docNumberNum = 14
         val voNum = 16
         val bikAndNameNum = 17
-        val purposeNum = when (version) {
-            V1, V3, V4, V5, V6 -> 20
-            V2 -> 19
-        }
+        val findDate = findMarker("Дата проводки", sheet)
+        val findPurpose = findMarker("Назначение платежа", sheet)
 
         logger().info("Reading ${sheet.lastRowNum} rows from sheet: ${sheet.sheetName}")
 
         val payments = mutableListOf<PaymentVO>()
-        val numberOfSkippingRows = if (version == V1) 11 else 16
-        for (i in numberOfSkippingRows..sheet.lastRowNum) {
+        for (i in findDate.first..sheet.lastRowNum) {
             val row = sheet.getRow(i) ?: continue
             if (row.getCell(voNum).stringCellValue.trim().isEmpty()) {
                 logger().info("$i: Checking the VO cell for emtpy: VO is null, continue")
@@ -71,22 +48,24 @@ class PaymentParser(private val file: MultipartFile) {
             }
             val payer = counterpartyParser(row.getCell(payerNum).stringCellValue.trim())
             val recipient = counterpartyParser(row.getCell(recipientNum).stringCellValue.trim())
-            val (bik, bankName) = when (version) {
-                V1 -> bikAndNameParser(row.getCell(bikAndNameNum).stringCellValue.trim())
-                V2, V3, V4, V5, V6 -> bikAndNameParserV2orV3(row.getCell(bikAndNameNum).stringCellValue.trim())
-            }
-            val date = when (version) {
-                V1, V4, V5, V6 -> row.getCell(dateNum).localDateTimeCellValue
-                V2, V3 -> LocalDate.parse(
-                    row.getCell(dateNum).stringCellValue.toString().trim(),
+            val (bik, bankName) = bikAndNameParser(row.getCell(bikAndNameNum).stringCellValue.trim())
+
+            val cellType = row.getCell(findDate.second).cellType
+
+            val date = when (cellType) {
+                CellType.NUMERIC -> row.getCell(findDate.second).localDateTimeCellValue
+                CellType.STRING -> LocalDate.parse(
+                    row.getCell(findDate.second).stringCellValue.toString().trim(),
                     DateTimeFormatter.ofPattern("dd.MM.yyyy")
                 ).atStartOfDay()
+
+                else -> throw IllegalArgumentException("Unknown cell type")
             }
             val docNumber = row.getCell(docNumberNum).stringCellValue.trim()
             val vo = row.getCell(voNum).stringCellValue.trim()
             val outgoingSum = getSumOrNull(row.getCell(outgoingSumNum))
             val incomingSum = getSumOrNull(row.getCell(incomingSumNum))
-            val purpose = row.getCell(purposeNum).stringCellValue.trim()
+            val purpose = row.getCell(findPurpose.second).stringCellValue.trim()
 
             logger().info("#$i: date=$date, num=$docNumber, out=$outgoingSum, in=$incomingSum, purpose=$purpose")
 
@@ -123,19 +102,14 @@ class PaymentParser(private val file: MultipartFile) {
         return if (value != 0.0) BigDecimal.valueOf(value) else null
     }
 
-    //БИК 042202603, ВОЛГО-ВЯТСКИЙ БАНК ПАО СБЕРБАНК Г. Нижний Новгород
+    //1) БИК 042202603, ВОЛГО-ВЯТСКИЙ БАНК ПАО СБЕРБАНК Г. Нижний Новгород
+    //2) БИК 044525232 ПАО "МТС-Банк", г.Москва
+    //1) bik = 042202603, bankName = ВОЛГО-ВЯТСКИЙ БАНК ПАО СБЕРБАНК Г. Нижний Новгород
+    //2) bik = 044525232, bankName = ПАО "МТС-Банк"
     private fun bikAndNameParser(bikAndName: String): Pair<String, String> {
-        val split = bikAndName.split(",")
-        val bik = split[0].substring(4)
-        val name = split[1].substring(1)
-        return Pair(bik, name)
-    }
-
-    //БИК 044525232 ПАО "МТС-Банк", г.Москва
-    fun bikAndNameParserV2orV3(bikAndName: String): Pair<String, String?> {
-        val split = bikAndName.split(" ", limit = 3)
-        val bik = split[1]
-        val name = if (split.size > 2) split[2] else null
+        val split = bikAndName.split(" ")
+        val bik = split[1].replace(",", "").trim()
+        val name = split.subList(2, split.size).joinToString(" ")
         return Pair(bik, name)
     }
 
@@ -151,5 +125,23 @@ class PaymentParser(private val file: MultipartFile) {
             accountAndNameOnly -> PaymentCounterparty(account = split[0], name = split[1])
             else -> PaymentCounterparty(account = split[0], inn = split[1], name = split[2])
         }
+    }
+
+    private fun findMarker(marker: String, sheet: Sheet): Pair<Int, Int> {
+        var i = 0;
+        var j = 0;
+        for (row in sheet) {
+            i++
+            for (cell in row) {
+                j++
+                if (cell.cellType != CellType.STRING) continue
+                if (cell.stringCellValue.isBlank()) continue
+                if (cell.stringCellValue.contains(marker)) {
+                    return Pair(i + 1, j - 1)
+                }
+            }
+            j = 0
+        }
+        throw IllegalArgumentException("Marker not found: $marker")
     }
 }
