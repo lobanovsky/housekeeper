@@ -84,4 +84,7 @@ interface IncomingPaymentRepository : CrudRepository<Payment, Long>, IncomingPay
     fun findByToAccountsAndAccountIsNull(
         toAccounts: Set<String>,
     ): List<IncomingPayment>
+
+    @Query("SELECT p FROM IncomingPayment p WHERE p.id = :id")
+    fun findByIdOrNull(id: Long): IncomingPayment?
 }

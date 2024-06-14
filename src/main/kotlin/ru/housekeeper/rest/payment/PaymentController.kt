@@ -23,6 +23,17 @@ class PaymentController(
     private val paymentService: PaymentService,
 ) {
 
+    @Operation(summary = "Set the manual account for the payment")
+    @PatchMapping(value = ["/{id}"])
+    fun setManualAccountForPayment(
+        @PathVariable id: Long,
+        @RequestBody manualAccountRequest: ManualAccountRequest,
+    ) = paymentService.setManualAccountForPayment(id, manualAccountRequest.account)
+
+    data class ManualAccountRequest(
+        val account: String,
+    )
+
     @Operation(summary = "Find all deposits made (outgoing payments)")
     @GetMapping(value = ["/deposits"])
     fun findAllDeposits(): List<DepositResponse> = paymentService.findAllDeposits()
@@ -82,7 +93,8 @@ class PaymentController(
 
     @GetMapping(path = ["/group-by"])
     @Operation(summary = "Find all payments grouped by {groupBy}")
-    fun findAllGroupingPaymentBy() = GroupingPaymentByEnum.values().map { GroupPaymentByResponse(it.name, it.description) }
+    fun findAllGroupingPaymentBy() =
+        GroupingPaymentByEnum.values().map { GroupPaymentByResponse(it.name, it.description) }
 
     data class GroupPaymentByResponse(
         val type: String,

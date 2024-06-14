@@ -7,6 +7,7 @@ import org.springframework.transaction.annotation.Transactional
 import org.springframework.web.multipart.MultipartFile
 import ru.housekeeper.enums.payment.CategoryOfPaymentEnum
 import ru.housekeeper.enums.payment.GroupingPaymentByEnum
+import ru.housekeeper.enums.payment.IncomingPaymentTypeEnum
 import ru.housekeeper.model.dto.AnnualPaymentVO
 import ru.housekeeper.model.dto.MonthPaymentVO
 import ru.housekeeper.model.dto.payment.GroupOfPayment
@@ -22,10 +23,7 @@ import ru.housekeeper.model.filter.OutgoingPaymentsFilter
 import ru.housekeeper.parser.PaymentParser
 import ru.housekeeper.repository.payment.IncomingPaymentRepository
 import ru.housekeeper.repository.payment.OutgoingPaymentRepository
-import ru.housekeeper.utils.MAX_SIZE_PER_PAGE_FOR_EXCEL
-import ru.housekeeper.utils.logger
-import ru.housekeeper.utils.onlyCyrillicLettersAndNumbers
-import ru.housekeeper.utils.sum
+import ru.housekeeper.utils.*
 import java.math.BigDecimal
 import java.time.LocalDateTime
 
@@ -228,5 +226,14 @@ class PaymentService(
         if (incomingSize > 0) incomingPaymentRepository.removeByPack(pack = checksum)
         if (outgoingSize > 0) outgoingPaymentRepository.removeByPack(pack = checksum)
         return incomingSize + outgoingSize
+    }
+
+    fun setManualAccountForPayment(id: Long, account: String): IncomingPayment {
+        val payment = incomingPaymentRepository.findByIdOrNull(id) ?: entityNotfound("входящий платёж" to id)
+        return incomingPaymentRepository.save(payment.apply {
+            this.account = account
+            this.updateAccountDateTime = LocalDateTime.now()
+            this.type = IncomingPaymentTypeEnum.ACCOUNT
+        })
     }
 }
