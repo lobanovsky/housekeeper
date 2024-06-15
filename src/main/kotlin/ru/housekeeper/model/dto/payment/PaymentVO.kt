@@ -10,6 +10,7 @@ import java.math.BigDecimal
 import java.time.LocalDateTime
 
 class PaymentVO(
+    val id: Long? = null,
     val uuid: String,
 
     val date: LocalDateTime,
@@ -96,6 +97,7 @@ fun OutgoingPayment.toPaymentVO(
     outgoingSum: BigDecimal? = null
 ): PaymentVO = with(this) {
     PaymentVO(
+        id = id,
         uuid = uuid,
         date = date,
 
@@ -127,6 +129,7 @@ fun IncomingPayment.toPaymentVO(
     outgoingSum: BigDecimal? = null
 ): PaymentVO = with(this) {
     PaymentVO(
+        id = id,
         uuid = uuid,
         date = date,
 
