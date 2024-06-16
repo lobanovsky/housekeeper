@@ -19,5 +19,7 @@ enum class IncomingPaymentTypeEnum(val description: String, val color: ColorEnum
     //субсидии за капитальный ремонт
     SUBSIDY_FOR_CAPITAL_REPAIR("Субсидия на капремонт", ColorEnum.GRAY),
     //неопознанные
-    UNKNOWN("Неопознанный", ColorEnum.PURPLE)
+    UNKNOWN("Неопознанный", ColorEnum.PURPLE),
+    //Ручная установка аккаунта (автоматически не смогли определить), например, по постановлению суда из описания
+    MANUAL_ACCOUNT("Ручная установка л/с", ColorEnum.GREEN),
 }

@@ -233,7 +233,7 @@ class PaymentService(
         return incomingPaymentRepository.save(payment.apply {
             this.account = account
             this.updateAccountDateTime = LocalDateTime.now()
-            this.type = IncomingPaymentTypeEnum.ACCOUNT
+            this.type = IncomingPaymentTypeEnum.MANUAL_ACCOUNT
         })
     }
 }
