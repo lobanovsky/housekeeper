@@ -4,12 +4,12 @@ import ru.housekeeper.enums.payment.IncomingPaymentTypeEnum
 import java.time.LocalDate
 
 data class IncomingPaymentsFilter(
-    val fromName: String?,
-    val fromInn: String?,
-    val purpose: String?,
-    val taxable: Boolean?,
-    val startDate: LocalDate?,
-    val endDate: LocalDate?,
-    val toAccounts: List<String>?,
-    val type: IncomingPaymentTypeEnum?
+    val fromName: String? = null,
+    val fromInn: String? = null,
+    val purpose: String? = null,
+    val taxable: Boolean? = null,
+    val startDate: LocalDate? = null,
+    val endDate: LocalDate? = null,
+    val toAccounts: List<String>? = null,
+    val type: IncomingPaymentTypeEnum? = null
 )

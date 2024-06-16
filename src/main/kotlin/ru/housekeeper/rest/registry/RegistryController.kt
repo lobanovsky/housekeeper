@@ -18,6 +18,19 @@ class RegistryController(
     private val registryService: RegistryService,
 ) {
 
+    @PostMapping(path = ["/manual-account"])
+    @Operation(summary = "Check and create new registry for manual account")
+    fun getManualRegistry(): ResponseEntity<ByteArray> {
+        val registry = registryService.makeByManualAccount(specialAccount = true)
+        logger().info("Registry size: ${registry.size}")
+        val fileName = "${LocalDateTime.now().format(yyyyMMddHHmmssDateFormat())}_manual_registry.txt"
+        return ResponseEntity.ok()
+            .contentType(MediaType.APPLICATION_OCTET_STREAM)
+            .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"$fileName\"")
+            .header(HttpHeaders.ACCESS_CONTROL_EXPOSE_HEADERS, HttpHeaders.CONTENT_DISPOSITION)
+            .body(registry.joinToString(separator = "\r\n").toByteArray(Charset.forName("WINDOWS-1251")))
+    }
+
     @PostMapping(path = ["/special-account"])
     @Operation(summary = "Check and create new registry for special account")
     fun getSpecialRegistry(

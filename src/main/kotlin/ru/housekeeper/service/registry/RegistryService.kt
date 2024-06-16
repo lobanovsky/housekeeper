@@ -7,6 +7,9 @@ import ru.housekeeper.model.entity.payment.IncomingPayment
 import ru.housekeeper.model.entity.registry.RegistryLastLine
 import ru.housekeeper.model.entity.registry.RegistryRow
 import ru.housekeeper.model.entity.registry.RegistrySum
+import ru.housekeeper.model.filter.IncomingPaymentsFilter
+import ru.housekeeper.service.PaymentService
+import ru.housekeeper.utils.MAX_SIZE_PER_PAGE_FOR_EXCEL
 import ru.housekeeper.utils.logger
 import java.math.BigDecimal
 import java.math.RoundingMode
@@ -16,11 +19,20 @@ import java.time.format.DateTimeFormatter
 @Service
 class RegistryService(
     private val ruleService: RuleService,
+    private val paymentService: PaymentService,
 ) {
+
+    fun makeByManualAccount(specialAccount: Boolean) = makeRegistry(
+        paymentService.findAllIncomingPaymentsWithFilter(
+            pageNum = 0,
+            pageSize = MAX_SIZE_PER_PAGE_FOR_EXCEL,
+            filter = IncomingPaymentsFilter(type = IncomingPaymentTypeEnum.MANUAL_ACCOUNT)
+        ).content
+    )
 
     fun make(specialAccount: Boolean, useInactiveAccount: Boolean) = makeRegistry(ruleService.recognizePayments(specialAccount, useInactiveAccount))
 
-    //Формирование Сбер реестр оплат
+    //Формирование Сбер реестр оплат по лицевым счетам (для типа ACCOUNT и MANUAL_ACCOUNT)
     fun makeRegistry(payments: List<IncomingPayment>): List<String> {
         if (payments.isEmpty()) return emptyList()
         val defaultLocalDateTime = LocalDateTime.of(2020, 11, 12, 10, 10, 10)
@@ -30,7 +42,7 @@ class RegistryService(
         val rows = mutableListOf<RegistryRow>()
         val sum = RegistrySum()
         for (payment in payments) {
-            if (payment.type != IncomingPaymentTypeEnum.ACCOUNT) continue
+            if (payment.type != IncomingPaymentTypeEnum.ACCOUNT && payment.type != IncomingPaymentTypeEnum.MANUAL_ACCOUNT) continue
             rows.add(
                 RegistryRow(
                     date = payment.date.format(ddmmyyyyDateFormat()),
