@@ -30,7 +30,7 @@ class OutgoingPayment(
     sum: BigDecimal? = null,
     docNumber: String = "",
     vo: String = "",
-    bik: String = "",
+    bik: String? = null,
     bankName: String? = null,
     purpose: String = "",
 

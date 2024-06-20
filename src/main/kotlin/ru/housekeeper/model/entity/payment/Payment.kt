@@ -27,7 +27,7 @@ abstract class Payment(
     val sum: BigDecimal? = null,
     val docNumber: String = "",
     val vo: String = "",
-    val bik: String = "",
+    val bik: String? = null,
     val bankName: String? = null,
     val purpose: String = "",
 

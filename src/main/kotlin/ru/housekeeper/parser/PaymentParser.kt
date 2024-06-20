@@ -106,7 +106,8 @@ class PaymentParser(private val file: MultipartFile) {
     //2) БИК 044525232 ПАО "МТС-Банк", г.Москва
     //1) bik = 042202603, bankName = ВОЛГО-ВЯТСКИЙ БАНК ПАО СБЕРБАНК Г. Нижний Новгород
     //2) bik = 044525232, bankName = ПАО "МТС-Банк"
-    private fun bikAndNameParser(bikAndName: String): Pair<String, String> {
+    private fun bikAndNameParser(bikAndName: String): Pair<String?, String?> {
+        if (bikAndName.isBlank()) return Pair(null, null)
         val split = bikAndName.split(" ")
         val bik = split[1].replace(",", "").trim()
         val name = split.subList(2, split.size).joinToString(" ")

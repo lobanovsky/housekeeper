@@ -30,7 +30,7 @@ class PaymentVO(
 
     val vo: String,
 
-    val bik: String,
+    val bik: String?,
     val bankName: String?,
 
     val purpose: String,
