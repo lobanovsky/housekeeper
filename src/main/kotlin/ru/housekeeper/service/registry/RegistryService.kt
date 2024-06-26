@@ -22,6 +22,35 @@ class RegistryService(
     private val paymentService: PaymentService,
 ) {
 
+    fun makeCustom(sum: String): List<String> {
+        //8195,41
+        val p01 = IncomingPayment(type = IncomingPaymentTypeEnum.ACCOUNT, account = "0000004165", fromName = "Безмен Виктор Георгиевич", sum = BigDecimal("4338.61"))
+        val p02 = IncomingPayment(type = IncomingPaymentTypeEnum.ACCOUNT, account = "0000700077", fromName = "Скалозуб Виктория Николаевна", sum = BigDecimal("358.94"))
+        val p03 = IncomingPayment(type = IncomingPaymentTypeEnum.ACCOUNT, account = "0000700135", fromName = "Коковина Ольга Ивановна", sum = BigDecimal("296.31"))
+        val p04 = IncomingPayment(type = IncomingPaymentTypeEnum.ACCOUNT, account = "0000700137", fromName = "Комбаров Александр Анатольевич", sum = BigDecimal("607.06"))
+        val p05 = IncomingPayment(type = IncomingPaymentTypeEnum.ACCOUNT, account = "0000700091", fromName = "Коковина Ольга Ивановна", sum = BigDecimal("301.13"))
+        val p06 = IncomingPayment(type = IncomingPaymentTypeEnum.ACCOUNT, account = "0000700098", fromName = "Романовский Геннадий Георгиевич", sum = BigDecimal("722.70"))
+        val p07 = IncomingPayment(type = IncomingPaymentTypeEnum.ACCOUNT, account = "0000700109", fromName = "Липецкий Иван Владимирович", sum = BigDecimal("917.82"))
+        val p08 = IncomingPayment(type = IncomingPaymentTypeEnum.ACCOUNT, account = "0000700134", fromName = "Коковина Ольга Ивановна", sum = BigDecimal("293.90"))
+        val p09 = IncomingPayment(type = IncomingPaymentTypeEnum.ACCOUNT, account = "0000700075", fromName = "Бессараб И. В.", sum = BigDecimal("358.94"))
+        //24985,05
+        val p10 = IncomingPayment(type = IncomingPaymentTypeEnum.ACCOUNT, account = "0000700129", fromName = "Гогохия Д.Г.", sum = BigDecimal("22631.47"))
+        val p11 = IncomingPayment(type = IncomingPaymentTypeEnum.ACCOUNT, account = "0000700117", fromName = "Гущин С.В.", sum = BigDecimal("717.88"))
+        val p12 = IncomingPayment(type = IncomingPaymentTypeEnum.ACCOUNT, account = "0000700118", fromName = "Гущин С.В.", sum = BigDecimal("717.88"))
+        val p13 = IncomingPayment(type = IncomingPaymentTypeEnum.ACCOUNT, account = "0000700109", fromName = "Липецкий Иван Владимирович", sum = BigDecimal("917.82"))
+
+        val p8194_41 = listOf(p01, p02, p03, p04, p05, p06, p07, p08, p09)
+        val p24985_05 = listOf(p10, p11, p12, p13)
+        return when (sum) {
+            "8195.41" -> makeRegistry(p8194_41)
+            "24985.05" -> makeRegistry(p24985_05)
+            else -> {
+                logger().error("Unknown sum: $sum")
+                throw IllegalArgumentException("Unknown sum: $sum")
+            }
+        }
+    }
+
     fun makeByManualAccount(specialAccount: Boolean) = makeRegistry(
         paymentService.findAllIncomingPaymentsWithFilter(
             pageNum = 0,

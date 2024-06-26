@@ -46,6 +46,8 @@ class IncomingPayment(
     var updateAccountDateTime: LocalDateTime? = null,
 
     @Enumerated(EnumType.STRING)
-    var type: IncomingPaymentTypeEnum? = null
+    var type: IncomingPaymentTypeEnum? = null,
 
-) : Payment(id, uuid, date, fromAccount, fromInn, fromName, toAccount, toInn, toName, sum, docNumber, vo, bik, bankName, purpose, createDate, source, pack)
+    comment: String? = null
+
+) : Payment(id, uuid, date, fromAccount, fromInn, fromName, toAccount, toInn, toName, sum, docNumber, vo, bik, bankName, purpose, createDate, source, pack, comment)
