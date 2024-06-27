@@ -31,3 +31,5 @@ target/
 /compose/
 /private/
 /.env
+
+/src/main/kotlin/ru/housekeeper/experiment/
