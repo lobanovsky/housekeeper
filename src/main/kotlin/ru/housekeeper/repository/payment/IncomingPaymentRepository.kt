@@ -87,4 +87,9 @@ interface IncomingPaymentRepository : CrudRepository<Payment, Long>, IncomingPay
 
     @Query("SELECT p FROM IncomingPayment p WHERE p.id = :id")
     fun findByIdOrNull(id: Long): IncomingPayment?
+
+    @Modifying
+    @Query("DELETE FROM IncomingPayment p WHERE p.id IN :ids")
+    fun deleteByIds(@Param("ids") ids: List<Long>)
+
 }

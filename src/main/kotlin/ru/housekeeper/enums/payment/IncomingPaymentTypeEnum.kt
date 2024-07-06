@@ -22,4 +22,6 @@ enum class IncomingPaymentTypeEnum(val description: String, val color: ColorEnum
     UNKNOWN("Неопознанный", ColorEnum.PURPLE),
     //Ручная установка аккаунта (автоматически не смогли определить), например, по постановлению суда из описания
     MANUAL_ACCOUNT("Ручная установка л/с", ColorEnum.GREEN),
+    //Распознан, то есть сумма распределена по лицевым счетам, согласно
+    RECOGNIZED("Распознан", ColorEnum.GREEN),
 }

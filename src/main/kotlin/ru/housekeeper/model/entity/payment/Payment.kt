@@ -39,6 +39,7 @@ abstract class Payment(
     @Column(nullable = true)
     val pack: String? = null,
 
+    @Column(columnDefinition = "TEXT")
     val comment: String? = null
 
     )

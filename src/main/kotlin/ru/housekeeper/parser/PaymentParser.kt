@@ -71,7 +71,7 @@ class PaymentParser(private val file: MultipartFile) {
 
             payments.add(
                 PaymentVO(
-                    uuid = "$date $docNumber ${sum(outgoingSum, incomingSum)}",
+                    uuid = "${date.toLocalDate()} $docNumber ${sum(outgoingSum, incomingSum)}",
                     date = date,
                     fromAccount = payer.account,
                     fromInn = payer.inn,
