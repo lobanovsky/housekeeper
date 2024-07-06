@@ -99,7 +99,7 @@ class PaymentParser(private val file: MultipartFile) {
     private fun getSumOrNull(cell: Cell): BigDecimal? {
         if (cell.cellType != CellType.NUMERIC) return null
         val value = cell.numericCellValue
-        return if (value != 0.0) BigDecimal.valueOf(value) else null
+        return if (value != 0.0) BigDecimal.valueOf(value).setScale(2) else null
     }
 
     //1) БИК 042202603, ВОЛГО-ВЯТСКИЙ БАНК ПАО СБЕРБАНК Г. Нижний Новгород
