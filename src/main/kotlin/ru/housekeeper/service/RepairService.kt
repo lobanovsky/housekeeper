@@ -6,6 +6,8 @@ import ru.housekeeper.model.entity.payment.IncomingPayment
 import ru.housekeeper.model.filter.IncomingPaymentsFilter
 import ru.housekeeper.repository.payment.IncomingPaymentRepository
 import ru.housekeeper.utils.logger
+import java.math.BigDecimal
+import java.time.LocalDate
 
 @Service
 class RepairService(
@@ -60,5 +62,22 @@ class RepairService(
             it.uuid = "${it.date.toLocalDate()} ${it.docNumber} ${it.sum}"
         }
         logger().info("Update UUID for incoming payments, size = ${incomingPayments.content.size}")
+    }
+
+    fun getSumOfPayments(
+        startDate: LocalDate, endDate:
+        LocalDate, toAccounts: List<String>
+    ): BigDecimal {
+        val incomingPayments = paymentService.findAllIncomingPaymentsWithFilter(
+            0, 10000, IncomingPaymentsFilter(
+                startDate = startDate,
+                endDate = endDate,
+                toAccounts = toAccounts
+            )
+        )
+        return incomingPayments.content
+            .filterNot { it.purpose.contains("Возврат депозита по договору") }
+            .map { it.sum }
+            .fold(BigDecimal.ZERO, BigDecimal::add)
     }
 }
