@@ -1,10 +1,7 @@
 package ru.housekeeper
 
 import org.junit.jupiter.api.Test
-import ru.housekeeper.utils.getFlatAccount
-import ru.housekeeper.utils.getOfficeAccount
-import ru.housekeeper.utils.getParkingAccount
-import ru.housekeeper.utils.getSpecialAccount
+import ru.housekeeper.utils.*
 
 class AccountFormatTest {
 
@@ -19,8 +16,17 @@ class AccountFormatTest {
         assert(getParkingAccount(14) == "0000003014")
         //office
         assert(getOfficeAccount(5) == "0000002005")
-        //special
+
+        //special flat
         assert(getSpecialAccount(87) == "0000500087")
         assert(getSpecialAccount(123) == "0000500123")
+        //special parking
+        assert(getSpecialParkingAccount(7) == "0000700007")
+        assert(getSpecialParkingAccount(117) == "0000700117")
+        //special office
+        assert(getSpecialOfficeAccount(3) == "0000004164")
+        assert(getSpecialOfficeAccount(5) == "0000004165")
+        assert(getSpecialOfficeAccount(8) == "0000004166")
+
     }
 }

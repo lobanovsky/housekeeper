@@ -1,17 +1,20 @@
 package ru.housekeeper.service.registry
 
 import ru.housekeeper.model.entity.payment.IncomingPayment
-import ru.housekeeper.utils.getFlatAccount
-import ru.housekeeper.utils.getParkingAccount
-import ru.housekeeper.utils.getSpecialAccount
-import ru.housekeeper.utils.getSpecialParkingAccount
+import ru.housekeeper.utils.*
 
 /**
- * Определение платежей от жителей
+ * Набор правил
+ * Определение платежей от собственников квартир, парковки и коммерческих помещений
  */
 
 //Поиск лицевого счета для спец-счёта
 fun findSpecialAccountByRules(payment: IncomingPayment): String? {
+    //Коммерческие помещения
+    if (payment.fromInn?.equals("7734401489") == true
+        && payment.purpose.contains("Оплата за капитальный ремонт", true)
+    ) return getSpecialOfficeAccount(5)
+
     //flats
     if (payment.fromName.contains("Михайлова Елена Владимировна", true))
         return getSpecialAccount(17)
@@ -44,25 +47,24 @@ fun findSpecialAccountByRules(payment: IncomingPayment): String? {
 
     //paring
     if (payment.fromName.contains("БОЕВ РОМАН БОРИСОВИЧ", true)
-        && payment.purpose.contains("700105", true)) {
-        return getSpecialParkingAccount(75)
-    }
+        && payment.purpose.contains("700105", true)
+    ) return getSpecialParkingAccount(75)
+
     if (payment.fromName.contains("Бобровский Николай Эдуардович", true)
-        && payment.purpose.contains("Машиноместо №34", true)) {
-        return getSpecialParkingAccount(34)
-    }
+        && payment.purpose.contains("Машиноместо №34", true)
+    ) return getSpecialParkingAccount(34)
+
     if (payment.fromName.contains("Бобровский Николай Эдуардович", true)
-        && payment.purpose.contains("Машиноместо №35", true)) {
-        return getSpecialParkingAccount(35)
-    }
+        && payment.purpose.contains("Машиноместо №35", true)
+    ) return getSpecialParkingAccount(35)
+
     if (payment.fromName.contains("Бобровский Николай Эдуардович", true)
-        && payment.purpose.contains("Машиноместо №67", true)) {
-        return getSpecialParkingAccount(67)
-    }
+        && payment.purpose.contains("Машиноместо №67", true)
+    ) return getSpecialParkingAccount(67)
+
     if (payment.fromName.contains("Бобровский Николай Эдуардович", true)
-        && payment.purpose.contains("Машиноместо №68", true)) {
-        return getSpecialParkingAccount(68)
-    }
+        && payment.purpose.contains("Машиноместо №68", true)
+    ) return getSpecialParkingAccount(68)
 
     return null
 }

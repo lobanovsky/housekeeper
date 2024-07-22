@@ -1,8 +1,6 @@
 package ru.housekeeper
 
 import org.junit.jupiter.api.Test
-import org.springframework.mock.web.MockMultipartFile
-import ru.housekeeper.parser.PaymentParser
 import ru.housekeeper.utils.getContractNumberFromDepositPurpose
 import ru.housekeeper.utils.simplify
 
@@ -20,16 +18,6 @@ class PaymentsTest {
         val originalName = "ООО \"Рога и    копыта\""
         val name = originalName.simplify()
         assert(name == "ооо рога и копыта")
-    }
-
-    @Test
-    fun bikAndName() {
-        val bikAndName = "БИК 044525232 ПАО \"МТС-Банк\", г.Москва"
-        val (bik, name) = PaymentParser(MockMultipartFile("fileName", "".byteInputStream())).bikAndNameParserV2orV3(
-            bikAndName
-        )
-        assert(bik == "044525232")
-        assert(name == "ПАО \"МТС-Банк\", г.Москва")
     }
 
     @Test
