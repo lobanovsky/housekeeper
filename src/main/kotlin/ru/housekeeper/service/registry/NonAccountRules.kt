@@ -70,7 +70,10 @@ fun rules(payment: IncomingPayment): Boolean {
     //АО "ИСКРАТЕЛЕКОМ"
     if (taxableEqInn(payment, "7736196490")) return true
     //ОБЩЕСТВО С ОГРАНИЧЕННОЙ ОТВЕТСТВЕННОСТЬЮ "РОКОСКЛИНИК"
-    if (taxableEqInn(payment, "7734401489") && !payment.purpose.contains(getOfficeAccount(5))) return true
+    if (taxableEqInn(payment, "7734401489")
+        && !payment.purpose.contains(getOfficeAccount(5))
+        && !payment.purpose.contains("Оплата за капитальный ремонт")
+    ) return true
 
     return false
 }
