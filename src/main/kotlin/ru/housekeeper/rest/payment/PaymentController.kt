@@ -83,7 +83,7 @@ class PaymentController(
     @GetMapping(path = ["/types"])
     @Operation(summary = "Find all payment types")
     fun findAllPaymentTypes() =
-        IncomingPaymentTypeEnum.values().map { PaymentTypeResponse(it.name, it.description, it.color.color) }
+        IncomingPaymentTypeEnum.entries.map { PaymentTypeResponse(it.name, it.description, it.color.color) }
 
     data class PaymentTypeResponse(
         val type: String,
@@ -94,7 +94,7 @@ class PaymentController(
     @GetMapping(path = ["/group-by"])
     @Operation(summary = "Find all payments grouped by {groupBy}")
     fun findAllGroupingPaymentBy() =
-        GroupingPaymentByEnum.values().map { GroupPaymentByResponse(it.name, it.description) }
+        GroupingPaymentByEnum.entries.map { GroupPaymentByResponse(it.name, it.description) }
 
     data class GroupPaymentByResponse(
         val type: String,

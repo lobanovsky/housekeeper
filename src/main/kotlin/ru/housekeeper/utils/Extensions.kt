@@ -28,6 +28,10 @@ fun yyyyMMddHHmmssDateFormat(): DateTimeFormatter = DateTimeFormatter.ofPattern(
 
 fun String.onlyLettersAndNumber() = Regex("[^А-Яа-яA-Za-z0-9]").replace(this, "").lowercase()
 
+fun String.onlyNumbers() = Regex("[^0-9]").replace(this, "")
+
+fun String.beautifulPhonePrint() = this.replaceFirst("(\\d{1})(\\d{3})(\\d{3})(\\d{2})(\\d{2})".toRegex(), "+$1-$2-$3-$4-$5")
+
 fun String.onlyCyrillicLettersAndNumbers(): String = this
     .replace("[^а-яА-Я0-9]".toRegex(), "")
     .trim()

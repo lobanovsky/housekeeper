@@ -18,7 +18,7 @@ class Room(
     val id: Long? = null,
 
     val street: String? = null,
-    val building: String? = null,
+    val building: Long,
     var cadastreNumber: String? = null,
 
     val account: String? = null,
@@ -28,11 +28,11 @@ class Room(
     val number: String,
     var certificate: String?,
     val dateOfCertificate: LocalDate? = null,
-    val square: BigDecimal = BigDecimal.ZERO,
-    val percentage: BigDecimal = BigDecimal.ZERO,
+    val square: BigDecimal,
+    val percentage: BigDecimal,
 
     @Enumerated(EnumType.STRING)
-    val type: RoomTypeEnum = RoomTypeEnum.FLAT,
+    val type: RoomTypeEnum,
 
     @Type(JsonType::class)
     @Column(name = "owners", columnDefinition = "jsonb")

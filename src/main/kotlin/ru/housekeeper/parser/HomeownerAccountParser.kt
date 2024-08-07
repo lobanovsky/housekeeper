@@ -39,9 +39,9 @@ class HomeownerAccountParser(private val file: MultipartFile) {
 
             val street = row.getCell(streetNum).stringCellValue.trim()
             val building = when (row.getCell(buildingNum).cellType) {
-                CellType.NUMERIC -> row.getCell(buildingNum).numericCellValue.toInt().toString()
-                CellType.STRING -> row.getCell(buildingNum).stringCellValue.trim()
-                else -> ""
+                CellType.NUMERIC -> row.getCell(buildingNum).numericCellValue.toLong()
+                CellType.STRING -> row.getCell(buildingNum).stringCellValue.trim().toLong()
+                else -> 0
             }
             val number = when (row.getCell(numberNum).cellType) {
                 CellType.NUMERIC -> row.getCell(numberNum).numericCellValue.toInt().toString()
@@ -68,7 +68,7 @@ class HomeownerAccountParser(private val file: MultipartFile) {
                     number = account.trimStart('0').drop(1).trimStart('0'),
                     square = BigDecimal(square).setScale(2, RoundingMode.HALF_UP),
                     owners = owners.split(",").map { OwnerVO(fullName = it.trim()) }.toMutableSet(),
-                    type = if (number.startsWith("Оф")) RoomTypeEnum.OFFICE else if (number.startsWith("А/м")) RoomTypeEnum.GARAGE else RoomTypeEnum.FLAT
+                    type = if (number.startsWith("Оф")) RoomTypeEnum.OFFICE else if (number.startsWith("А/м")) RoomTypeEnum.GARAGE else RoomTypeEnum.FLAT,
                 )
             )
         }

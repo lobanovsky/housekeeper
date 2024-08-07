@@ -7,7 +7,7 @@ enum class AnswerEnum(val answers: Set<String>) {
 
     companion object {
         fun determine(s: String): AnswerEnum {
-            for (v in values()) {
+            for (v in entries) {
                 if (v.answers.contains(s)) {
                     return v
                 }

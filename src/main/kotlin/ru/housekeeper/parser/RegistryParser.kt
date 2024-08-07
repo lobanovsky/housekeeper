@@ -58,7 +58,8 @@ class RegistryParser(private val file: MultipartFile) {
                     square = BigDecimal(square).setScale(2, RoundingMode.HALF_UP),
                     owners = owners.split(",").map { OwnerVO(fullName = it.trim()) }.toMutableSet(),
                     type = if (number.isNotEmpty()) RoomTypeEnum.FLAT else RoomTypeEnum.GARAGE,
-                    certificate = description
+                    certificate = description,
+                    building = if (number.isNotEmpty()) 1 else 2
                 )
             )
         }

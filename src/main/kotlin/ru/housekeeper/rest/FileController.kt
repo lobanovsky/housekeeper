@@ -6,7 +6,7 @@ import org.springframework.web.bind.annotation.*
 import ru.housekeeper.enums.FileTypeEnum
 import ru.housekeeper.model.dto.FileVO
 import ru.housekeeper.model.filter.FileFilter
-import ru.housekeeper.service.*
+import ru.housekeeper.service.FileService
 import ru.housekeeper.utils.toFileVO
 
 @CrossOrigin
@@ -18,7 +18,7 @@ class FileController(
 
     @GetMapping("/types")
     @Operation(summary = "Get all types of files")
-    fun getFileTypes(): List<FileTypeResponse> = FileTypeEnum.values().map { FileTypeResponse(it.name, it.description) }
+    fun getFileTypes(): List<FileTypeResponse> = FileTypeEnum.entries.map { FileTypeResponse(it.name, it.description) }
 
     data class FileTypeResponse(
         val name: String,

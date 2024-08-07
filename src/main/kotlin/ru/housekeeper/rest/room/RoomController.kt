@@ -4,11 +4,10 @@ import io.swagger.v3.oas.annotations.Operation
 import org.springframework.data.domain.Page
 import org.springframework.web.bind.annotation.*
 import ru.housekeeper.enums.RoomTypeEnum
-import ru.housekeeper.excel.*
 import ru.housekeeper.model.dto.RoomVO
 import ru.housekeeper.model.filter.RoomFilter
 import ru.housekeeper.service.RoomService
-import ru.housekeeper.utils.*
+import ru.housekeeper.utils.toRoomVO
 
 @CrossOrigin
 @RestController
@@ -19,7 +18,7 @@ class RoomController(
 
     @GetMapping("/types")
     @Operation(summary = "Get all types of room")
-    fun getRoomTypes(): List<RoomTypeResponse> = RoomTypeEnum.values().map { RoomTypeResponse(it.name, it.description) }
+    fun getRoomTypes(): List<RoomTypeResponse> = RoomTypeEnum.entries.map { RoomTypeResponse(it.name, it.description) }
 
     data class RoomTypeResponse(
         val name: String,

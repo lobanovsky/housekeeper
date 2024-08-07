@@ -6,7 +6,7 @@ data class RoomFilter(
     val account: String? = null,
     val type: RoomTypeEnum? = null,
     val number: String? = null,
-    val building: String? = null,
+    val building: Long? = null,
     val street: String? = null,
     val ownerName: String? = null,
 )

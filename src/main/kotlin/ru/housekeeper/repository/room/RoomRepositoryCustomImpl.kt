@@ -23,6 +23,7 @@ class RoomRepositoryCustomImpl(
         predicates["number"] = equalFilterBy("r.number", filter.number)
         predicates["ownerName"] = likeFilterBy("r.ownerName", filter.ownerName)
         predicates["type"] = equalFilterBy("r.type", filter.type)
+        predicates["building"] = equalFilterBy("r.building", filter.building)
         val conditions = predicates.values.joinToString(separator = " ")
 
         val sql = "SELECT r FROM Room r WHERE true = true $conditions ORDER BY r.building, r.account"

@@ -20,7 +20,7 @@ class LogEntryController(
 
     @GetMapping("/access-methods")
     @Operation(summary = "Get all access-methods of log entry")
-    fun getLogEntryAccessMethods(): List<LogEntryAccessMethodResponse> = LogEntryAccessMethodEnum.values().map {
+    fun getLogEntryAccessMethods(): List<LogEntryAccessMethodResponse> = LogEntryAccessMethodEnum.entries.map {
         LogEntryAccessMethodResponse(
             it.name,
             it.description
@@ -34,7 +34,7 @@ class LogEntryController(
 
     @GetMapping("/statuses")
     @Operation(summary = "Get all statuses of log entry")
-    fun getLogEntryStatuses(): List<LogEntryStatusResponse> = LogEntryStatusEnum.values().map {
+    fun getLogEntryStatuses(): List<LogEntryStatusResponse> = LogEntryStatusEnum.entries.map {
         LogEntryStatusResponse(
             it.name,
             it.description

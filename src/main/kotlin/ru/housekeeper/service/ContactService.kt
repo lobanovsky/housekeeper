@@ -33,7 +33,7 @@ class ContactService(
         upsert(contacts)
 
         val owners = contactVOs.filter { !it.block && !it.tenant }
-        RoomTypeEnum.values().forEach { type ->
+        RoomTypeEnum.entries.forEach { type ->
             updateOwner(owners.filter { it.roomType == type }.groupBy { it.label }, type)
         }
 

@@ -10,7 +10,7 @@ data class RoomVO(
     val id: Long? = null,
 
     val street: String? = null,
-    val building: String? = null,
+    val building: Long,
     val cadastreNumber: String? = null,
 
     val account: String? = null,
@@ -18,12 +18,13 @@ data class RoomVO(
     val ownerName: String,
     val number: String,
     val certificate: String? = null,
-    val square: BigDecimal = BigDecimal.ZERO,
+    val square: BigDecimal,
     val percentage: BigDecimal = getPercentage(square),
-    val type: RoomTypeEnum = RoomTypeEnum.FLAT,
+    val type: RoomTypeEnum,
+    val typeDescription: String = type.description,
 
-    val owners: MutableSet<OwnerVO> = mutableSetOf(),
-    val tenants: MutableSet<OwnerVO> = mutableSetOf(),
+    val owners: MutableSet<OwnerVO>? = null,
+    val tenants: MutableSet<OwnerVO>? = null,
 ) {
     fun toRoom(checksum: String): Room {
         return Room(

@@ -76,10 +76,12 @@ class RoomService(
 
             //save owners
             val savedOwner = ownerService.saveIfNotExist(
-                if (roomVO.owners.size > 1) {
+                if (roomVO.owners != null && roomVO.owners.size > 1) {
                     OwnerVO(fullName = roomVO.owners.joinToString(separator = ",") { it.fullName }).toOwner(checksum)
-                } else {
+                } else if (roomVO.owners != null) {
                     roomVO.owners.first().toOwner(checksum)
+                } else {
+                    OwnerVO(fullName = roomVO.ownerName).toOwner(checksum)
                 }
             )
             countSavedOwner++
@@ -105,5 +107,6 @@ class RoomService(
 
     fun findWithFilter(pageNum: Int, pageSize: Int, filter: RoomFilter): Page<Room> =
         roomRepository.findAllWithFilter(pageNum, pageSize, filter)
+            .also { logger().info("Found ${it.totalElements} rooms for filter: $filter}") }
 
 }

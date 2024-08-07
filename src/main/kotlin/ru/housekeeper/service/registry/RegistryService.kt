@@ -23,7 +23,7 @@ class RegistryService(
 ) {
 
     fun makeCustom(sum: String): List<String> {
-        //8195,41
+        //8195,41 - 499 pack
         val p01 = IncomingPayment(type = IncomingPaymentTypeEnum.ACCOUNT, account = "0000004165", fromName = "Безмен Виктор Георгиевич", sum = BigDecimal("4338.61"))
         val p02 = IncomingPayment(type = IncomingPaymentTypeEnum.ACCOUNT, account = "0000700077", fromName = "Скалозуб Виктория Николаевна", sum = BigDecimal("358.94"))
         val p03 = IncomingPayment(type = IncomingPaymentTypeEnum.ACCOUNT, account = "0000700135", fromName = "Коковина Ольга Ивановна", sum = BigDecimal("296.31"))
@@ -33,12 +33,12 @@ class RegistryService(
         val p07 = IncomingPayment(type = IncomingPaymentTypeEnum.ACCOUNT, account = "0000700109", fromName = "Липецкий Иван Владимирович", sum = BigDecimal("917.82"))
         val p08 = IncomingPayment(type = IncomingPaymentTypeEnum.ACCOUNT, account = "0000700134", fromName = "Коковина Ольга Ивановна", sum = BigDecimal("293.90"))
         val p09 = IncomingPayment(type = IncomingPaymentTypeEnum.ACCOUNT, account = "0000700075", fromName = "Бессараб И. В.", sum = BigDecimal("358.94"))
-        //24985,05
+        //24985,05 - 500 pack
         val p10 = IncomingPayment(type = IncomingPaymentTypeEnum.ACCOUNT, account = "0000700129", fromName = "Гогохия Д.Г.", sum = BigDecimal("22631.47"))
         val p11 = IncomingPayment(type = IncomingPaymentTypeEnum.ACCOUNT, account = "0000700117", fromName = "Гущин С.В.", sum = BigDecimal("717.88"))
         val p12 = IncomingPayment(type = IncomingPaymentTypeEnum.ACCOUNT, account = "0000700118", fromName = "Гущин С.В.", sum = BigDecimal("717.88"))
         val p13 = IncomingPayment(type = IncomingPaymentTypeEnum.ACCOUNT, account = "0000700109", fromName = "Липецкий Иван Владимирович", sum = BigDecimal("917.82"))
-        //flat 53471,49
+        //flat 53471,49 - 501 pack
         val p_f_7 = IncomingPayment(type = IncomingPaymentTypeEnum.ACCOUNT, account = "0000500007", fromName = "0000500007", sum = BigDecimal("2329.50"))
         val p_f_8 = IncomingPayment(type = IncomingPaymentTypeEnum.ACCOUNT, account = "0000500008", fromName = "0000500008", sum = BigDecimal("922.65"))
         val p_f_13 = IncomingPayment(type = IncomingPaymentTypeEnum.ACCOUNT, account = "0000500013", fromName = "0000500013", sum = BigDecimal("2336.73"))

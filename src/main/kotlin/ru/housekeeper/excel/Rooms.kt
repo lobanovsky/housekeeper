@@ -84,7 +84,7 @@ data class Registry(
     val numberOfFlat: String,
     val number: String,
     val square: BigDecimal,
-    val type: RoomTypeEnum = RoomTypeEnum.FLAT,
+    val type: RoomTypeEnum,
     val owner: String,
     val certificate: String,
     val percentage: String,
