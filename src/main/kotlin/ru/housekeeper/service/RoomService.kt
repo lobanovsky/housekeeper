@@ -10,6 +10,7 @@ import ru.housekeeper.model.filter.RoomFilter
 import ru.housekeeper.parser.HomeownerAccountParser
 import ru.housekeeper.parser.RegistryParser
 import ru.housekeeper.repository.room.RoomRepository
+import ru.housekeeper.utils.MAX_SIZE_PER_PAGE
 import ru.housekeeper.utils.logger
 import java.math.BigDecimal
 
@@ -105,7 +106,7 @@ class RoomService(
     fun findByRoomNumbersAndType(roomNumbers: Set<String>): List<Room> =
         roomRepository.findByRoomNumbersAndType(roomNumbers)
 
-    fun findWithFilter(pageNum: Int, pageSize: Int, filter: RoomFilter): Page<Room> =
+    fun findWithFilter(pageNum: Int = 0, pageSize: Int = MAX_SIZE_PER_PAGE, filter: RoomFilter): Page<Room> =
         roomRepository.findAllWithFilter(pageNum, pageSize, filter)
             .also { logger().info("Found ${it.totalElements} rooms for filter: $filter}") }
 

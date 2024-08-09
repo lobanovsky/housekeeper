@@ -22,6 +22,8 @@ data class Building(
 
     val numberOfApartments: Int?,
 
+    val numberOfApartmentsPerFloor: Int,
+
     @Enumerated(EnumType.STRING)
     val type: BuildingTypeEnum = BuildingTypeEnum.APARTMENT_BUILDING,
 
