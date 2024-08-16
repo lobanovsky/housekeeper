@@ -1,5 +1,6 @@
 package ru.housekeeper.repository
 
+import java.math.BigDecimal
 import java.time.LocalDate
 
 fun equalFilterBy(parameterName: String, value: String?, ignoreCase: Boolean = true) =
@@ -10,6 +11,9 @@ fun equalFilterBy(parameterName: String, value: String?, ignoreCase: Boolean = t
     }
 
 fun equalFilterBy(parameterName: String, value: Long?) =
+    if (value != null) "AND $parameterName = $value" else ""
+
+fun equalFilterBy(parameterName: String, value: BigDecimal?) =
     if (value != null) "AND $parameterName = $value" else ""
 
 fun likeFilterBy(parameterName: String, value: String?) =

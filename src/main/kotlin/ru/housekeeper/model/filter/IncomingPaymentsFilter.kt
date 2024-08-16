@@ -1,6 +1,7 @@
 package ru.housekeeper.model.filter
 
 import ru.housekeeper.enums.payment.IncomingPaymentTypeEnum
+import java.math.BigDecimal
 import java.time.LocalDate
 
 data class IncomingPaymentsFilter(
@@ -11,5 +12,6 @@ data class IncomingPaymentsFilter(
     val startDate: LocalDate? = null,
     val endDate: LocalDate? = null,
     val toAccounts: List<String>? = null,
-    val type: IncomingPaymentTypeEnum? = null
+    val type: IncomingPaymentTypeEnum? = null,
+    val sum: BigDecimal? = null,
 )
