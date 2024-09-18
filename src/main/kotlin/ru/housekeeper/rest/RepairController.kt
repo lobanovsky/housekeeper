@@ -1,6 +1,7 @@
 package ru.housekeeper.rest
 
 import org.springframework.web.bind.annotation.*
+import org.springframework.web.multipart.MultipartFile
 import ru.housekeeper.service.RepairService
 import java.math.BigDecimal
 import java.time.LocalDate
@@ -45,4 +46,13 @@ class RepairController(
         val endDate: LocalDate,
         val toAccounts: List<String>,
     )
+
+    /**
+     * Инициализация доступа на территории
+     */
+    @PostMapping("/init-access-info")
+    fun initAccessInfo(
+        @RequestPart file: MultipartFile,
+    ): Int = repairService.initAccessInfo(file)
+
 }

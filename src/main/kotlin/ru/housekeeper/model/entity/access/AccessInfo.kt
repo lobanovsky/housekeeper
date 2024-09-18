@@ -23,6 +23,8 @@ data class AccessInfo(
 
     val active: Boolean = true,
 
+    val blockDateTime: LocalDateTime? = null,
+
     //куда (where?)
     @Type(JsonType::class)
     @Column(name = "areas", columnDefinition = "jsonb")
@@ -42,6 +44,8 @@ data class AccessInfo(
 
     //template: 79266191359
     val phoneNumber: String,
+
+    val phoneLabel: String? = null,
 
     val tenant: Boolean? = false,
 

@@ -4,16 +4,13 @@ import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
 import ru.housekeeper.exception.AccessToAreaException
 import ru.housekeeper.model.dto.RoomVO
-import ru.housekeeper.model.dto.access.AccessInfoVO
-import ru.housekeeper.model.dto.access.AreaVO
+import ru.housekeeper.model.dto.access.*
 import ru.housekeeper.model.entity.Owner
-import ru.housekeeper.model.entity.Room
 import ru.housekeeper.model.entity.access.AccessInfo
 import ru.housekeeper.repository.AreaRepository
 import ru.housekeeper.repository.OwnerRepository
 import ru.housekeeper.repository.access.AccessPhoneRepository
 import ru.housekeeper.repository.room.RoomRepository
-import ru.housekeeper.rest.access.AccessController
 import ru.housekeeper.utils.*
 
 @Service
@@ -24,17 +21,21 @@ class AccessService(
     private val areaRepository: AreaRepository
 ) {
 
-    fun createAccessToArea(accessRequest: AccessController.AccessRequest): List<String> {
+    fun createAccessToArea(accessRequest: AccessRequest): List<String> {
         val areas = accessRequest.areas
-        val rooms = accessRequest.rooms
+        val rooms = accessRequest.person.rooms
         val results = mutableListOf<String>()
-        for (number in accessRequest.phoneNumbers) {
+        for (phone in accessRequest.person.phones) {
             try {
-                val phoneNumber = createAccessToArea(number.onlyNumbers(), areas, rooms, accessRequest.tenant)
+                val phoneNumber = createAccessToArea(
+                    phone = phone,
+                    areas = areas,
+                    rooms = rooms,
+                    tenant = accessRequest.person.tenant
+                )
                 results.add("[${phoneNumber.phoneNumber.beautifulPhonePrint()}] успешно добавлен")
             } catch (e: AccessToAreaException) {
-                results.add("[$number] Ошибка: ${e.message}")
-                logger().error("[$number] Ошибка: $e")
+                logger().error("[$phone] Ошибка: $e")
             }
         }
         return results
@@ -42,11 +43,13 @@ class AccessService(
 
     //add new phone number for access
     private fun createAccessToArea(
-        phoneNumber: String,
+        phone: Phone,
         areas: Set<Long>,
-        rooms: Set<AccessController.Room>,
+        rooms: Set<Room>,
         tenant: Boolean
     ): AccessInfo {
+        val phoneNumber= phone.number.onlyNumbers()
+        val phoneLabel = phone.label?.trim()
         if (phoneNumber.first() != '7') {
             throw AccessToAreaException("Номер телефона [$phoneNumber] должен начинаться с 7")
         }
@@ -54,22 +57,23 @@ class AccessService(
             throw AccessToAreaException("Номер телефона [$phoneNumber] должен содержать 11 цифр")
         }
         accessPhoneRepository.findByPhoneNumber(phoneNumber)?.let {
-            throw AccessToAreaException("Данный номер [${phoneNumber.beautifulPhonePrint()}] уже зарегистрирован для доступа")
+            throw AccessToAreaException("Данный номер [${phoneNumber}] уже зарегистрирован для доступа")
         }
         val accessInfo = AccessInfo(
             label = makeLabel(rooms),
             phoneNumber = phoneNumber,
+            phoneLabel = phoneLabel,
             tenant = tenant
         ).apply {
             this.areas.addAll(areas)
             this.buildings.addAll(rooms.map { it.buildingId })
             this.rooms.addAll(rooms.flatMap { it.roomIds })
         }
-        logger().info("Добавлен новый номер телефона: $accessInfo")
+//        logger().info("Добавлен новый номер телефона: $accessInfo")
         return accessPhoneRepository.save(accessInfo)
     }
 
-    private fun makeLabel(rooms: Set<AccessController.Room>): String {
+    private fun makeLabel(rooms: Set<Room>): String {
         val roomNumbers = mutableListOf<String>()
         for (roomId in rooms.flatMap { it.roomIds }) {
             val (room, owner) = getRoomWithOwnerByRoomId(roomId)
@@ -79,7 +83,7 @@ class AccessService(
         return if (label.length > MAX_ELDES_LABEL_LENGTH) label.substring(0, MAX_ELDES_LABEL_LENGTH) else label
     }
 
-    private fun getRoomWithOwnerByRoomId(roomId: Long): Pair<Room, Owner> {
+    private fun getRoomWithOwnerByRoomId(roomId: Long): Pair<ru.housekeeper.model.entity.Room, Owner> {
         roomRepository.findByIdOrNull(roomId)?.let { room ->
             room.owners.firstOrNull()?.let { ownerId ->
                 ownerRepository.findByIdOrNull(ownerId)?.let { owner ->

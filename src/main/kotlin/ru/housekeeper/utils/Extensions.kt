@@ -30,6 +30,8 @@ fun String.onlyLettersAndNumber() = Regex("[^А-Яа-яA-Za-z0-9]").replace(this
 
 fun String.onlyNumbers() = Regex("[^0-9]").replace(this, "")
 
+fun String.isNumeric(): Boolean = Regex("-?[0-9]+(\\.[0-9]+)?").matches(this)
+
 fun String.beautifulPhonePrint() = this.replaceFirst("(\\d{1})(\\d{3})(\\d{3})(\\d{2})(\\d{2})".toRegex(), "+$1-$2-$3-$4-$5")
 
 fun String.onlyCyrillicLettersAndNumbers(): String = this

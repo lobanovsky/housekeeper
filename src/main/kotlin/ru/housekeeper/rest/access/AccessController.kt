@@ -2,6 +2,7 @@ package ru.housekeeper.rest.access
 
 import io.swagger.v3.oas.annotations.Operation
 import org.springframework.web.bind.annotation.*
+import ru.housekeeper.model.dto.access.AccessRequest
 import ru.housekeeper.service.access.AccessService
 
 @CrossOrigin
@@ -18,17 +19,6 @@ class AccessController(
         @RequestBody accessRequest: AccessRequest
     ): List<String> = accessService.createAccessToArea(accessRequest)
 
-    data class AccessRequest(
-        val phoneNumbers: Set<String>,
-        val areas: Set<Long>,
-        val rooms: Set<Room>,
-        val tenant: Boolean
-    )
-
-    data class Room(
-        val buildingId: Long,
-        val roomIds: Set<Long>,
-    )
 
     @GetMapping("/rooms/{room-id}")
     @Operation(summary = "Get the access by the room id")
