@@ -108,7 +108,7 @@ class AccessService(
         val accessInfoVO = AccessInfoVO(
             owner = OwnerVO(
                 fullName = owners[0].fullName,
-                rooms = roomVOS
+                ownerRooms = roomVOS
             ),
             keys = accessKeyVOS
         )

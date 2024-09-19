@@ -9,7 +9,7 @@ class OwnerVO(
     private var phones: MutableSet<String> = mutableSetOf(),
     private var active: Boolean = true,
     private var dateOfLeft: LocalDateTime? = null,
-    var rooms: List<RoomVO> = mutableListOf(),
+    var ownerRooms: List<RoomVO> = mutableListOf(),
 ) {
 
     fun toOwner(checksum: String): Owner {
