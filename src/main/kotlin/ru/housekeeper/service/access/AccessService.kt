@@ -98,7 +98,7 @@ class AccessService(
         val accessInfos = accessPhoneRepository.findByRoomId(roomId, active)
         if (accessInfos.isEmpty()) return emptyList()
         val room = roomRepository.findByIdOrNull(roomId) ?: entityNotfound("Помещение" to roomId)
-        logger().info("Получен доступ по идентификатору [$roomId] помещения [${room.type?.description}: ${room.number}]")
+        logger().info("Получен доступ по идентификатору [$roomId] помещения [${room.type.description}: ${room.number}]")
         return accessInfoVOS(accessInfos)
     }
 
@@ -117,14 +117,15 @@ class AccessService(
         return accessInfos.map { accessInfo ->
             AccessInfoVO(
                 id = accessInfo.id,
-                phoneNumber = accessInfo.phoneNumber,
+                phoneNumber = accessInfo.phoneNumber.beautifulPhonePrint(),
+                phoneLabel = accessInfo.phoneLabel,
                 areas = areaRepository.findAllByIdIn(accessInfo.areas).map { area ->
                     AreaVO(
                         id = area.id,
                         name = area.name,
                         type = area.type.name
                     )
-                },
+                }.sortedBy { it.type },
                 rooms = accessInfo.rooms.map {
                     val (r, o) = getRoomWithOwnerByRoomId(it)
                     RoomVO(
@@ -135,7 +136,7 @@ class AccessService(
                         square = r.square,
                         type = r.type,
                     )
-                }
+                }.sortedBy { it.type }
             )
         }
     }

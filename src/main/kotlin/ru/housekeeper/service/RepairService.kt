@@ -151,12 +151,8 @@ class RepairService(
     }
 
     private fun getPhones(contacts: List<Contact>): Set<Phone> {
-        for (contact in contacts) {
-            logger().info("Label: ${contact.label}")
-        }
-        val maxLable = contacts.map { it.label }.maxBy { it?.length ?: 0 }
-        logger().info("Max label: $maxLable")
-        return setOf(Phone(contacts[0].phone, maxLable))
+        val maxLengthLabel = contacts.map { it.label }.maxBy { it?.length ?: 0 }
+        return setOf(Phone(contacts[0].phone, maxLengthLabel))
     }
 
 
