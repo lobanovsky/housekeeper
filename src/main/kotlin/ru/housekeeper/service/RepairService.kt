@@ -113,6 +113,8 @@ class RepairService(
             val label = row.getCell(4).stringCellValue.trim()
             val flat = row.getCell(5).stringCellValue
             val phone = row.getCell(6).stringCellValue
+            val carNumber = row.getCell(7).stringCellValue
+            val carModel = row.getCell(8).stringCellValue
 
             if (phone.isNotBlank()) {
                 gateCount++
@@ -127,6 +129,8 @@ class RepairService(
             val label = row.getCell(4).stringCellValue.trim()
             val flat = row.getCell(5).stringCellValue
             val phone = row.getCell(6).stringCellValue
+            val carNumber = row.getCell(7).stringCellValue
+            val carModel = row.getCell(8).stringCellValue
 
             if (phone.isNotBlank()) {
                 parkingCount++

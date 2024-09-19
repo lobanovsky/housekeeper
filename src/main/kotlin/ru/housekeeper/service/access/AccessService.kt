@@ -101,7 +101,6 @@ class AccessService(
         val owners = ownerRepository.findByRoomId(roomId, active)
         val rooms = roomRepository.findByIds(owners[0].rooms)
         val roomVOS = rooms.map { it.toRoomVO() }.sortedBy { it.type }
-//        val accessInfos = accessPhoneRepository.findByRoomId(roomId, active)
         val ownerId: Long = owners[0].id!!
         val accessInfos = accessInfoRepository.findByOwnerId(ownerId)
         val accessKeyVOS = accessKeyVOS(accessInfos)
@@ -115,15 +114,22 @@ class AccessService(
         return accessInfoVO
     }
 
-    fun findByPhoneNumber(phoneNumber: String, active: Boolean): KeyVO {
-        val access = accessInfoRepository.findByPhoneNumber(phoneNumber, active)
-            ?: entityNotfound("Номер телефона" to phoneNumber)
+    fun findByPhoneNumber(phoneNumber: String, active: Boolean): AccessInfoVO {
+        val access = accessInfoRepository.findByPhoneNumber(phoneNumber, active) ?: entityNotfound("Номер телефона" to phoneNumber)
+        val owner = ownerRepository.findByIdOrNull(access.ownerId) ?: entityNotfound("Владелец" to access.ownerId)
+        val ownerVO = OwnerVO(
+            fullName = owner.fullName,
+            ownerRooms = roomRepository.findByIds(owner.rooms).map { it.toRoomVO() }
+        )
         //get all areas
         val areas = areaRepository.findAllByIdIn(access.areas)
         areas.forEach { area ->
             logger().info("Получен доступ по номеру телефона: [${phoneNumber.beautifulPhonePrint()}] для зоны: ${area.name}")
         }
-        return accessKeyVOS(listOf(access)).first()
+        return AccessInfoVO(
+            owner = ownerVO,
+            keys = accessKeyVOS(listOf(access))
+        )
     }
 
     private fun accessKeyVOS(accessInfos: List<AccessInfo>): List<KeyVO> {
