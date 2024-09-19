@@ -25,7 +25,7 @@ class Decision(
 
     @Type(JsonType::class)
     @Column(name = "rooms", columnDefinition = "jsonb")
-    val rooms: MutableSet<Long?> = mutableSetOf(),
+    val rooms: MutableSet<Long> = mutableSetOf(),
 
     val numbersOfRooms: String,
 

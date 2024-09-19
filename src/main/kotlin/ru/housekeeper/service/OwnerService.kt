@@ -3,7 +3,7 @@ package ru.housekeeper.service
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
 import ru.housekeeper.model.entity.Owner
-import ru.housekeeper.repository.OwnerRepository
+import ru.housekeeper.repository.owner.OwnerRepository
 import ru.housekeeper.utils.entityNotfound
 
 @Service

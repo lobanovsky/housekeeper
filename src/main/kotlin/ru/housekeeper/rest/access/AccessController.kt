@@ -17,7 +17,7 @@ class AccessController(
     @Operation(summary = "Create the area access by the phone number (Were? -> Area, Who? -> Room)")
     fun createAccess(
         @RequestBody accessRequest: AccessRequest
-    ): List<String> = accessService.createAccessToArea(accessRequest)
+    ) = accessService.createAccessToArea(accessRequest)
 
 
     @GetMapping("/rooms/{room-id}")

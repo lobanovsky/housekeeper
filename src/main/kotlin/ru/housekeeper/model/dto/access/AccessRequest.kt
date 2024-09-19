@@ -8,17 +8,12 @@ data class AccessRequest(
 )
 
 data class Person(
+    val ownerId: Long,
     val phones: Set<Phone>,
-    val rooms: Set<Room>,
-    val tenant: Boolean
+    val tenant: Boolean = false,
 )
 
 data class Phone(
     val number: String,
     val label: String? = null,
-)
-
-data class Room(
-    val buildingId: Long,
-    val roomIds: Set<Long>,
 )

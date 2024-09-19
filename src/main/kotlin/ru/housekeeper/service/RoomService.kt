@@ -4,6 +4,7 @@ import org.springframework.data.domain.Page
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import org.springframework.web.multipart.MultipartFile
+import ru.housekeeper.enums.RoomTypeEnum
 import ru.housekeeper.model.dto.OwnerVO
 import ru.housekeeper.model.entity.Room
 import ru.housekeeper.model.filter.RoomFilter
@@ -90,7 +91,7 @@ class RoomService(
 
             //save room
             val savedRoom = roomRepository.save(room)
-            savedOwner.rooms.add(savedRoom.id)
+            savedRoom.id?.let { savedOwner.rooms.add(it) }
             countSavedRoom++
         }
         logger().info("Saved rooms = [$countSavedRoom], owners = [$countSavedOwner]")
@@ -105,6 +106,9 @@ class RoomService(
 
     fun findByRoomNumbersAndType(roomNumbers: Set<String>): List<Room> =
         roomRepository.findByRoomNumbersAndType(roomNumbers)
+
+    fun findByRoomNumberAndType(number: String, type: RoomTypeEnum): Room? =
+        roomRepository.findByNumberAndType(number, type)
 
     fun findWithFilter(pageNum: Int = 0, pageSize: Int = MAX_SIZE_PER_PAGE, filter: RoomFilter): Page<Room> =
         roomRepository.findAllWithFilter(pageNum, pageSize, filter)

@@ -9,10 +9,10 @@ import ru.housekeeper.enums.RoomTypeEnum
 import ru.housekeeper.model.dto.access.AccessRequest
 import ru.housekeeper.model.dto.access.Person
 import ru.housekeeper.model.dto.access.Phone
-import ru.housekeeper.model.dto.access.Room
 import ru.housekeeper.model.entity.access.AccessInfo
 import ru.housekeeper.model.entity.payment.IncomingPayment
 import ru.housekeeper.model.filter.IncomingPaymentsFilter
+import ru.housekeeper.repository.owner.OwnerRepository
 import ru.housekeeper.repository.payment.IncomingPaymentRepository
 import ru.housekeeper.repository.room.RoomRepository
 import ru.housekeeper.service.access.AccessService
@@ -27,6 +27,8 @@ class RepairService(
     private val accessService: AccessService,
     private val roomRepository: RoomRepository,
     private val roomService: RoomService,
+    private val ownerRepository: OwnerRepository,
+    private val ownerService: OwnerService,
 
     ) {
 
@@ -139,9 +141,12 @@ class RepairService(
         var count = 0
         for (contact in groupingByPhone) {
             val areas = getAreas(contact.value.map { it.type }.toSet())
+            val room = roomService.findByRoomNumberAndType(contact.value[0].roomNumber, contact.value[0].type)
+            val owners = room?.id?.let { ownerRepository.findByRoomId(it) }
+            if (owners == null) continue
             val person = Person(
+                ownerId = owners[0].id ?: 0,
                 phones = getPhones(contact.value),
-                rooms = getRooms(contact.value),
                 tenant = contact.value[0].tenant
             )
             val accesses = accessService.createAccessToArea(AccessRequest(areas, person))
@@ -172,19 +177,6 @@ class RepairService(
             }
         }
         return areas
-    }
-
-    private fun getRooms(contacts: List<Contact>): Set<Room> {
-        val rooms = mutableSetOf<Room>()
-        val groupByRoom = contacts.groupBy { it.type }
-        for (type in groupByRoom) {
-            val roomNumbers = type.value.map { it.roomNumber }.toSet()
-            val roomsByType = roomRepository.findByRoomNumbersAndType(roomNumbers, type.key)
-            val buildingId = roomsByType[0].building
-            val roomIds: List<Long> = roomsByType.map { it.id!! }
-            rooms.add(Room(buildingId, roomIds.toSet()))
-        }
-        return rooms
     }
 
     data class Contact(

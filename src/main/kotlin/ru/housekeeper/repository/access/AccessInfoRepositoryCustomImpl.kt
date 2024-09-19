@@ -4,9 +4,9 @@ import jakarta.persistence.EntityManager
 import jakarta.persistence.PersistenceContext
 import ru.housekeeper.model.entity.access.AccessInfo
 
-class AccessPhoneRepositoryCustomImpl(
+class AccessInfoRepositoryCustomImpl(
     @PersistenceContext private val entityManager: EntityManager,
-) : AccessPhoneRepositoryCustom {
+) : AccessInfoRepositoryCustom {
 
     override fun findByRoomId(roomId: Long, active: Boolean): List<AccessInfo> {
         val sql = "select * from access_info where rooms @> '[$roomId]' and active = $active"

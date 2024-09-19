@@ -31,22 +31,13 @@ data class AccessInfo(
     val areas: MutableSet<Long> = mutableSetOf(),
 
     //кому (who?)
-    @Type(JsonType::class)
-    @Column(name = "buildings", columnDefinition = "jsonb")
-    val buildings: MutableSet<Long> = mutableSetOf(),
-
-    @Type(JsonType::class)
-    @Column(name = "rooms", columnDefinition = "jsonb")
-    val rooms: MutableSet<Long> = mutableSetOf(),
-
-    @Column(length = 15)
-    val label: String,
+    val ownerId: Long,
 
     //template: 79266191359
     val phoneNumber: String,
 
     val phoneLabel: String? = null,
 
-    val tenant: Boolean? = false,
+    val tenant: Boolean = false,
 
     )

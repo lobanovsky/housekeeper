@@ -4,8 +4,8 @@ import org.springframework.stereotype.Repository
 import ru.housekeeper.model.entity.access.AccessInfo
 
 @Repository
-interface AccessPhoneRepositoryCustom {
+interface AccessInfoRepositoryCustom {
 
-    fun findByRoomId(roomId: Long, active: Boolean): List<AccessInfo>
+    fun findByRoomId(roomId: Long, active: Boolean = true): List<AccessInfo>
 
 }
