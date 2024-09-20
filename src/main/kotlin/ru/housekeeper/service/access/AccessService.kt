@@ -72,19 +72,8 @@ class AccessService(
         ).apply {
             this.areas.addAll(areas)
         }
-//        logger().info("Добавлен новый номер телефона: $accessInfo")
         return accessInfoRepository.save(accessInfo)
     }
-
-//    private fun makeLabel(rooms: Set<Room>): String {
-//        val roomNumbers = mutableListOf<String>()
-//        for (roomId in rooms.flatMap { it.roomIds }) {
-//            val (room, owner) = getRoomWithOwnerByRoomId(roomId)
-//            roomNumbers.add(room.number)
-//        }
-//        val label = roomNumbers.joinToString(", ")
-//        return if (label.length > MAX_ELDES_LABEL_LENGTH) label.substring(0, MAX_ELDES_LABEL_LENGTH) else label
-//    }
 
     private fun getRoomWithOwnerByRoomId(roomId: Long): Pair<ru.housekeeper.model.entity.Room, Owner> {
         roomRepository.findByIdOrNull(roomId)?.let { room ->
@@ -128,6 +117,7 @@ class AccessService(
         }
         return AccessInfoVO(
             owner = ownerVO,
+            //keys sort by area type
             keys = accessKeyVOS(listOf(access))
         )
     }
@@ -147,7 +137,7 @@ class AccessService(
                     )
                 }.sortedBy { it.type },
             )
-        }
+        }.sortedBy { it.areas.first().type }
     }
 
 

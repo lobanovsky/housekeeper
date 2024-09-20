@@ -1,9 +1,7 @@
 package ru.housekeeper.model.entity.access
 
-import com.vladmihalcea.hibernate.type.json.JsonType
 import jakarta.persistence.*
 import org.hibernate.annotations.CreationTimestamp
-import org.hibernate.annotations.Type
 import java.time.LocalDateTime
 
 @Entity
@@ -11,7 +9,7 @@ import java.time.LocalDateTime
 data class Car(
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    val id: Long,
+    val id: Long? = null,
 
     @CreationTimestamp
     @Column(updatable = false)
@@ -20,12 +18,13 @@ data class Car(
     val active: Boolean = true,
 
     //access to the areas
-    @Type(JsonType::class)
-    @Column(name = "rooms", columnDefinition = "jsonb")
-    val areas: MutableSet<Long?> = mutableSetOf(),
+//    @Type(JsonType::class)
+//    @Column(name = "rooms", columnDefinition = "jsonb")
+//    val areas: MutableSet<Long?> = mutableSetOf(),
 
     //car plate number: A123BC999
     //moto plate number: 1234AB99
+    @Column(unique = true)
     val number: String,
 
     val description: String? = null,

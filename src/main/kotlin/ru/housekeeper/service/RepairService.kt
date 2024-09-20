@@ -1,5 +1,6 @@
 package ru.housekeeper.service
 
+import org.apache.poi.ss.usermodel.Sheet
 import org.apache.poi.ss.usermodel.WorkbookFactory
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -14,9 +15,11 @@ import ru.housekeeper.model.entity.payment.IncomingPayment
 import ru.housekeeper.model.filter.IncomingPaymentsFilter
 import ru.housekeeper.repository.owner.OwnerRepository
 import ru.housekeeper.repository.payment.IncomingPaymentRepository
-import ru.housekeeper.repository.room.RoomRepository
 import ru.housekeeper.service.access.AccessService
+import ru.housekeeper.service.access.CarService
+import ru.housekeeper.utils.isValidRussianCarNumber
 import ru.housekeeper.utils.logger
+import ru.housekeeper.utils.replaceLatinToCyrillic
 import java.math.BigDecimal
 import java.time.LocalDate
 
@@ -25,11 +28,9 @@ class RepairService(
     private val paymentService: PaymentService,
     private val paymentRepository: IncomingPaymentRepository,
     private val accessService: AccessService,
-    private val roomRepository: RoomRepository,
     private val roomService: RoomService,
     private val ownerRepository: OwnerRepository,
-    private val ownerService: OwnerService,
-
+    private val carService: CarService,
     ) {
 
     @Transactional
@@ -106,42 +107,15 @@ class RepairService(
         var access = mutableListOf<AccessInfo>()
         val contacts = mutableListOf<Contact>()
 
-        var gateCount = 0
-        for (i in 15..gateSheet.lastRowNum) {
-            val row = gateSheet.getRow(i)
-            val tenant = row.getCell(2).stringCellValue.trim() == "1"
-            val label = row.getCell(4).stringCellValue.trim()
-            val flat = row.getCell(5).stringCellValue
-            val phone = row.getCell(6).stringCellValue
-            val carNumber = row.getCell(7).stringCellValue
-            val carModel = row.getCell(8).stringCellValue
+        val gateCount = sheetParser(gateSheet, contacts, 15, RoomTypeEnum.FLAT)
+        val parkingCount = sheetParser(parkingSheet, contacts, 5, RoomTypeEnum.GARAGE)
 
-            if (phone.isNotBlank()) {
-                gateCount++
-                contacts.add(makePhone(flat, phone, label.ifBlank { null }, tenant, RoomTypeEnum.FLAT))
-            }
-        }
-
-        var parkingCount = 0
-        for (i in 5..parkingSheet.lastRowNum) {
-            val row = parkingSheet.getRow(i)
-            val tenant = row.getCell(2).stringCellValue.trim() == "1"
-            val label = row.getCell(4).stringCellValue.trim()
-            val flat = row.getCell(5).stringCellValue
-            val phone = row.getCell(6).stringCellValue
-            val carNumber = row.getCell(7).stringCellValue
-            val carModel = row.getCell(8).stringCellValue
-
-            if (phone.isNotBlank()) {
-                parkingCount++
-                contacts.add(makePhone(flat, phone, label.ifBlank { null }, tenant, RoomTypeEnum.GARAGE))
-            }
-        }
         logger().info("Gate count = $gateCount, Parking count = $parkingCount")
 
         val groupingByPhone = contacts.groupBy { it.phone }
-        println("Phones count = ${contacts.size}, Unique phones count = ${groupingByPhone.size}")
+        logger().info("Phones count = ${contacts.size}, Unique phones count = ${groupingByPhone.size}")
 
+        var countCarPlate = 0
         var count = 0
         for (contact in groupingByPhone) {
             val areas = getAreas(contact.value.map { it.type }.toSet())
@@ -154,7 +128,54 @@ class RepairService(
                 tenant = contact.value[0].tenant
             )
             val accesses = accessService.createAccessToArea(AccessRequest(areas, person))
+            //create cars
+
+            contact.value.forEach {
+                if (it.carNumber?.isNotBlank() == true) {
+                    carService.createCar(it.carNumber, it.carDescription)
+                    countCarPlate++
+                }
+            }
             count += accesses.size
+        }
+        logger().info("Accesses count = $count, Car plates count = $countCarPlate")
+        return count
+    }
+
+    private fun sheetParser(
+        gateSheet: Sheet,
+        contacts: MutableList<Contact>,
+        skipCount: Int,
+        roomType: RoomTypeEnum,
+    ): Int {
+        var count = 0
+        for (i in skipCount..gateSheet.lastRowNum) {
+            val row = gateSheet.getRow(i)
+            val tenant = row.getCell(2).stringCellValue.trim() == "1"
+            val label = row.getCell(4).stringCellValue.trim()
+            val flat = row.getCell(5).stringCellValue
+            val phone = row.getCell(6).stringCellValue.trim()
+            val carNumber = row.getCell(7).stringCellValue.trim().replaceLatinToCyrillic()
+            val carDescription = row.getCell(8).stringCellValue.trim()
+
+            if (carNumber.isNotBlank()) {
+                if (!isValidRussianCarNumber(carNumber)) {
+                    logger().warn("before = $carNumber, after = $carNumber: Invalid car number = $carNumber")
+                }
+            }
+
+            if (phone.isBlank()) continue
+            contacts.add(
+                makeContact(
+                    flat,
+                    phone,
+                    label.ifBlank { null },
+                    tenant,
+                    roomType,
+                    carNumber.ifBlank { null },
+                    carDescription.ifBlank { null })
+            )
+            count++
         }
         return count
     }
@@ -164,10 +185,17 @@ class RepairService(
         return setOf(Phone(contacts[0].phone, maxLengthLabel))
     }
 
-
-    private fun makePhone(flat: String, phone: String, label: String?, tenant: Boolean, type: RoomTypeEnum): Contact {
+    private fun makeContact(
+        flat: String,
+        phone: String,
+        label: String?,
+        tenant: Boolean,
+        type: RoomTypeEnum,
+        carNumber: String?,
+        carDescription: String?
+    ): Contact {
         val roomNumber = flat.split("-")[0]
-        return Contact(roomNumber, phone, label, tenant, type)
+        return Contact(roomNumber, phone, label, tenant, type, carNumber, carDescription)
     }
 
     private fun getAreas(types: Set<RoomTypeEnum>): Set<Long> {
@@ -188,6 +216,8 @@ class RepairService(
         val phone: String,
         val label: String? = null,
         val tenant: Boolean,
-        val type: RoomTypeEnum
+        val type: RoomTypeEnum,
+        val carNumber: String? = null,
+        val carDescription: String? = null,
     )
 }
