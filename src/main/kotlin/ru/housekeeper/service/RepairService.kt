@@ -132,7 +132,7 @@ class RepairService(
 
             contact.value.forEach {
                 if (it.carNumber?.isNotBlank() == true) {
-                    carService.createCar(it.carNumber, it.carDescription)
+                    carService.createCar(it.carNumber, accesses.firstNotNullOf { accessId -> accessId.id }, it.carDescription)
                     countCarPlate++
                 }
             }
@@ -162,6 +162,9 @@ class RepairService(
                 if (!isValidRussianCarNumber(carNumber)) {
                     logger().warn("before = $carNumber, after = $carNumber: Invalid car number = $carNumber")
                 }
+            }
+            if (phone.isBlank() && carNumber.isNotBlank()) {
+                logger().warn("Car number = $carNumber, but phone is empty, for flat = $flat, label = $label")
             }
 
             if (phone.isBlank()) continue

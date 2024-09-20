@@ -13,4 +13,17 @@ data class KeyVO(
     val phoneLabel: String? = null,
     val tenant: Boolean,
     val areas: List<AreaVO>,
+    val cars: List<CarVO>? = emptyList()
+)
+
+data class AreaVO(
+    val id: Long?,
+    val name: String,
+    val type: String,
+)
+
+class CarVO(
+    val id: Long?,
+    val number: String,
+    val description: String? = null,
 )

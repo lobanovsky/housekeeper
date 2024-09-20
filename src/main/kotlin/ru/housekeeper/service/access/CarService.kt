@@ -14,6 +14,7 @@ class CarService(
 
     fun createCar(
         carNumber: String,
+        accessInfoId: Long,
         description: String? = null
     ): Car {
         //check if car number is valid
@@ -31,9 +32,18 @@ class CarService(
             Car(
                 createDate = LocalDateTime.now(),
                 number = carNumber,
-                description = description
+                description = description,
+                accessInfoId = accessInfoId
             )
         )
+    }
+
+    fun findByAccessInfo(accessInfo: Long, active: Boolean): List<Car> {
+        return carRepository.findByAccessInfoId(accessInfo, active)
+    }
+
+    fun findByCarNumber(carNumber: String, active: Boolean): Car? {
+        return carRepository.findByNumber(carNumber, active)
     }
 
 }

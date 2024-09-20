@@ -14,4 +14,8 @@ interface CarRepository : CrudRepository<Car, Long> {
         @Param("number") number: String,
         @Param("active") active: Boolean = true,
     ): Car?
+
+    @Query("SELECT c FROM Car c WHERE c.accessInfoId = :accessInfoId AND c.active = :active")
+    fun findByAccessInfoId(accessInfoId: Long, active: Boolean = true): List<Car>
+
 }

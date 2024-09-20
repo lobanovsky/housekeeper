@@ -5,7 +5,6 @@ import org.springframework.stereotype.Service
 import ru.housekeeper.exception.AccessToAreaException
 import ru.housekeeper.model.dto.OwnerVO
 import ru.housekeeper.model.dto.access.*
-import ru.housekeeper.model.entity.Owner
 import ru.housekeeper.model.entity.access.AccessInfo
 import ru.housekeeper.repository.AreaRepository
 import ru.housekeeper.repository.access.AccessInfoRepository
@@ -18,10 +17,12 @@ class AccessService(
     private val accessInfoRepository: AccessInfoRepository,
     private val ownerRepository: OwnerRepository,
     private val roomRepository: RoomRepository,
-    private val areaRepository: AreaRepository
+    private val areaRepository: AreaRepository,
+    private val carService: CarService,
 ) {
 
     data class AccessResponse(
+        val id: Long? = null,
         val phoneNumber: String,
         val success: Boolean
     )
@@ -31,16 +32,16 @@ class AccessService(
         val response = mutableListOf<AccessResponse>()
         for (phone in accessRequest.person.phones) {
             try {
-                val phoneNumber = createAccessToArea(
+                val accessInfo = createAccessToArea(
                     ownerId = accessRequest.person.ownerId,
                     phone = phone,
                     areas = areas,
                     tenant = accessRequest.person.tenant
                 )
-                response.add(AccessResponse(phoneNumber.phoneNumber.beautifulPhonePrint(), true))
+                response.add(AccessResponse(accessInfo.id, accessInfo.phoneNumber.beautifulPhonePrint(), true))
             } catch (e: AccessToAreaException) {
                 logger().error("[$phone] Ошибка: $e")
-                response.add(AccessResponse(phone.number, false))
+                response.add(AccessResponse(phoneNumber = phone.number, success = false))
             }
         }
         return response
@@ -75,51 +76,37 @@ class AccessService(
         return accessInfoRepository.save(accessInfo)
     }
 
-    private fun getRoomWithOwnerByRoomId(roomId: Long): Pair<ru.housekeeper.model.entity.Room, Owner> {
-        roomRepository.findByIdOrNull(roomId)?.let { room ->
-            room.owners.firstOrNull()?.let { ownerId ->
-                ownerRepository.findByIdOrNull(ownerId)?.let { owner ->
-                    return Pair(room, owner)
-                }
-            }
-        }
-        entityNotfound("Помещение" to roomId)
-    }
-
     fun findByRoom(roomId: Long, active: Boolean): AccessInfoVO {
         val owners = ownerRepository.findByRoomId(roomId, active)
-        val rooms = roomRepository.findByIds(owners[0].rooms)
-        val roomVOS = rooms.map { it.toRoomVO() }.sortedBy { it.type }
-        val ownerId: Long = owners[0].id!!
-        val accessInfos = accessInfoRepository.findByOwnerId(ownerId)
-        val accessKeyVOS = accessKeyVOS(accessInfos)
+        return findByOwner(owners[0].id!!)
+    }
+
+    private fun findByOwner(ownerId: Long): AccessInfoVO {
+        val owner = ownerRepository.findByIdOrNull(ownerId) ?: entityNotfound("Владелец" to ownerId)
         val accessInfoVO = AccessInfoVO(
             owner = OwnerVO(
-                fullName = owners[0].fullName,
-                ownerRooms = roomVOS
+                fullName = owner.fullName,
+                ownerRooms = roomRepository.findByIds(owner.rooms).map { it.toRoomVO() }
             ),
-            keys = accessKeyVOS
+            keys = accessKeyVOS(accessInfoRepository.findByOwnerId(ownerId))
         )
         return accessInfoVO
     }
 
     fun findByPhoneNumber(phoneNumber: String, active: Boolean): AccessInfoVO {
-        val access = accessInfoRepository.findByPhoneNumber(phoneNumber, active) ?: entityNotfound("Номер телефона" to phoneNumber)
+        val access = accessInfoRepository.findByPhoneNumber(phoneNumber, active)
+            ?: entityNotfound("Номер телефона" to phoneNumber)
         val owner = ownerRepository.findByIdOrNull(access.ownerId) ?: entityNotfound("Владелец" to access.ownerId)
-        val ownerVO = OwnerVO(
-            fullName = owner.fullName,
-            ownerRooms = roomRepository.findByIds(owner.rooms).map { it.toRoomVO() }
-        )
-        //get all areas
-        val areas = areaRepository.findAllByIdIn(access.areas)
-        areas.forEach { area ->
-            logger().info("Получен доступ по номеру телефона: [${phoneNumber.beautifulPhonePrint()}] для зоны: ${area.name}")
-        }
-        return AccessInfoVO(
-            owner = ownerVO,
-            //keys sort by area type
-            keys = accessKeyVOS(listOf(access))
-        )
+        return findByOwner(owner.id!!)
+    }
+
+    fun findByCarNumber(carNumber: String, active: Boolean): AccessInfoVO? {
+        val car = carService.findByCarNumber(carNumber, active) ?: entityNotfound("Автомобиль" to carNumber)
+        val accessInfo =
+            accessInfoRepository.findByIdOrNull(car.accessInfoId) ?: entityNotfound("Доступ" to car.accessInfoId)
+        val owner =
+            ownerRepository.findByIdOrNull(accessInfo.ownerId) ?: entityNotfound("Владелец" to accessInfo.ownerId)
+        return findByOwner(owner.id!!)
     }
 
     private fun accessKeyVOS(accessInfos: List<AccessInfo>): List<KeyVO> {
@@ -136,6 +123,13 @@ class AccessService(
                         type = area.type.name
                     )
                 }.sortedBy { it.type },
+                cars = carService.findByAccessInfo(accessInfo.id!!, true).map { car ->
+                    CarVO(
+                        id = car.id,
+                        number = car.number,
+                        description = car.description
+                    )
+                }
             )
         }.sortedBy { it.areas.first().type }
     }

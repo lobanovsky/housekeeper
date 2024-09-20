@@ -35,5 +35,11 @@ class AccessController(
         @RequestParam active: Boolean = true,
     ) = accessService.findByPhoneNumber(phoneNumber, active)
 
+    @GetMapping("/cars/{car-number}")
+    @Operation(summary = "Get the access by the car number")
+    fun findByCarNumber(
+        @PathVariable("car-number") carNumber: String,
+        @RequestParam active: Boolean = true,
+    ) = accessService.findByCarNumber(carNumber, active)
 
 }

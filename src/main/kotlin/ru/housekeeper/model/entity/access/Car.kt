@@ -17,16 +17,10 @@ data class Car(
 
     val active: Boolean = true,
 
-    //access to the areas
-//    @Type(JsonType::class)
-//    @Column(name = "rooms", columnDefinition = "jsonb")
-//    val areas: MutableSet<Long?> = mutableSetOf(),
+    val accessInfoId: Long,
 
-    //car plate number: A123BC999
-    //moto plate number: 1234AB99
     @Column(unique = true)
     val number: String,
 
     val description: String? = null,
-
     )
