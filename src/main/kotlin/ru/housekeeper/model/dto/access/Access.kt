@@ -35,4 +35,5 @@ data class AccessUpdateRequest(
     val label: String? = null,
     val tenant: Boolean = false,
     val areas: Set<Long>,
+    val cars: Set<AccessCar>? = mutableSetOf(),
 )

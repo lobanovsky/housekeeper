@@ -40,6 +40,30 @@ class CarService(
         )
     }
 
+    fun updateCars(accessInfoId: Long, accessCars: Set<AccessCar>) {
+        val associateByPlate = accessCars.associateBy { it.plateNumber }
+
+        //get all car numbers
+        val carNumbers = carRepository.findByAccessInfoId(accessInfoId, true).map { it.number }
+        //get all car numbers from request
+        val carNumbersFromRequest = accessCars.map { it.plateNumber }
+        //get all car numbers that are not in the request
+        val carNumbersToDelete = carNumbers.minus(carNumbersFromRequest)
+        //get all car numbers that are in the request
+        val carNumbersToSave = carNumbersFromRequest.minus(carNumbers)
+        //delete all cars that are not in the request
+        carNumbersToDelete.forEach {
+            carRepository.findByNumber(it)?.let { car ->
+                car.active = false
+                carRepository.save(car)
+            }
+        }
+        //save all cars that are in the request
+        carNumbersToSave.forEach {
+            createCar(it, accessInfoId, associateByPlate[it]?.description)
+        }
+    }
+
     fun findByAccessInfo(accessInfo: Long, active: Boolean): List<Car> {
         return carRepository.findByAccessInfoId(accessInfo, active)
     }

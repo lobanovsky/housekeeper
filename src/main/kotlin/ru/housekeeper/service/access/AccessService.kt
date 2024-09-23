@@ -26,12 +26,14 @@ class AccessService(
     private val ownerService: OwnerService,
 ) {
 
+    @Transactional
     fun deleteAccess(accessId: Long) {
         val accessInfo = accessInfoRepository.findByIdOrNull(accessId) ?: entityNotfound("Доступ" to accessId)
         accessInfo.id?.let { accessInfoRepository.deactivateById(it) }
         accessInfo.id?.let { careRepository.deactivateById(it) }
     }
 
+    @Transactional
     fun updateAccessToArea(accessId: Long, accessEditRequest: AccessUpdateRequest): AccessInfoVO {
         val areas = accessEditRequest.areas
         if (areas.isEmpty()) {
@@ -45,6 +47,8 @@ class AccessService(
             accessInfo.areas.addAll(areas)
             accessInfoRepository.save(accessInfo)
         } ?: entityNotfound("Доступ" to accessId)
+
+        carService.updateCars(accessId, accessEditRequest.cars ?: setOf())
 
         return findByOwner(accessInfo.ownerId)
     }

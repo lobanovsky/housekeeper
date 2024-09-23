@@ -15,12 +15,12 @@ data class Car(
     @Column(updatable = false)
     var createDate: LocalDateTime = LocalDateTime.now(),
 
-    val active: Boolean = true,
+    var active: Boolean = true,
 
     val accessInfoId: Long,
 
     @Column(unique = true)
     val number: String,
 
-    val description: String? = null,
+    var description: String? = null,
     )
