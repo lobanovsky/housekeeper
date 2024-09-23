@@ -2,7 +2,8 @@ package ru.housekeeper.rest.access
 
 import io.swagger.v3.oas.annotations.Operation
 import org.springframework.web.bind.annotation.*
-import ru.housekeeper.model.dto.access.AccessRequest
+import ru.housekeeper.model.dto.access.AccessCreateRequest
+import ru.housekeeper.model.dto.access.AccessUpdateRequest
 import ru.housekeeper.service.access.AccessService
 
 @CrossOrigin
@@ -16,8 +17,16 @@ class AccessController(
     @PostMapping
     @Operation(summary = "Create the area access by the phone number (Were? -> Area, Who? -> Room)")
     fun createAccess(
-        @RequestBody accessRequest: AccessRequest
-    ) = accessService.createAccessToArea(accessRequest)
+        @RequestBody accessCreateRequest: AccessCreateRequest
+    ) = accessService.createAccessToArea(accessCreateRequest)
+
+    //Edit the area access by phone number
+    @PutMapping("/{access-id}")
+    @Operation(summary = "Edit the area access by the phone number")
+    fun updateAccess(
+        @PathVariable("access-id") accessId: Long,
+        @RequestBody accessEditRequest: AccessUpdateRequest
+    ) = accessService.updateAccessToArea(accessId, accessEditRequest)
 
 
     @GetMapping("/rooms/{room-id}")

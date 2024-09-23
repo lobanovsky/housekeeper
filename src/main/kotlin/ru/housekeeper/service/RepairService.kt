@@ -7,9 +7,9 @@ import org.springframework.transaction.annotation.Transactional
 import org.springframework.web.multipart.MultipartFile
 import ru.housekeeper.enums.AreaTypeEnum
 import ru.housekeeper.enums.RoomTypeEnum
-import ru.housekeeper.model.dto.access.AccessRequest
-import ru.housekeeper.model.dto.access.Person
-import ru.housekeeper.model.dto.access.Phone
+import ru.housekeeper.model.dto.access.AccessCreateRequest
+import ru.housekeeper.model.dto.access.AccessPerson
+import ru.housekeeper.model.dto.access.AccessPhone
 import ru.housekeeper.model.entity.access.AccessInfo
 import ru.housekeeper.model.entity.payment.IncomingPayment
 import ru.housekeeper.model.filter.IncomingPaymentsFilter
@@ -122,11 +122,11 @@ class RepairService(
             val room = roomService.findByRoomNumberAndType(contact.value[0].roomNumber, contact.value[0].type)
             val owners = room?.id?.let { ownerRepository.findByRoomId(it) }
             if (owners == null) continue
-            val person = Person(
+            val accessPerson = AccessPerson(
                 ownerId = owners[0].id ?: 0,
-                phones = getPhones(contact.value),
+                accessPhones = getPhones(contact.value),
             )
-            val accesses = accessService.createAccessToArea(AccessRequest(areas, person))
+            val accesses = accessService.createAccessToArea(AccessCreateRequest(areas, accessPerson))
             //create cars
 
             contact.value.forEach {
@@ -182,9 +182,9 @@ class RepairService(
         return count
     }
 
-    private fun getPhones(contacts: List<Contact>): Set<Phone> {
+    private fun getPhones(contacts: List<Contact>): Set<AccessPhone> {
         val maxLengthLabel = contacts.map { it.label }.maxBy { it?.length ?: 0 }
-        return setOf(Phone(contacts[0].phone, maxLengthLabel, contacts[0].tenant))
+        return setOf(AccessPhone(contacts[0].phone, maxLengthLabel, contacts[0].tenant))
     }
 
     private fun makeContact(

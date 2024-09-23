@@ -1,26 +1,31 @@
 package ru.housekeeper.model.dto.access
 
-data class AccessRequest(
+data class AccessCreateRequest(
     //куда
     val areas: Set<Long>,
     //кому
-    val person: Person,
+    val accessPerson: AccessPerson,
 )
 
-data class Person(
+data class AccessPerson(
     val ownerId: Long,
-    val phones: Set<Phone>,
+    val accessPhones: Set<AccessPhone>,
 )
 
-data class Phone(
+data class AccessPhone(
     val number: String,
     val label: String? = null,
     val tenant: Boolean = false,
 )
 
-data class AccessResponse(
+data class AccessCreateResponse(
     val id: Long? = null,
     val phoneNumber: String,
     val success: Boolean,
     val reason: String? = null,
+)
+
+data class AccessUpdateRequest(
+    val phone: AccessPhone,
+    val areas: Set<Long>,
 )

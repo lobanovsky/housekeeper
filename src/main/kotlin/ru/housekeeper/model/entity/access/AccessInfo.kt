@@ -34,10 +34,10 @@ data class AccessInfo(
     val ownerId: Long,
 
     //template: 79266191359
-    val phoneNumber: String,
+    var phoneNumber: String,
 
-    val phoneLabel: String? = null,
+    var phoneLabel: String? = null,
 
-    val tenant: Boolean = false,
+    var tenant: Boolean = false,
 
     )

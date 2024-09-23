@@ -23,21 +23,49 @@ class AccessService(
     private val ownerService: OwnerService,
 ) {
 
-    fun createAccessToArea(accessRequest: AccessRequest): List<AccessResponse> {
-        val areas = accessRequest.areas
-        val response = mutableListOf<AccessResponse>()
-        for (phone in accessRequest.person.phones) {
+    fun updateAccessToArea(accessId: Long, accessEditRequest: AccessUpdateRequest): AccessInfoVO {
+        val phone = accessEditRequest.phone
+        val areas = accessEditRequest.areas
+        if (phone.number.isEmpty()) {
+            throw AccessToAreaException("Не указан номер телефона")
+        }
+        if (areas.isEmpty()) {
+            throw AccessToAreaException("Не указаны зоны доступа")
+        }
+        phoneNumberValidator(phone.number, accessId)
+
+        val accessInfo = accessInfoRepository.findByIdOrNull(accessId)?.let { accessInfo ->
+            accessInfo.phoneNumber = phone.number.onlyNumbers()
+            accessInfo.phoneLabel = phone.label?.trim()
+            accessInfo.tenant = phone.tenant
+            accessInfo.areas.clear()
+            accessInfo.areas.addAll(areas)
+            accessInfoRepository.save(accessInfo)
+        } ?: entityNotfound("Доступ" to accessId)
+
+        return findByOwner(accessInfo.ownerId)
+    }
+
+    fun createAccessToArea(accessCreateRequest: AccessCreateRequest): List<AccessCreateResponse> {
+        if (accessCreateRequest.areas.isEmpty()) {
+            throw AccessToAreaException("Не указаны зоны доступа")
+        }
+        if (accessCreateRequest.accessPerson.accessPhones.isEmpty()) {
+            throw AccessToAreaException("Не указаны телефоны")
+        }
+        val response = mutableListOf<AccessCreateResponse>()
+        for (phone in accessCreateRequest.accessPerson.accessPhones) {
             try {
                 val accessInfo = createAccessToArea(
-                    ownerId = accessRequest.person.ownerId,
-                    phone = phone,
-                    areas = areas,
+                    ownerId = accessCreateRequest.accessPerson.ownerId,
+                    accessPhone = phone,
+                    areas = accessCreateRequest.areas,
                     tenant = phone.tenant
                 )
-                response.add(AccessResponse(accessInfo.id, accessInfo.phoneNumber.beautifulPhonePrint(), true))
+                response.add(AccessCreateResponse(accessInfo.id, accessInfo.phoneNumber.beautifulPhonePrint(), true))
             } catch (e: AccessToAreaException) {
                 logger().error("[$phone] Ошибка: $e")
-                response.add(AccessResponse(phoneNumber = phone.number, success = false, reason = e.message))
+                response.add(AccessCreateResponse(phoneNumber = phone.number, success = false, reason = e.message))
             }
         }
         return response
@@ -46,27 +74,16 @@ class AccessService(
     //add new phone number for access
     private fun createAccessToArea(
         ownerId: Long,
-        phone: Phone,
+        accessPhone: AccessPhone,
         areas: Set<Long>,
         tenant: Boolean
     ): AccessInfo {
-        val phoneNumber = phone.number.onlyNumbers()
-        val phoneLabel = phone.label?.trim()
-        if (phoneNumber.first() != '7') {
-            throw AccessToAreaException("Номер телефона [$phoneNumber] должен начинаться с 7")
-        }
-        if (phoneNumber.length != PHONE_NUMBER_LENGTH) {
-            throw AccessToAreaException("Номер телефона [$phoneNumber] должен содержать 11 цифр")
-        }
-        accessInfoRepository.findByPhoneNumber(phoneNumber)?.let {
-            val owner = ownerService.findById(it.ownerId)
-            val rooms = owner?.let { it1 -> roomRepository.findByIds(it1.rooms) }?.map { it.toRoomVO() }
-            throw AccessToAreaException("Данный номер [${phoneNumber}] уже зарегистрирован. Собственник: ${owner?.fullName}: ${rooms?.map { it.type.description + " " + it.number }}")
-        }
+        val phoneNumber = accessPhone.number.onlyNumbers()
+        phoneNumberValidator(phoneNumber)
         val accessInfo = AccessInfo(
             ownerId = ownerId,
             phoneNumber = phoneNumber,
-            phoneLabel = phoneLabel,
+            phoneLabel = accessPhone.label?.trim(),
             tenant = tenant
         ).apply {
             this.areas.addAll(areas)
@@ -133,5 +150,20 @@ class AccessService(
         }.sortedBy { it.areas.first().type }
     }
 
+    private fun phoneNumberValidator(phoneNumber: String, accessId: Long? = null) {
+        if (phoneNumber.first() != '7') {
+            throw AccessToAreaException("Номер телефона [$phoneNumber] должен начинаться с 7")
+        }
+        if (phoneNumber.length != PHONE_NUMBER_LENGTH) {
+            throw AccessToAreaException("Номер телефона [$phoneNumber] должен содержать 11 цифр")
+        }
+        accessInfoRepository.findByPhoneNumber(phoneNumber)?.let {
+            if (accessId == null || it.id != accessId) {
+                val owner = ownerService.findById(it.ownerId)
+                val rooms = owner?.let { it1 -> roomRepository.findByIds(it1.rooms) }?.map { it.toRoomVO() }
+                throw AccessToAreaException("Данный номер [${phoneNumber}] уже зарегистрирован. Собственник: ${owner?.fullName}: ${rooms?.map { it.type.description + " " + it.number }}")
+            }
+        }
+    }
 
 }
