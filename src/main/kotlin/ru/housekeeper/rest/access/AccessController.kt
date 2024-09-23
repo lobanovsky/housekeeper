@@ -13,7 +13,7 @@ class AccessController(
 ) {
 
     //create the area access by phone number
-    @PostMapping("/areas")
+    @PostMapping
     @Operation(summary = "Create the area access by the phone number (Were? -> Area, Who? -> Room)")
     fun createAccess(
         @RequestBody accessRequest: AccessRequest
@@ -34,6 +34,7 @@ class AccessController(
         @PathVariable("phone-number") phoneNumber: String,
         @RequestParam active: Boolean = true,
     ) = accessService.findByPhoneNumber(phoneNumber, active)
+
 
     @GetMapping("/cars/{car-number}")
     @Operation(summary = "Get the access by the car number")

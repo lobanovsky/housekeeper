@@ -4,6 +4,7 @@ import ru.housekeeper.model.entity.Owner
 import java.time.LocalDateTime
 
 class OwnerVO(
+    val id: Long? = null,
     val fullName: String,
     private val emails: MutableSet<String> = mutableSetOf(),
     private var phones: MutableSet<String> = mutableSetOf(),

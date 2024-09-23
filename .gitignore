@@ -33,3 +33,4 @@ target/
 /.env
 
 /src/main/kotlin/ru/housekeeper/experiment/
+/.kotlin/

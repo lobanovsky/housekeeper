@@ -125,7 +125,6 @@ class RepairService(
             val person = Person(
                 ownerId = owners[0].id ?: 0,
                 phones = getPhones(contact.value),
-                tenant = contact.value[0].tenant
             )
             val accesses = accessService.createAccessToArea(AccessRequest(areas, person))
             //create cars
@@ -185,7 +184,7 @@ class RepairService(
 
     private fun getPhones(contacts: List<Contact>): Set<Phone> {
         val maxLengthLabel = contacts.map { it.label }.maxBy { it?.length ?: 0 }
-        return setOf(Phone(contacts[0].phone, maxLengthLabel))
+        return setOf(Phone(contacts[0].phone, maxLengthLabel, contacts[0].tenant))
     }
 
     private fun makeContact(
