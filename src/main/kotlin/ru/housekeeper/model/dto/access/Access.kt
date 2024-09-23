@@ -26,6 +26,7 @@ data class AccessCreateResponse(
 )
 
 data class AccessUpdateRequest(
-    val phone: AccessPhone,
+    val label: String? = null,
+    val tenant: Boolean = false,
     val areas: Set<Long>,
 )

@@ -21,4 +21,7 @@ interface AccessInfoRepository : CrudRepository<AccessInfo, Long>, AccessInfoRep
         active: Boolean = true
     ): List<AccessInfo>
 
+    //Deactivate all access by id
+    @Query("update AccessInfo p set p.active = false where p.id = :id")
+    fun deactivateById(id: Long)
 }

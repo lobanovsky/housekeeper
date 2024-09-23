@@ -18,4 +18,8 @@ interface CarRepository : CrudRepository<Car, Long> {
     @Query("SELECT c FROM Car c WHERE c.accessInfoId = :accessInfoId AND c.active = :active")
     fun findByAccessInfoId(accessInfoId: Long, active: Boolean = true): List<Car>
 
+    //Deactivate car by id
+    @Query("UPDATE Car c SET c.active = false WHERE c.id = :id")
+    fun deactivateById(id: Long)
+
 }

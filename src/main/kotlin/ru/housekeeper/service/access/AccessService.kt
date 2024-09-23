@@ -8,6 +8,7 @@ import ru.housekeeper.model.dto.access.*
 import ru.housekeeper.model.entity.access.AccessInfo
 import ru.housekeeper.repository.AreaRepository
 import ru.housekeeper.repository.access.AccessInfoRepository
+import ru.housekeeper.repository.access.CarRepository
 import ru.housekeeper.repository.owner.OwnerRepository
 import ru.housekeeper.repository.room.RoomRepository
 import ru.housekeeper.service.OwnerService
@@ -20,24 +21,25 @@ class AccessService(
     private val roomRepository: RoomRepository,
     private val areaRepository: AreaRepository,
     private val carService: CarService,
+    private val careRepository: CarRepository,
     private val ownerService: OwnerService,
 ) {
 
+    fun deleteAccess(accessId: Long) {
+        val accessInfo = accessInfoRepository.findByIdOrNull(accessId) ?: entityNotfound("Доступ" to accessId)
+        accessInfo.id?.let { accessInfoRepository.deactivateById(it) }
+        accessInfo.id?.let { careRepository.deactivateById(it) }
+    }
+
     fun updateAccessToArea(accessId: Long, accessEditRequest: AccessUpdateRequest): AccessInfoVO {
-        val phone = accessEditRequest.phone
         val areas = accessEditRequest.areas
-        if (phone.number.isEmpty()) {
-            throw AccessToAreaException("Не указан номер телефона")
-        }
         if (areas.isEmpty()) {
             throw AccessToAreaException("Не указаны зоны доступа")
         }
-        phoneNumberValidator(phone.number, accessId)
 
         val accessInfo = accessInfoRepository.findByIdOrNull(accessId)?.let { accessInfo ->
-            accessInfo.phoneNumber = phone.number.onlyNumbers()
-            accessInfo.phoneLabel = phone.label?.trim()
-            accessInfo.tenant = phone.tenant
+            accessInfo.phoneLabel = accessEditRequest.label?.trim()
+            accessInfo.tenant = accessEditRequest.tenant
             accessInfo.areas.clear()
             accessInfo.areas.addAll(areas)
             accessInfoRepository.save(accessInfo)

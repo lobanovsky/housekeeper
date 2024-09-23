@@ -28,6 +28,13 @@ class AccessController(
         @RequestBody accessEditRequest: AccessUpdateRequest
     ) = accessService.updateAccessToArea(accessId, accessEditRequest)
 
+    //remove the area access by phone number
+    @DeleteMapping("/{access-id}")
+    @Operation(summary = "Remove the area access by the phone number")
+    fun deleteAccess(
+        @PathVariable("access-id") accessId: Long
+    ) = accessService.deleteAccess(accessId)
+
 
     @GetMapping("/rooms/{room-id}")
     @Operation(summary = "Get the access by the room id")

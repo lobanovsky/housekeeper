@@ -34,7 +34,7 @@ data class AccessInfo(
     val ownerId: Long,
 
     //template: 79266191359
-    var phoneNumber: String,
+    val phoneNumber: String,
 
     var phoneLabel: String? = null,
 
