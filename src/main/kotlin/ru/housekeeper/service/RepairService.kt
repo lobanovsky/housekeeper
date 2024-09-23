@@ -124,7 +124,7 @@ class RepairService(
             if (owners == null) continue
             val accessPerson = AccessPerson(
                 ownerId = owners[0].id ?: 0,
-                accessPhones = getPhones(contact.value),
+                phones = getPhones(contact.value),
             )
             val accesses = accessService.createAccessToArea(AccessCreateRequest(areas, accessPerson))
             //create cars

@@ -4,18 +4,24 @@ data class AccessCreateRequest(
     //куда
     val areas: Set<Long>,
     //кому
-    val accessPerson: AccessPerson,
+    val person: AccessPerson,
 )
 
 data class AccessPerson(
     val ownerId: Long,
-    val accessPhones: Set<AccessPhone>,
+    val phones: Set<AccessPhone>,
 )
 
 data class AccessPhone(
     val number: String,
     val label: String? = null,
     val tenant: Boolean = false,
+    val cars: Set<AccessCar>? = mutableSetOf(),
+)
+
+data class AccessCar(
+    val plateNumber: String,
+    val description: String? = null,
 )
 
 data class AccessCreateResponse(

@@ -1,6 +1,7 @@
 package ru.housekeeper.service.access
 
 import org.springframework.stereotype.Service
+import ru.housekeeper.model.dto.access.AccessCar
 import ru.housekeeper.model.entity.access.Car
 import ru.housekeeper.repository.access.CarRepository
 import ru.housekeeper.utils.isValidRussianCarNumber
@@ -19,7 +20,8 @@ class CarService(
     ): Car {
         //check if car number is valid
         if (!isValidRussianCarNumber(carNumber)) {
-            logger().warn("Car number $carNumber is not valid")
+            logger().error("Car number $carNumber is not valid")
+            throw IllegalArgumentException("Автомобильный номер $carNumber не является валидным")
         }
         //check by exist, if not then add
         val car = carRepository.findByNumber(carNumber)
@@ -44,6 +46,12 @@ class CarService(
 
     fun findByCarNumber(carNumber: String, active: Boolean): Car? {
         return carRepository.findByNumber(carNumber, active)
+    }
+
+    fun createCarForAccesses(accessInfoId: Long, cars: Set<AccessCar>) {
+        cars.forEach {
+            createCar(it.plateNumber, accessInfoId, it.description)
+        }
     }
 
 }

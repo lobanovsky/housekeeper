@@ -2,6 +2,7 @@ package ru.housekeeper.service.access
 
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
+import org.springframework.transaction.annotation.Transactional
 import ru.housekeeper.exception.AccessToAreaException
 import ru.housekeeper.model.dto.OwnerVO
 import ru.housekeeper.model.dto.access.*
@@ -48,22 +49,24 @@ class AccessService(
         return findByOwner(accessInfo.ownerId)
     }
 
+    @Transactional
     fun createAccessToArea(accessCreateRequest: AccessCreateRequest): List<AccessCreateResponse> {
         if (accessCreateRequest.areas.isEmpty()) {
             throw AccessToAreaException("Не указаны зоны доступа")
         }
-        if (accessCreateRequest.accessPerson.accessPhones.isEmpty()) {
+        if (accessCreateRequest.person.phones.isEmpty()) {
             throw AccessToAreaException("Не указаны телефоны")
         }
         val response = mutableListOf<AccessCreateResponse>()
-        for (phone in accessCreateRequest.accessPerson.accessPhones) {
+        for (phone in accessCreateRequest.person.phones) {
             try {
                 val accessInfo = createAccessToArea(
-                    ownerId = accessCreateRequest.accessPerson.ownerId,
+                    ownerId = accessCreateRequest.person.ownerId,
                     accessPhone = phone,
                     areas = accessCreateRequest.areas,
                     tenant = phone.tenant
                 )
+                accessInfo.id?.let { phone.cars?.let { cars -> carService.createCarForAccesses(it, cars) } }
                 response.add(AccessCreateResponse(accessInfo.id, accessInfo.phoneNumber.beautifulPhonePrint(), true))
             } catch (e: AccessToAreaException) {
                 logger().error("[$phone] Ошибка: $e")
