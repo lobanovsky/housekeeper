@@ -1,5 +1,6 @@
 package ru.housekeeper.repository.access
 
+import org.springframework.data.jpa.repository.Modifying
 import org.springframework.data.jpa.repository.Query
 import org.springframework.data.repository.CrudRepository
 import org.springframework.data.repository.query.Param
@@ -19,6 +20,7 @@ interface CarRepository : CrudRepository<Car, Long> {
     fun findByAccessInfoId(accessInfoId: Long, active: Boolean = true): List<Car>
 
     //Deactivate car by id
+    @Modifying
     @Query("UPDATE Car c SET c.active = false WHERE c.id = :id")
     fun deactivateById(id: Long)
 

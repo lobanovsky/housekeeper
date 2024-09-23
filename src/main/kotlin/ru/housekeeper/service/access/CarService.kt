@@ -43,8 +43,10 @@ class CarService(
     fun updateCars(accessInfoId: Long, accessCars: Set<AccessCar>) {
         val associateByPlate = accessCars.associateBy { it.plateNumber }
 
+        //get all cars by accessInfoId
+        val cars = carRepository.findByAccessInfoId(accessInfoId, true)
         //get all car numbers
-        val carNumbers = carRepository.findByAccessInfoId(accessInfoId, true).map { it.number }
+        val carNumbers = cars.map { it.number }
         //get all car numbers from request
         val carNumbersFromRequest = accessCars.map { it.plateNumber }
         //get all car numbers that are not in the request
@@ -61,6 +63,15 @@ class CarService(
         //save all cars that are in the request
         carNumbersToSave.forEach {
             createCar(it, accessInfoId, associateByPlate[it]?.description)
+        }
+        //update descriptions if change
+        cars.forEach {
+            associateByPlate[it.number]?.let { accessCar ->
+                if (it.description != accessCar.description) {
+                    it.description = accessCar.description
+                    carRepository.save(it)
+                }
+            }
         }
     }
 

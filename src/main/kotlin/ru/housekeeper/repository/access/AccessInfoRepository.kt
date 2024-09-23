@@ -1,5 +1,6 @@
 package ru.housekeeper.repository.access
 
+import org.springframework.data.jpa.repository.Modifying
 import org.springframework.data.jpa.repository.Query
 import org.springframework.data.repository.CrudRepository
 import org.springframework.data.repository.query.Param
@@ -22,6 +23,7 @@ interface AccessInfoRepository : CrudRepository<AccessInfo, Long>, AccessInfoRep
     ): List<AccessInfo>
 
     //Deactivate all access by id
+    @Modifying
     @Query("update AccessInfo p set p.active = false where p.id = :id")
     fun deactivateById(id: Long)
 }

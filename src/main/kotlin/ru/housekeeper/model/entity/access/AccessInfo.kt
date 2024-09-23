@@ -21,7 +21,7 @@ data class AccessInfo(
     @Column(updatable = false)
     var createDate: LocalDateTime = LocalDateTime.now(),
 
-    val active: Boolean = true,
+    var active: Boolean = true,
 
     val blockDateTime: LocalDateTime? = null,
 
