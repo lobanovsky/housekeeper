@@ -18,7 +18,9 @@ class FileController(
 
     @GetMapping("/types")
     @Operation(summary = "Get all types of files")
-    fun getFileTypes(): List<FileTypeResponse> = FileTypeEnum.entries.map { FileTypeResponse(it.name, it.description) }
+    fun getFileTypes(): List<FileTypeResponse> =
+        FileTypeEnum.entries.filterIndexed { index, _ -> index == 0 || index == 6 }
+            .map { FileTypeResponse(it.name, it.description) }
 
     data class FileTypeResponse(
         val name: String,

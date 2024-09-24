@@ -4,6 +4,7 @@ import com.vladmihalcea.hibernate.type.json.JsonType
 import jakarta.persistence.*
 import org.hibernate.annotations.CreationTimestamp
 import org.hibernate.annotations.Type
+import ru.housekeeper.enums.AccessBlockReasonEnum
 import java.time.LocalDateTime
 
 /**
@@ -24,6 +25,9 @@ data class AccessInfo(
     var active: Boolean = true,
 
     val blockDateTime: LocalDateTime? = null,
+
+    @Enumerated(EnumType.STRING)
+    val blockReason: AccessBlockReasonEnum? = AccessBlockReasonEnum.MANUAL,
 
     //куда (where?)
     @Type(JsonType::class)
