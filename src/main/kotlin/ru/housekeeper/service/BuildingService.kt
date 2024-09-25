@@ -18,4 +18,6 @@ class BuildingService(
         (buildingRepository.findByIdOrNull(buildingId) ?: entityNotfound("Дом" to buildingId)).let { building ->
             return building.numberOfApartmentsPerFloor
         }
+
+    fun getBuildingById(id: Long): Building = buildingRepository.findByIdOrNull(id) ?: entityNotfound("Дом" to id)
 }
