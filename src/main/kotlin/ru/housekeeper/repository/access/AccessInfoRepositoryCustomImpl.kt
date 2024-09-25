@@ -14,4 +14,10 @@ class AccessInfoRepositoryCustomImpl(
         return query.resultList as List<AccessInfo>
     }
 
+    override fun findByAreaId(areaId: Long, active: Boolean): List<AccessInfo> {
+        val sql = "select * from access_info where areas @> '[$areaId]' and active = $active"
+        val query = entityManager.createNativeQuery(sql, AccessInfo::class.java)
+        return query.resultList as List<AccessInfo>
+    }
+
 }

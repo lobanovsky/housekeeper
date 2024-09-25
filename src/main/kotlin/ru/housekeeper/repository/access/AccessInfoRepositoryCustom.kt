@@ -8,4 +8,6 @@ interface AccessInfoRepositoryCustom {
 
     fun findByRoomId(roomId: Long, active: Boolean = true): List<AccessInfo>
 
+    fun findByAreaId(areaId: Long, active: Boolean = true): List<AccessInfo>
+
 }
