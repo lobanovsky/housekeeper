@@ -12,6 +12,8 @@ import ru.housekeeper.repository.likeFilterBy
 import ru.housekeeper.rest.gate.LogEntryController
 import ru.housekeeper.utils.getPage
 import java.time.LocalDate
+import java.time.LocalDateTime
+import java.time.temporal.ChronoUnit
 
 class LogEntryRepositoryCustomImpl(
     @PersistenceContext private val entityManager: EntityManager
@@ -78,4 +80,13 @@ class LogEntryRepositoryCustomImpl(
             }
     }
 
+    override fun getAllLastNMonths(n: Int): List<LogEntry> {
+        //now minus n months
+        val startDate = LocalDateTime.now().minus(n.toLong(), ChronoUnit.MONTHS)
+
+        val sql = "SELECT p FROM LogEntry p WHERE p.dateTime >= :startDate ORDER BY p.dateTime DESC"
+        val query = entityManager.createQuery(sql)
+        query.setParameter("startDate", startDate)
+        return query.resultList as List<LogEntry>
+    }
 }

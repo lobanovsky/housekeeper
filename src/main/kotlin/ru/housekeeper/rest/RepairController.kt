@@ -55,4 +55,10 @@ class RepairController(
         @RequestPart file: MultipartFile,
     ): Int = repairService.initAccessInfo(file)
 
+    //Блокировка номеров телефонов, которые не пользовались шлагбаумом более n-месяцев
+    @GetMapping("/block-expired-phone-numbers")
+    fun blockExpiredPhoneNumbers(
+        @RequestParam months: Int,
+    ) = repairService.blockExpiredPhoneNumbers(months)
+
 }

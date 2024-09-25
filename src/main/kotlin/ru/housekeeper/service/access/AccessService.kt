@@ -3,6 +3,7 @@ package ru.housekeeper.service.access
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
+import ru.housekeeper.enums.AccessBlockReasonEnum
 import ru.housekeeper.exception.AccessToAreaException
 import ru.housekeeper.model.dto.OwnerVO
 import ru.housekeeper.model.dto.access.*
@@ -14,6 +15,7 @@ import ru.housekeeper.repository.owner.OwnerRepository
 import ru.housekeeper.repository.room.RoomRepository
 import ru.housekeeper.service.OwnerService
 import ru.housekeeper.utils.*
+import java.time.LocalDateTime
 
 @Service
 class AccessService(
@@ -27,9 +29,13 @@ class AccessService(
 ) {
 
     @Transactional
-    fun deleteAccess(accessId: Long) {
+    fun deactivateAccess(
+        accessId: Long,
+        blockedDateTime: LocalDateTime = LocalDateTime.now(),
+        blockReason: AccessBlockReasonEnum = AccessBlockReasonEnum.MANUAL
+    ) {
         val accessInfo = accessInfoRepository.findByIdOrNull(accessId) ?: entityNotfound("Доступ" to accessId)
-        accessInfo.id?.let { accessInfoRepository.deactivateById(it) }
+        accessInfo.id?.let { accessInfoRepository.deactivateById(it, blockedDateTime, blockReason) }
         accessInfo.id?.let { careRepository.deactivateById(it) }
     }
 

@@ -33,7 +33,7 @@ class AccessController(
     @Operation(summary = "Remove the area access by the phone number")
     fun deleteAccess(
         @PathVariable("access-id") accessId: Long
-    ) = accessService.deleteAccess(accessId)
+    ) = accessService.deactivateAccess(accessId)
 
 
     @GetMapping("/rooms/{room-id}")

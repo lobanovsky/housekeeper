@@ -21,7 +21,8 @@ class LogEntryService(
         val totalSize: Int,
     )
 
-    @Synchronized fun parseAndSave(file: MultipartFile, checkSum: String, imei: String): UploadLogEntriesInfo {
+    @Synchronized
+    fun parseAndSave(file: MultipartFile, checkSum: String, imei: String): UploadLogEntriesInfo {
         val gate = gateService.getGateByImei(imei)
         if (gate == null) {
             logger().error("Gate with IMEI $imei not found")
@@ -72,4 +73,18 @@ class LogEntryService(
         if (size > 0) logEntryRepository.removeBySource(source = checksum)
         return size
     }
+
+    fun getAllLastNMonths(n: Int) = logEntryRepository.getAllLastNMonths(n)
+
+    fun lastEntryByPhoneNumber(phoneNumber: String): LastEntries {
+        val entries = logEntryRepository.lastEntryByPhoneNumber(phoneNumber)
+        if (entries.isEmpty()) return LastEntries(0, null)
+        val lastEntry = entries.first()
+        return LastEntries(entries.count(), lastEntry)
+    }
+
+    data class LastEntries(
+        val countLastEntries: Int,
+        val lastEntry: LogEntry?,
+    )
 }

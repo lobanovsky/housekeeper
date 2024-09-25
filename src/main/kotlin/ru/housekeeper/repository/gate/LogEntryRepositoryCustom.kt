@@ -27,4 +27,6 @@ interface LogEntryRepositoryCustom {
         val phoneNumber: String? = null,
         val userName: String? = null,
     )
+
+    fun getAllLastNMonths(n: Int): List<LogEntry>
 }

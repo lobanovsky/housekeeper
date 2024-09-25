@@ -5,6 +5,7 @@ import org.apache.poi.ss.usermodel.WorkbookFactory
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import org.springframework.web.multipart.MultipartFile
+import ru.housekeeper.enums.AccessBlockReasonEnum
 import ru.housekeeper.enums.AreaTypeEnum
 import ru.housekeeper.enums.RoomTypeEnum
 import ru.housekeeper.model.dto.access.AccessCreateRequest
@@ -13,15 +14,19 @@ import ru.housekeeper.model.dto.access.AccessPhone
 import ru.housekeeper.model.entity.access.AccessInfo
 import ru.housekeeper.model.entity.payment.IncomingPayment
 import ru.housekeeper.model.filter.IncomingPaymentsFilter
+import ru.housekeeper.repository.access.AccessInfoRepository
 import ru.housekeeper.repository.owner.OwnerRepository
 import ru.housekeeper.repository.payment.IncomingPaymentRepository
 import ru.housekeeper.service.access.AccessService
 import ru.housekeeper.service.access.CarService
+import ru.housekeeper.service.gate.GateService
+import ru.housekeeper.service.gate.LogEntryService
 import ru.housekeeper.utils.isValidRussianCarNumber
 import ru.housekeeper.utils.logger
 import ru.housekeeper.utils.replaceLatinToCyrillic
 import java.math.BigDecimal
 import java.time.LocalDate
+import java.time.LocalDateTime
 
 @Service
 class RepairService(
@@ -31,7 +36,10 @@ class RepairService(
     private val roomService: RoomService,
     private val ownerRepository: OwnerRepository,
     private val carService: CarService,
-    ) {
+    private val logEntryService: LogEntryService,
+    private val accessInfoRepository: AccessInfoRepository,
+    private val gateService: GateService,
+) {
 
     @Transactional
     fun findAndRemoveDuplicates() {
@@ -131,7 +139,11 @@ class RepairService(
 
             contact.value.forEach {
                 if (it.carNumber?.isNotBlank() == true) {
-                    carService.createCar(it.carNumber, accesses.firstNotNullOf { accessId -> accessId.id }, it.carDescription)
+                    carService.createCar(
+                        it.carNumber,
+                        accesses.firstNotNullOf { accessId -> accessId.id },
+                        it.carDescription
+                    )
                     countCarPlate++
                 }
             }
@@ -221,5 +233,51 @@ class RepairService(
         val type: RoomTypeEnum,
         val carNumber: String? = null,
         val carDescription: String? = null,
+    )
+
+    fun blockExpiredPhoneNumbers(months: Int): List<Blocked> {
+        //get all live phones
+        val allLiveEntries = logEntryService.getAllLastNMonths(months)
+        val liveEntries = allLiveEntries.map { it.phoneNumber }.toSet()
+        logger().info("Log entries count = ${allLiveEntries.size}")
+        val allAccess = accessInfoRepository.findAll()
+        //заблокировать все телефоны, которые не пользовались шлагбаумом более n-месяцев
+        val blockedNumbers = allAccess.filterNot { liveEntries.contains(it.phoneNumber) }
+
+        val allGates = gateService.getAllGates().associateBy { it.id }
+        val result = mutableListOf<Blocked>()
+        blockedNumbers.forEach { accessId ->
+            val lastEntry = logEntryService.lastEntryByPhoneNumber(accessId.phoneNumber)
+            result.add(
+                Blocked(
+                    accessId.id ?: 0,
+                    accessId.phoneNumber,
+                    lastEntry.lastEntry?.flatNumber,
+                    lastEntry.lastEntry?.userName,
+                    lastEntry.countLastEntries,
+                    lastEntry.lastEntry?.dateTime,
+                    lastEntry.lastEntry?.let { allGates[it.gateId] }?.name
+                )
+            )
+        }
+        //block access by id
+        val blockedDataTime = LocalDateTime.now()
+        val blockedReason = AccessBlockReasonEnum.EXPIRED
+        result.forEach {
+            accessService.deactivateAccess(it.accessId, blockedDataTime, blockedReason)
+        }
+        logger().info("Blocked phones count = ${result.size}")
+        return result
+    }
+
+    data class Blocked(
+        val accessId: Long,
+        val phoneNumber: String,
+        //
+        val flatNumber: String?,
+        val userName: String?,
+        val countEntries: Int,
+        val lastEntry: LocalDateTime?,
+        val gate: String?
     )
 }

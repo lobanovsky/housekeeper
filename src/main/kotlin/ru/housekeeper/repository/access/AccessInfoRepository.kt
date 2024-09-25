@@ -29,7 +29,7 @@ interface AccessInfoRepository : CrudRepository<AccessInfo, Long>, AccessInfoRep
     @Query("update AccessInfo p set p.active = false, p.blockDateTime = :blockedDateTime, p.blockReason = :blockReason where p.id = :id")
     fun deactivateById(
         id: Long,
-        blockedDateTime: LocalDateTime = LocalDateTime.now(),
-        blockReason: AccessBlockReasonEnum = AccessBlockReasonEnum.MANUAL
+        blockedDateTime: LocalDateTime,
+        blockReason: AccessBlockReasonEnum
     )
 }

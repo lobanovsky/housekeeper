@@ -22,4 +22,6 @@ interface LogEntryRepository : CrudRepository<LogEntry, Long>, LogEntryRepositor
     @Query("SELECT COUNT(p) FROM LogEntry p WHERE p.source = :source")
     fun countBySource(@Param("source") source: String): Int
 
+    @Query("SELECT p FROM LogEntry p WHERE p.phoneNumber = :phoneNumber ORDER BY p.dateTime DESC")
+    fun lastEntryByPhoneNumber(phoneNumber: String): List<LogEntry>
 }
