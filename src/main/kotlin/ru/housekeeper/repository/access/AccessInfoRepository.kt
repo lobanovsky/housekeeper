@@ -12,7 +12,7 @@ import java.time.LocalDateTime
 @Repository
 interface AccessInfoRepository : CrudRepository<AccessInfo, Long>, AccessInfoRepositoryCustom {
 
-    @Query("select p from AccessInfo p where p.phoneNumber = :number and p.active = :active")
+    @Query("select p from AccessInfo p where p.phoneNumber like %:number% and p.active = :active")
     fun findByPhoneNumber(
         @Param("number") number: String,
         @Param("active") active: Boolean = true
