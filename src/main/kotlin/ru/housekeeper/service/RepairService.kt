@@ -109,8 +109,13 @@ class RepairService(
 
     fun initAccessInfo(file: MultipartFile): Int {
         val workbook = WorkbookFactory.create(file.inputStream)
-        val gateSheet = workbook.getSheet("gate")
-        val parkingSheet = workbook.getSheet("parking")
+        val gateSheet = workbook.getSheet("yard - №\tBlock\tАренда\tfirst nam")
+        val parkingSheet = workbook.getSheet("parkning - Паркинг")
+
+        if (gateSheet == null || parkingSheet == null) {
+            logger().error("Yard or parking sheet not found")
+            throw IllegalArgumentException("Yard or parking sheet not found")
+        }
 
         var access = mutableListOf<AccessInfo>()
         val contacts = mutableListOf<Contact>()
