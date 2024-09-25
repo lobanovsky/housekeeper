@@ -19,6 +19,11 @@ class RoomController(
     private val buildingService: BuildingService,
 ) {
 
+    //Get Room By Id
+    @GetMapping("/{id}")
+    @Operation(summary = "Get room by id")
+    fun getRoomById(@PathVariable id: Long): RoomVO = roomService.findById(id).toRoomVO()
+
     @GetMapping("/types")
     @Operation(summary = "Get all types of room")
     fun getRoomTypes(): List<RoomTypeResponse> = RoomTypeEnum.entries.map { RoomTypeResponse(it.name, it.description) }
