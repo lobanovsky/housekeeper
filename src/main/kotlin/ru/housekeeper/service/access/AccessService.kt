@@ -187,11 +187,16 @@ class AccessService(
         val contacts = mutableListOf<String>()
         contacts.add("User Name;Tel Number;Relay No.;Sch.1 (1-true 0-false);Sch.2 (1-true 0-false);Sch.3 (1-true 0-false);Sch.4 (1-true 0-false);Sch.5 (1-true 0-false);Sch.6 (1-true 0-false);Sch.7 (1-true 0-false);Sch.8 (1-true 0-false);Year (Valid until);Month (Valid until);Day (Valid until);Hour (Valid until);Minute (Valid until);Ring Counter;Ring Counter Status")
         accessInfos.forEach { accessInfo ->
-            val owner = ownerRepository.findByIdOrNull(accessInfo.ownerId) ?: entityNotfound("Владелец" to accessInfo.ownerId)
-            val label = roomRepository.findByIds(owner.rooms).map { it.number }.joinToString(",")
+            val owner =
+                ownerRepository.findByIdOrNull(accessInfo.ownerId) ?: entityNotfound("Владелец" to accessInfo.ownerId)
+            val firstRoom = roomRepository.findByIds(owner.rooms).first();
+            val label = firstRoom.number + "-" + firstRoom.type.name
             contacts.add(
                 EldesContact(
-                    userName = if (label.length > MAX_ELDES_LABEL_LENGTH) label.substring(0, MAX_ELDES_LABEL_LENGTH) else label,
+                    userName = if (label.length > MAX_ELDES_LABEL_LENGTH) label.substring(
+                        0,
+                        MAX_ELDES_LABEL_LENGTH
+                    ) else label,
                     telNumber = accessInfo.phoneNumber,
                 ).toCSVLine()
             )
