@@ -189,7 +189,7 @@ class AccessService(
         accessInfos.forEach { accessInfo ->
             val owner =
                 ownerRepository.findByIdOrNull(accessInfo.ownerId) ?: entityNotfound("Владелец" to accessInfo.ownerId)
-            val firstRoom = roomRepository.findByIds(owner.rooms).first();
+            val firstRoom = roomRepository.findByIds(owner.rooms).sortedBy { it.type }.first();
             val label = firstRoom.number + "-" + firstRoom.type.name
             contacts.add(
                 EldesContact(
