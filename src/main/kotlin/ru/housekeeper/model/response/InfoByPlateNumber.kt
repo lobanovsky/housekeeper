@@ -6,6 +6,7 @@ data class InfoByPlateNumber(
 
     val phoneNumber: String,
     val phoneLabel: String?,
+    val tenant: Boolean,
 
     val carNumber: String,
     val carDescription: String?,

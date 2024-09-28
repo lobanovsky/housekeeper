@@ -216,6 +216,7 @@ class AccessService(
             ownerRooms = roomRepository.findByIds(owner.rooms).sortedBy { it.type }.joinToString { it.type.shortDescription + "" + it.number },
             phoneNumber = accessInfo.phoneNumber.beautifulPhonePrint(),
             phoneLabel = accessInfo.phoneLabel,
+            tenant = accessInfo.tenant,
             carNumber = car.number,
             carDescription = car.description
         )
