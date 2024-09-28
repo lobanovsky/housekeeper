@@ -9,6 +9,7 @@ import ru.housekeeper.model.dto.OwnerVO
 import ru.housekeeper.model.dto.access.*
 import ru.housekeeper.model.dto.eldes.EldesContact
 import ru.housekeeper.model.entity.access.AccessInfo
+import ru.housekeeper.model.response.InfoByPlateNumber
 import ru.housekeeper.repository.AreaRepository
 import ru.housekeeper.repository.access.AccessInfoRepository
 import ru.housekeeper.repository.access.CarRepository
@@ -202,6 +203,22 @@ class AccessService(
             )
         }
         return contacts
+    }
+
+    fun getInfoByCarNumber(plateNumber: String, active: Boolean): InfoByPlateNumber {
+        val car = carService.findByCarNumber(plateNumber, active) ?: entityNotfound("Автомобиль" to plateNumber)
+        val accessInfo =
+            accessInfoRepository.findByIdOrNull(car.accessInfoId) ?: entityNotfound("Доступ" to car.accessInfoId)
+        val owner =
+            ownerRepository.findByIdOrNull(accessInfo.ownerId) ?: entityNotfound("Владелец" to accessInfo.ownerId)
+        return InfoByPlateNumber(
+            ownerName = owner.fullName,
+            ownerRooms = roomRepository.findByIds(owner.rooms).sortedBy { it.type }.joinToString { it.type.shortDescription + "" + it.number },
+            phoneNumber = accessInfo.phoneNumber,
+            phoneLabel = accessInfo.phoneLabel,
+            carNumber = car.number,
+            carDescription = car.description
+        )
     }
 
 }

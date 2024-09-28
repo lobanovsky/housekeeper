@@ -86,4 +86,12 @@ class AccessController(
             )
     }
 
+    //get info by car number
+    @GetMapping("/info/{car-number}")
+    @Operation(summary = "Get the info by the car number")
+    fun getInfoByCarNumber(
+        @PathVariable("car-number") carNumber: String,
+        @RequestParam active: Boolean = true,
+    ) = accessService.getInfoByCarNumber(carNumber, active)
+
 }
