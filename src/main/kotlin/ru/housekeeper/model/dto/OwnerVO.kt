@@ -1,6 +1,8 @@
 package ru.housekeeper.model.dto
 
 import ru.housekeeper.model.entity.Owner
+import ru.housekeeper.model.entity.Room
+import ru.housekeeper.utils.toRoomVO
 import java.time.LocalDateTime
 
 class OwnerVO(
@@ -10,7 +12,7 @@ class OwnerVO(
     private var phones: MutableSet<String> = mutableSetOf(),
     private var active: Boolean = true,
     private var dateOfLeft: LocalDateTime? = null,
-    var ownerRooms: List<RoomVO> = mutableListOf(),
+    var rooms: List<RoomVO> = mutableListOf(),
 ) {
 
     fun toOwner(checksum: String): Owner {
@@ -25,3 +27,9 @@ class OwnerVO(
         )
     }
 }
+
+fun Owner.toOwnerVO(rooms: List<Room>): OwnerVO = OwnerVO(
+    id = this.id,
+    fullName = this.fullName,
+    rooms = rooms.map { it.toRoomVO() },
+)

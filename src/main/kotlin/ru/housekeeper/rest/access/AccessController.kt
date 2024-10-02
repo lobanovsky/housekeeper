@@ -5,8 +5,8 @@ import org.springframework.http.HttpHeaders
 import org.springframework.http.MediaType
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
-import ru.housekeeper.model.dto.access.AccessCreateRequest
-import ru.housekeeper.model.dto.access.AccessUpdateRequest
+import ru.housekeeper.model.dto.access.CreateAccessRequest
+import ru.housekeeper.model.dto.access.UpdateAccessRequest
 import ru.housekeeper.service.AreaService
 import ru.housekeeper.service.access.AccessService
 import ru.housekeeper.utils.yyyyMMddHHmmssDateFormat
@@ -23,17 +23,17 @@ class AccessController(
 
     //create the area access by phone number
     @PostMapping
-    @Operation(summary = "Create the area access by the phone number (Were? -> Area, Who? -> Room)")
+    @Operation(summary = "Create the area access by the phone number")
     fun createAccess(
-        @RequestBody accessCreateRequest: AccessCreateRequest
-    ) = accessService.createAccessToArea(accessCreateRequest)
+        @RequestBody createAccessRequest: CreateAccessRequest
+    ) = accessService.create(createAccessRequest)
 
     //Edit the area access by phone number
     @PutMapping("/{access-id}")
     @Operation(summary = "Edit the area access by the phone number")
     fun updateAccess(
         @PathVariable("access-id") accessId: Long,
-        @RequestBody accessEditRequest: AccessUpdateRequest
+        @RequestBody accessEditRequest: UpdateAccessRequest
     ) = accessService.updateAccessToArea(accessId, accessEditRequest)
 
     //remove the area access by phone number
@@ -73,10 +73,10 @@ class AccessController(
     fun exportAccess(
         @PathVariable("area-id") areaId: Long
     ): ResponseEntity<ByteArray> {
-        val areas = areaService.getAllAreas().associateBy { it.id }
+        val areas = areaService.findAll().associateBy { it.id }
         val area = areas[areaId] ?: return ResponseEntity.notFound().build()
 
-        val fileName = "${LocalDateTime.now().format(yyyyMMddHHmmssDateFormat())}_${area.type.name}.txt"
+        val fileName = "${LocalDateTime.now().format(yyyyMMddHHmmssDateFormat())}_${area.id}.txt"
         val eldesContact = accessService.getEldesContact(areaId)
         return ResponseEntity.ok()
             .contentType(MediaType.APPLICATION_OCTET_STREAM)
@@ -92,6 +92,6 @@ class AccessController(
     fun getInfoByCarNumber(
         @PathVariable("car-number") carNumber: String,
         @RequestParam active: Boolean = true,
-    ) = accessService.getInfoByCarNumber(carNumber, active)
+    ) = accessService.getOverview(carNumber, active)
 
 }

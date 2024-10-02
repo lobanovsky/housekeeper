@@ -10,7 +10,7 @@ fun Room.toRoomVO(): RoomVO {
     return RoomVO(
         id = id,
         street = street,
-        building = building,
+        building = buildingId,
         cadastreNumber = cadastreNumber,
         account = account,
         ownerName = ownerName,

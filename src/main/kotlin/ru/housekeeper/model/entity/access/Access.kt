@@ -12,8 +12,8 @@ import java.time.LocalDateTime
  *
  */
 @Entity
-@Table(name = "access_info")
-data class AccessInfo(
+@Table(name = "access")
+data class Access(
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     val id: Long? = null,
@@ -27,21 +27,26 @@ data class AccessInfo(
     val blockDateTime: LocalDateTime? = null,
 
     @Enumerated(EnumType.STRING)
-    val blockReason: AccessBlockReasonEnum? = AccessBlockReasonEnum.MANUAL,
+    val blockReason: AccessBlockReasonEnum? = null,
 
-    //куда (where?)
+    //куда
     @Type(JsonType::class)
     @Column(name = "areas", columnDefinition = "jsonb")
-    val areas: MutableSet<Long> = mutableSetOf(),
+    val areas: MutableSet<AccessToArea> = mutableSetOf(),
 
-    //кому (who?)
+    //Кто выдаёт доступ
     val ownerId: Long,
 
-    //template: 79266191359
+    //Ключ доступа
     val phoneNumber: String,
-
     var phoneLabel: String? = null,
 
-    var tenant: Boolean = false,
+    )
 
+data class AccessToArea(
+    val areaId: Long,
+    //арендатор или владелец
+    var tenant: Boolean? = null,
+    //конкретные места
+    val places: Set<String>? = mutableSetOf(),
     )

@@ -29,7 +29,7 @@ data class RoomVO(
     fun toRoom(checksum: String): Room {
         return Room(
             street = street,
-            building = building,
+            buildingId = building,
             cadastreNumber = cadastreNumber,
             account = account,
             ownerName = ownerName,

@@ -17,6 +17,13 @@ interface RoomRepository : CrudRepository<Room, Long>, RoomRepositoryCustom {
         @Param("type") type: RoomTypeEnum = RoomTypeEnum.FLAT
     ): Room?
 
+    //find room by building id
+    @Query("SELECT r FROM Room r WHERE r.number = :number AND r.buildingId = :buildingId")
+    fun findByNumberAndBuildingId(
+        @Param("number") number: String?,
+        @Param("buildingId") buildingId: Long
+    ): List<Room>?
+
     @Query("SELECT r FROM Room r WHERE LOWER(r.ownerName) = :ownerName AND r.square = :square AND (r.type = 'GARAGE' OR r.type = 'OFFICE')")
     fun findGarageOrOfficeByOwnerNameAndSquare(
         @Param("ownerName") ownerName: String,

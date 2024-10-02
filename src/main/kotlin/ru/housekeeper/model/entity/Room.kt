@@ -18,7 +18,7 @@ class Room(
     val id: Long? = null,
 
     val street: String? = null,
-    val building: Long,
+    val buildingId: Long,
     var cadastreNumber: String? = null,
 
     val account: String? = null,

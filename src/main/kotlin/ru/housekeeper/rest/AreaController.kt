@@ -14,6 +14,6 @@ class AreaController(
 ) {
 
     @GetMapping
-    fun findAll() = areaService.getAllAreas()
+    fun findAll() = areaService.findAll()
 
 }

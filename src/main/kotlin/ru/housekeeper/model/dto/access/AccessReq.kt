@@ -1,21 +1,23 @@
 package ru.housekeeper.model.dto.access
 
-data class AccessCreateRequest(
+import ru.housekeeper.model.entity.access.AccessToArea
+
+
+data class CreateAccessRequest(
     //куда
-    val areas: Set<Long>,
+    val areas: Set<AccessToArea>,
     //кому
     val person: AccessPerson,
 )
 
 data class AccessPerson(
     val ownerId: Long,
-    val phones: Set<AccessPhone>,
+    val contacts: Set<Contact>,
 )
 
-data class AccessPhone(
+data class Contact(
     val number: String,
     val label: String? = null,
-    val tenant: Boolean = false,
     val cars: Set<AccessCar>? = mutableSetOf(),
 )
 
@@ -24,16 +26,12 @@ data class AccessCar(
     val description: String? = null,
 )
 
-data class AccessCreateResponse(
-    val id: Long? = null,
-    val phoneNumber: String,
-    val success: Boolean,
-    val reason: String? = null,
-)
 
-data class AccessUpdateRequest(
+
+data class UpdateAccessRequest(
     val label: String? = null,
-    val tenant: Boolean = false,
-    val areas: Set<Long>,
+    val areas: Set<AccessToArea>,
     val cars: Set<AccessCar>? = mutableSetOf(),
 )
+
+

@@ -4,6 +4,7 @@ import org.springframework.stereotype.Service
 import ru.housekeeper.model.dto.access.AccessCar
 import ru.housekeeper.model.entity.access.Car
 import ru.housekeeper.repository.access.CarRepository
+import ru.housekeeper.utils.entityNotfound
 import ru.housekeeper.utils.isValidRussianCarNumber
 import ru.housekeeper.utils.logger
 import java.time.LocalDateTime
@@ -15,8 +16,9 @@ class CarService(
 
     fun createCar(
         carNumber: String,
-        accessInfoId: Long,
-        description: String? = null
+        accessId: Long,
+        description: String? = null,
+        active: Boolean = true,
     ): Car {
         //check if car number is valid
         if (!isValidRussianCarNumber(carNumber)) {
@@ -33,20 +35,21 @@ class CarService(
         return carRepository.save(
             Car(
                 createDate = LocalDateTime.now(),
-                number = carNumber,
+                plateNumber = carNumber,
                 description = description,
-                accessInfoId = accessInfoId
+                accessId = accessId,
+                active = active,
             )
         )
     }
 
-    fun updateCars(accessInfoId: Long, accessCars: Set<AccessCar>) {
+    fun updateCars(accessId: Long, accessCars: Set<AccessCar>) {
         val associateCarsFromReq = accessCars.associateBy { it.plateNumber }
 
-        //get all cars by accessInfoId
-        val cars = carRepository.findByAccessInfoId(accessInfoId, true)
+        //get all cars by accessId
+        val cars = carRepository.findByAccessId(accessId, true)
         //get all car numbers
-        val carNumbers = cars.map { it.number }
+        val carNumbers = cars.map { it.plateNumber }
         //get all car numbers from request
         val carNumbersFromRequest = accessCars.map { it.plateNumber }
         //get all car numbers that are not in the request
@@ -62,11 +65,11 @@ class CarService(
         }
         //save all cars that are in the request
         carNumbersToSave.forEach {
-            createCar(it, accessInfoId, associateCarsFromReq[it]?.description)
+            createCar(it, accessId, associateCarsFromReq[it]?.description)
         }
         //update descriptions if change
         cars.forEach {
-            associateCarsFromReq[it.number]?.let { carFromRequest ->
+            associateCarsFromReq[it.plateNumber]?.let { carFromRequest ->
                 if (it.description != carFromRequest.description) {
                     it.description = carFromRequest.description
                     carRepository.save(it)
@@ -75,18 +78,18 @@ class CarService(
         }
     }
 
-    fun findByAccessInfo(accessInfo: Long, active: Boolean): List<Car> {
-        return carRepository.findByAccessInfoId(accessInfo, active)
-    }
+    fun findByAccessId(access: Long, active: Boolean = true): List<Car> =
+        carRepository.findByAccessId(access, active)
 
-    fun findByCarNumber(carNumber: String, active: Boolean): Car? {
-        return carRepository.findByNumber(carNumber, active)
-    }
 
-    fun createCarForAccesses(accessInfoId: Long, cars: Set<AccessCar>) {
-        cars.forEach {
-            createCar(it.plateNumber, accessInfoId, it.description)
-        }
-    }
+    fun findByCarNumber(carNumber: String, active: Boolean): Car =
+        carRepository.findByNumber(carNumber, active) ?: entityNotfound("Автомобиль" to carNumber)
+
+
+    fun addCars(accessId: Long, cars: Set<AccessCar>, active: Boolean) =
+        cars.forEach { createCar(it.plateNumber, accessId, it.description, active) }
+
+    fun deactivateCar(id: Long) = carRepository.deactivateById(id)
+
 
 }

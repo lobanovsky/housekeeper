@@ -10,14 +10,14 @@ import ru.housekeeper.model.entity.access.Car
 @Repository
 interface CarRepository : CrudRepository<Car, Long> {
 
-    @Query("SELECT c FROM Car c WHERE c.number LIKE %:number% AND c.active = :active")
+    @Query("SELECT c FROM Car c WHERE c.plateNumber LIKE %:number% AND c.active = :active")
     fun findByNumber(
         @Param("number") number: String,
         @Param("active") active: Boolean = true,
     ): Car?
 
-    @Query("SELECT c FROM Car c WHERE c.accessInfoId = :accessInfoId AND c.active = :active")
-    fun findByAccessInfoId(accessInfoId: Long, active: Boolean = true): List<Car>
+    @Query("SELECT c FROM Car c WHERE c.accessId = :accessId AND c.active = :active")
+    fun findByAccessId(accessId: Long, active: Boolean = true): List<Car>
 
     //Deactivate car by id
     @Modifying

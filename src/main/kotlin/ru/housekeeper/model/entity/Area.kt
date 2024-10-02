@@ -2,7 +2,6 @@ package ru.housekeeper.model.entity
 
 import jakarta.persistence.*
 import org.hibernate.annotations.CreationTimestamp
-import ru.housekeeper.enums.AreaTypeEnum
 import java.time.LocalDateTime
 
 @Entity
@@ -20,9 +19,9 @@ data class Area(
 
     val name: String,
 
-    val description: String? = null,
-
-    @Enumerated(EnumType.STRING)
-    val type: AreaTypeEnum = AreaTypeEnum.YARD_AREA,
+    //specific place with diapason of area
+    val specificPlace: Boolean? = false,
+    val fromNumber: Int? = null,
+    val toNumber: Int? = null,
 
     )

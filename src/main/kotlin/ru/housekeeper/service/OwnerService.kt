@@ -15,7 +15,9 @@ class OwnerService(
 
     fun saveIfNotExist(owner: Owner): Owner = findByFullName(owner.fullName) ?: ownerRepository.save(owner)
 
-    fun findById(id: Long): Owner? = ownerRepository.findByIdOrNull(id) ?: entityNotfound("Owner" to id)
+    fun findById(id: Long): Owner = ownerRepository.findByIdOrNull(id) ?: entityNotfound("Собственник" to id)
 
     fun findAll(): List<Owner> = ownerRepository.findAll().toList()
+
+    fun findByRoomId(roomId: Long, active: Boolean): List<Owner> = ownerRepository.findByRoomId(roomId, active)
 }

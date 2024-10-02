@@ -17,10 +17,9 @@ data class Car(
 
     var active: Boolean = true,
 
-    val accessInfoId: Long,
+    val accessId: Long,
 
-    @Column(unique = true)
-    val number: String,
+    val plateNumber: String,
 
     var description: String? = null,
     )

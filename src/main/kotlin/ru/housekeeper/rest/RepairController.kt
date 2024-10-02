@@ -50,12 +50,19 @@ class RepairController(
     /**
      * Инициализация доступа на территории
      */
-    @PostMapping("/init-access-info")
-    fun initAccessInfo(
+    @PostMapping("/init-yard")
+    fun initYard(
         @RequestPart file: MultipartFile,
-    ): Int = repairService.initAccessInfo(file)
+    ): Int = repairService.initYard(file)
 
-    //Блокировка номеров телефонов, которые не пользовались шлагбаумом более n-месяцев
+    @PostMapping("/init-garage")
+    fun initGarage(
+        @RequestPart file: MultipartFile,
+    ): Int = repairService.initGarage(file)
+
+    /**
+     *Блокировка номеров телефонов, которые не пользовались шлагбаумом более n-месяцев
+     */
     @GetMapping("/block-expired-phone-numbers")
     fun blockExpiredPhoneNumbers(
         @RequestParam months: Int,

@@ -112,10 +112,15 @@ class RoomService(
     fun findByRoomNumberAndType(number: String, type: RoomTypeEnum): Room? =
         roomRepository.findByNumberAndType(number, type)
 
+    fun findByNumberAndBuildingId(number: String, buildingId: Long): List<Room>? =
+        roomRepository.findByNumberAndBuildingId(number, buildingId)
+
     fun findWithFilter(pageNum: Int = 0, pageSize: Int = MAX_SIZE_PER_PAGE, filter: RoomFilter): Page<Room> =
         roomRepository.findAllWithFilter(pageNum, pageSize, filter)
             .also { logger().info("Found ${it.totalElements} rooms for filter: $filter}") }
 
     fun findById(roomId: Long): Room = roomRepository.findByIdOrNull(roomId) ?: entityNotfound("Помещение" to roomId)
+
+    fun findByIds(ids: Set<Long>): List<Room> = roomRepository.findByIds(ids)
 
 }
