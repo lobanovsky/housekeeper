@@ -10,7 +10,7 @@ import ru.housekeeper.enums.RoomTypeEnum
 import ru.housekeeper.model.dto.access.CarRequest
 import ru.housekeeper.model.dto.access.Contact
 import ru.housekeeper.model.dto.access.CreateAccessRequest
-import ru.housekeeper.model.dto.access.UpdateAccessRequest
+import ru.housekeeper.model.dto.access.CreateAccessResponse
 import ru.housekeeper.model.entity.Owner
 import ru.housekeeper.model.entity.access.AccessToArea
 import ru.housekeeper.model.entity.payment.IncomingPayment
@@ -126,33 +126,38 @@ class RepairService(
         val buildingId = 1L
         val areaId = 1L
 
-        val contacts = sheetParser(yardSheet, 15)
-        val area = areaService.findById(areaId)
-        var countCarPlate = 0
+        val contacts = contactParser(yardSheet, 15)
         var count = 0
-        val now = LocalDateTime.now()
         for (contact in contacts) {
             val owners = findOwnersByRoom(contact.roomNumber, buildingId, RoomTypeEnum.FLAT)
             if (owners.isEmpty()) continue
 
-            val accesses = accessService.create(
-                createAccessRequest = CreateAccessRequest(
-                    areas = setOf<AccessToArea>(AccessToArea(areaId, tenant = contact.tenant)),
-                    ownerIds = owners.map { it.id }.filterNotNull().toSet(),
-                    contacts = setOf(
-                        Contact(
-                            contact.phone,
-                            contact.label,
-                            cars = if (contact.carNumber?.isNotBlank() == true) setOf(CarRequest(contact.carNumber, contact.carDescription)) else null
-                        )
-                    )
-                ),
-                active = contact.active
-            )
+            val accesses = createAccess(areaId, contact, owners)
             count += accesses.size
         }
         logger().info("Created accesses count = $count")
         return count
+    }
+
+    private fun createAccess(
+        areaId: Long,
+        contact: RepairService.Contact,
+        owners: List<Owner>
+    ): List<CreateAccessResponse> {
+        return  accessService.create(
+            createAccessRequest = CreateAccessRequest(
+                areas = setOf<AccessToArea>(AccessToArea(areaId, tenant = contact.tenant)),
+                ownerIds = owners.map { it.id }.filterNotNull().toSet(),
+                contacts = setOf(
+                    Contact(
+                        contact.phone,
+                        contact.label,
+                        cars = if (contact.carNumber?.isNotBlank() == true) setOf(CarRequest(contact.carNumber, contact.carDescription)) else null
+                    )
+                )
+            ),
+            active = contact.active
+        )
     }
 
     fun initGarage(file: MultipartFile): Int {
@@ -165,108 +170,30 @@ class RepairService(
         val buildingId = 2L
         val areaId = 2L
 
-        val contacts = sheetParser(parkingSheet, 5)
-        val area = areaService.findById(areaId)
-        var countCarPlate = 0
+        val contacts = contactParser(parkingSheet, 5)
         var count = 0
         for (contact in contacts) {
-            val access = accessService.findByPhoneNumber(contact.phone, active = true)
+            val owners = findOwnersByRoom(contact.roomNumber, buildingId, RoomTypeEnum.FLAT)
+            if (owners.isEmpty()) continue
 
-            //если пришёл активный контакт и он в доступе, то ОБНОВИТЬ
-            if (contact.active && access != null) {
-                //то нужно обновить информацию о доступе
-                val area = AccessToArea(
-                    areaId = areaId,
-                    places = if (area.specificPlace == true) setOf(contact.roomNumber) else null
-                )
-                val updatedAreas = mutableSetOf<AccessToArea>()
-//                updatedAreas.addAll(access.)
-                updatedAreas.addAll(setOf(area))
-                accessService.updateAccessToArea(access.id!!, UpdateAccessRequest(areas = updatedAreas))
+            if (contact.active == false) {
+                createAccess(areaId, contact, owners)
             }
+
+            val access = accessService.findByPhone(contact.phone)
 
             if (access == null) {
-
+                createAccess(areaId, contact, owners)
             }
+
+
         }
 
-//        for (contact in contacts) {
-//            val room = roomService.findByNumberAndBuildingId(contact.roomNumber, buildingId)?.first()
-//            val owners = room?.id?.let { ownerRepository.findByRoomId(it) }
-//            if (owners == null) continue
-//            val accessPerson = AccessPerson(
-//                ownerId = owners[0].id ?: 0,
-//                phones = setOf(AccessPhone(contact.phone, contact.label, contact.tenant)),
-//            )
-//            val areas = AreaInfo(
-//                id = areaId,
-//                places = if (area.specificPlace == true) setOf(contact.roomNumber) else null
-//            )
-//            val accesses =
-//                accessService.createAccessToArea(AccessCreateRequest(setOf(areas), accessPerson), contact.active)
-//            //add cars
-//            if (contact.carNumber?.isNotBlank() == true && accesses.isNotEmpty() && accesses.first().id != null) {
-//                accesses.first().id?.let { accessId ->
-//                    carService.createCar(
-//                        contact.carNumber,
-//                        accessId,
-//                        contact.carDescription,
-//                        active = contact.active
-//                    )
-//                }
-//                countCarPlate++
-//            }
-//            count += accesses.size
-//        }
         return count
     }
 
-//    fun initGarage(
-//        buildingId: Long,
-//        areaId: Long,
-//        sheet: Sheet,
-//        skipFirstRows: Int
-//    ): Int {
-//        val contacts = sheetParser(sheet, skipFirstRows)
-//        val area = areaService.findById(areaId)
-//        var countCarPlate = 0
-//        var count = 0
-//        val now = LocalDateTime.now()
-//        for (contact in contacts) {
-//            val room = roomService.findByNumberAndBuildingId(contact.roomNumber, buildingId)?.first()
-//            val owners = room?.id?.let { ownerRepository.findByRoomId(it) }
-//            if (owners == null) continue
-//            val person = Person(
-//                ownerId = owners[0].id ?: 0,
-//                contacts = setOf(Contact(contact.phone, contact.label)),
-//            )
-//            val areas = AccessToArea(
-//                areaId = areaId,
-//                places = if (area.specificPlace == true) setOf(contact.roomNumber) else null
-//            )
-//            val access = accessService.findByPhoneNumber(contact.phone, active = true)
-//            if (access == null) {
-//                val accesses =
-//                    accessService.create(CreateAccessRequest(setOf(areas), person), contact.active)
-//            }
-//            //add cars
-////            if (contact.carNumber?.isNotBlank() == true && accesses.isNotEmpty() && accesses.first().id != null) {
-////                accesses.first().id?.let { accessId ->
-////                    carService.createCar(
-////                        contact.carNumber,
-////                        accessId,
-////                        contact.carDescription,
-////                        active = contact.active
-////                    )
-////                }
-////                countCarPlate++
-////            }
-////            count += accesses.size
-//        }
-//        return count
-//    }
 
-    private fun sheetParser(
+    private fun contactParser(
         gateSheet: Sheet,
         skipFirstRows: Int,
     ): MutableList<Contact> {

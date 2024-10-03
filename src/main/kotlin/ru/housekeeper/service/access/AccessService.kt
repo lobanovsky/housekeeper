@@ -112,8 +112,7 @@ class AccessService(
 
     fun findById(id: Long): Access = accessRepository.findByIdOrNull(id) ?: entityNotfound("Доступ" to id)
 
-    fun findByPhone(phoneNumber: String, active: Boolean) =
-        accessRepository.findByPhoneNumber(phoneNumber, active) ?: entityNotfound("Доступ по номеру телефона" to phoneNumber)
+    fun findByPhone(phoneNumber: String, active: Boolean = true): Access? = accessRepository.findByPhoneNumber(phoneNumber, active)
 
     private fun deactivateAccessById(accessId: Long, blockedDateTime: LocalDateTime, blockReason: AccessBlockReasonEnum) =
         accessRepository.deactivateById(accessId, blockedDateTime, blockReason)
