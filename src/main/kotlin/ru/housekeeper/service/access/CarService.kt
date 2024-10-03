@@ -87,4 +87,6 @@ class CarService(
 
     fun deactivateCar(id: Long) = carRepository.deactivateById(id)
 
+    fun deactivateCars(ids: List<Long>) = carRepository.deactivateByIds(ids)
+
 }

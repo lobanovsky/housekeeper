@@ -31,4 +31,9 @@ interface CarRepository : CrudRepository<Car, Long> {
     @Query("UPDATE Car c SET c.active = false WHERE c.id = :id")
     fun deactivateById(id: Long)
 
+    //Deactivate cars by ids
+    @Modifying
+    @Query("UPDATE Car c SET c.active = false WHERE c.id IN :ids")
+    fun deactivateByIds(ids: List<Long>)
+
 }

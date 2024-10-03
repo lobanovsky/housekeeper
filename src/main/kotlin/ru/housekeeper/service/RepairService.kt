@@ -285,11 +285,12 @@ class RepairService(
 
         //Найти все телефоны в доступах, которыми не пользовались более 3-х месяцев
         val accessesForBlock = accessService.findAll().filterNot { liveEntries.contains(it.phoneNumber) }
+        logger().info("Phones for block count = ${accessesForBlock.size}")
 
         //block access by id
         val blockedDataTime = LocalDateTime.now()
         val blockedReason = AccessBlockReasonEnum.EXPIRED
-        accessesForBlock.forEach { it.id?.let { accessId -> accessService.deactivateAccess(accessId, blockedDataTime, blockedReason) } }
+        accessService.deactivateAccess(accessesForBlock.mapNotNull { it.id }, blockedDataTime, blockedReason)
         logger().info("Blocked phones count = ${accessesForBlock.size}")
         return accessesForBlock.size
     }

@@ -110,6 +110,16 @@ class AccessService(
         access.id?.let { carService.deactivateCar(it) }
     }
 
+    @Transactional
+    fun deactivateAccess(
+        accessIds: List<Long>,
+        blockedDateTime: LocalDateTime = LocalDateTime.now(),
+        blockReason: AccessBlockReasonEnum = AccessBlockReasonEnum.MANUAL
+    ) {
+        deactivateAccessByIds(accessIds, blockedDateTime, blockReason)
+        carService.deactivateCars(accessIds)
+    }
+
     fun findAll() = accessRepository.findAll()
 
     fun findById(id: Long): Access = accessRepository.findByIdOrNull(id) ?: entityNotfound("Доступ" to id)
@@ -118,6 +128,9 @@ class AccessService(
 
     private fun deactivateAccessById(accessId: Long, blockedDateTime: LocalDateTime, blockReason: AccessBlockReasonEnum) =
         accessRepository.deactivateById(accessId, blockedDateTime, blockReason)
+
+    private fun deactivateAccessByIds(accessIds: List<Long>, blockedDateTime: LocalDateTime, blockReason: AccessBlockReasonEnum) =
+        accessRepository.deactivateByIds(accessIds, blockedDateTime, blockReason)
 
     fun findByRoom(roomId: Long, active: Boolean): AccessVO? {
         val owners = ownerService.findByRoomId(roomId, active)

@@ -33,4 +33,14 @@ interface AccessRepository : CrudRepository<Access, Long>, AccessRepositoryCusto
         blockedDateTime: LocalDateTime,
         blockReason: AccessBlockReasonEnum
     )
+
+    //Deactivate all access by ids
+    @Modifying
+    @Query("update Access p set p.active = false, p.blockDateTime = :blockedDateTime, p.blockReason = :blockReason where p.id in :ids")
+    fun deactivateByIds(
+        ids: List<Long>,
+        blockedDateTime: LocalDateTime,
+        blockReason: AccessBlockReasonEnum
+    )
+
 }
