@@ -4,7 +4,6 @@ import org.springframework.stereotype.Service
 import ru.housekeeper.model.dto.access.AccessCar
 import ru.housekeeper.model.entity.access.Car
 import ru.housekeeper.repository.access.CarRepository
-import ru.housekeeper.utils.entityNotfound
 import ru.housekeeper.utils.isValidRussianCarNumber
 import ru.housekeeper.utils.logger
 import java.time.LocalDateTime
@@ -26,7 +25,7 @@ class CarService(
             throw IllegalArgumentException("Автомобильный номер $carNumber не является валидным")
         }
         //check by exist, if not then add
-        val car = carRepository.findByNumber(carNumber)
+        val car = findByNumber(carNumber)
         if (car != null) {
             logger().warn("Car with number $carNumber already exists")
             return car
@@ -58,7 +57,7 @@ class CarService(
         val carNumbersToSave = carNumbersFromRequest.minus(carNumbers)
         //delete all cars that are not in the request
         carNumbersToDelete.forEach {
-            carRepository.findByNumber(it)?.let { car ->
+            findByNumber(it)?.let { car ->
                 car.active = false
                 carRepository.save(car)
             }
@@ -78,18 +77,14 @@ class CarService(
         }
     }
 
-    fun findByAccessId(access: Long, active: Boolean = true): List<Car> =
-        carRepository.findByAccessId(access, active)
+    fun addCars(accessId: Long, cars: Set<AccessCar>, active: Boolean) = cars.forEach { createCar(it.plateNumber, accessId, it.description, active) }
 
+    fun findByAccessId(access: Long, active: Boolean = true): List<Car> = carRepository.findByAccessId(access, active)
 
-    fun findByCarNumber(carNumber: String, active: Boolean): Car =
-        carRepository.findByNumber(carNumber, active) ?: entityNotfound("Автомобиль" to carNumber)
+    fun findByNumberLike(carNumber: String, active: Boolean): List<Car> = carRepository.findByNumberLike(carNumber, active)
 
-
-    fun addCars(accessId: Long, cars: Set<AccessCar>, active: Boolean) =
-        cars.forEach { createCar(it.plateNumber, accessId, it.description, active) }
+    fun findByNumber(carNumber: String, active: Boolean = true): Car? = carRepository.findByNumber(carNumber, active)
 
     fun deactivateCar(id: Long) = carRepository.deactivateById(id)
-
 
 }

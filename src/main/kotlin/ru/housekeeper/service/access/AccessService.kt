@@ -128,8 +128,9 @@ class AccessService(
     }
 
     fun findByCarNumber(carNumber: String, active: Boolean): AccessVO? {
-        val car = carService.findByCarNumber(carNumber, active)
-        val access = findById(car.accessId)
+        val cars = carService.findByNumberLike(carNumber, active)
+        if (cars.size > 1) throw AccessToAreaException("Найдено несколько автомобилей с номером [$carNumber]. Уточните номер автомобиля")
+        val access = findById(cars[0].accessId)
         val owner = ownerService.findById(access.ownerId)
         return owner.id?.let { findByOwner(it, access.id) }
     }
@@ -189,24 +190,25 @@ class AccessService(
         return contacts
     }
 
-    fun getOverview(plateNumber: String, active: Boolean): OverviewAccessVO {
-        val car = carService.findByCarNumber(plateNumber, active)
-        val access = findById(car.accessId)
-        val owner = ownerService.findById(access.ownerId)
-        return OverviewAccessVO(
-            ownerName = owner.fullName,
-            ownerRooms = roomService.findByIds(owner.rooms).sortedBy { it.type }.joinToString { it.type.shortDescription + "" + it.number },
-            phoneNumber = access.phoneNumber.beautifulPhonePrint(),
-            phoneLabel = access.phoneLabel,
-            carNumber = car.plateNumber,
-            carDescription = car.description,
-            overviewAreas = access.areas.map { areaToAccess ->
-                OverviewArea(
-                    areaName = areaService.findById(areaToAccess.areaId).name,
-                    tenant = areaToAccess.tenant
-                )
-            }
-        )
-    }
+    fun getOverview(plateNumber: String, active: Boolean): List<OverviewAccessVO> =
+        carService.findByNumberLike(plateNumber, active).map { car ->
+            val access = findById(car.accessId)
+            val owner = ownerService.findById(access.ownerId)
+            OverviewAccessVO(
+                ownerName = owner.fullName,
+                ownerRooms = roomService.findByIds(owner.rooms).sortedBy { it.type }.joinToString { it.type.shortDescription + "" + it.number },
+                phoneNumber = access.phoneNumber.beautifulPhonePrint(),
+                phoneLabel = access.phoneLabel,
+                carNumber = car.plateNumber,
+                carDescription = car.description,
+                overviewAreas = access.areas.map { areaToAccess ->
+                    OverviewArea(
+                        areaName = areaService.findById(areaToAccess.areaId).name,
+                        tenant = areaToAccess.tenant,
+                        places = areaToAccess.places
+                    )
+                }
+            )
+        }
 
 }

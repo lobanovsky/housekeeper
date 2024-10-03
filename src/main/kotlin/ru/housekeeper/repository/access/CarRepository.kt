@@ -11,6 +11,13 @@ import ru.housekeeper.model.entity.access.Car
 interface CarRepository : CrudRepository<Car, Long> {
 
     @Query("SELECT c FROM Car c WHERE c.plateNumber LIKE %:number% AND c.active = :active")
+    fun findByNumberLike(
+        @Param("number") number: String,
+        @Param("active") active: Boolean = true,
+    ): List<Car>
+
+    //find by plate number, exact match
+    @Query("SELECT c FROM Car c WHERE c.plateNumber = :number AND c.active = :active")
     fun findByNumber(
         @Param("number") number: String,
         @Param("active") active: Boolean = true,

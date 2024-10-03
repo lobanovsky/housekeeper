@@ -87,10 +87,10 @@ class AccessController(
     }
 
     //get info by car number
-    @GetMapping("/info/{car-number}")
-    @Operation(summary = "Get the info by the car number")
-    fun getInfoByCarNumber(
-        @PathVariable("car-number") carNumber: String,
+    @GetMapping("/overview/{plate-number}")
+    @Operation(summary = "Get the overview by the plate number")
+    fun overview(
+        @PathVariable("plate-number") carNumber: String,
         @RequestParam active: Boolean = true,
     ) = accessService.getOverview(carNumber, active)
 

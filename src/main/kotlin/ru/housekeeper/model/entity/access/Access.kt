@@ -48,5 +48,5 @@ data class AccessToArea(
     //арендатор или владелец
     var tenant: Boolean? = null,
     //конкретные места
-    val places: Set<String>? = mutableSetOf(),
+    val places: Set<String>?,
     )

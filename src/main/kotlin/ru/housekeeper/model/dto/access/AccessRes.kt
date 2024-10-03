@@ -66,5 +66,6 @@ data class OverviewAccessVO(
 
 data class OverviewArea(
     val areaName: String,
-    val tenant: Boolean?,
+    var tenant: Boolean? = null,
+    val places: Set<String>?,
 )
