@@ -11,6 +11,7 @@ import ru.housekeeper.model.dto.access.CarRequest
 import ru.housekeeper.model.dto.access.Contact
 import ru.housekeeper.model.dto.access.CreateAccessRequest
 import ru.housekeeper.model.dto.access.CreateAccessResponse
+import ru.housekeeper.model.dto.access.UpdateAccessRequest
 import ru.housekeeper.model.entity.Owner
 import ru.housekeeper.model.entity.access.AccessToArea
 import ru.housekeeper.model.entity.payment.IncomingPayment
@@ -144,7 +145,7 @@ class RepairService(
         contact: RepairService.Contact,
         owners: List<Owner>
     ): List<CreateAccessResponse> {
-        return  accessService.create(
+        return accessService.create(
             createAccessRequest = CreateAccessRequest(
                 areas = setOf<AccessToArea>(AccessToArea(areaId, tenant = contact.tenant)),
                 ownerIds = owners.map { it.id }.filterNotNull().toSet(),
@@ -171,24 +172,56 @@ class RepairService(
         val areaId = 2L
 
         val contacts = contactParser(parkingSheet, 5)
-        var count = 0
+
+        var blockedCount = 0
+        var newCount = 0
+        var updatedCount = 0
+
         for (contact in contacts) {
-            val owners = findOwnersByRoom(contact.roomNumber, buildingId, RoomTypeEnum.FLAT)
+            val owners = findOwnersByRoom(contact.roomNumber, buildingId, RoomTypeEnum.GARAGE)
             if (owners.isEmpty()) continue
 
+            //просто добавляем как историяю, если контакт неактивен
             if (contact.active == false) {
                 createAccess(areaId, contact, owners)
+                blockedCount++
+                continue
             }
 
-            val access = accessService.findByPhone(contact.phone)
+            val existAccess = accessService.findByPhone(contact.phone)
 
-            if (access == null) {
+            if (existAccess == null) {
                 createAccess(areaId, contact, owners)
+                newCount++
+                continue
             }
 
-
+            //если контакт активен и есть уже такой же активный доступ, то обновляем
+            if (contact.phone == existAccess?.phoneNumber) {
+                val areas = mutableSetOf<AccessToArea>()
+                areas.addAll(existAccess.areas)
+                areas.add(
+                    AccessToArea(
+                        areaId,
+                        tenant = contact.tenant,
+                        places = setOf(contact.roomNumber)
+                    )
+                )
+                existAccess.id?.let {
+                    accessService.update(
+                        accessId = it,
+                        accessUpdateRequest = UpdateAccessRequest(
+                            label = existAccess.phoneLabel,
+                            areas = areas,
+                            cars = if (contact.carNumber?.isNotBlank() == true) setOf(CarRequest(contact.carNumber, contact.carDescription)) else null
+                        )
+                    )
+                }
+                updatedCount++
+            }
         }
-        return count
+        logger().info("Blocked count = $blockedCount, New count = $newCount, Updated count = $updatedCount")
+        return blockedCount + newCount + updatedCount
     }
 
 

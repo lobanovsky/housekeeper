@@ -34,7 +34,7 @@ class AccessController(
     fun updateAccess(
         @PathVariable("access-id") accessId: Long,
         @RequestBody accessEditRequest: UpdateAccessRequest
-    ) = accessService.updateAccessToArea(accessId, accessEditRequest)
+    ) = accessService.update(accessId, accessEditRequest)
 
     //remove the area access by phone number
     @DeleteMapping("/{access-id}")

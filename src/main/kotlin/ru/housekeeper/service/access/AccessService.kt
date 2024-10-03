@@ -84,18 +84,18 @@ class AccessService(
     }
 
     @Transactional
-    fun updateAccessToArea(accessId: Long, accessEditRequest: UpdateAccessRequest): AccessVO {
-        val areas = accessEditRequest.areas
+    fun update(accessId: Long, accessUpdateRequest: UpdateAccessRequest): AccessVO {
+        val areas = accessUpdateRequest.areas
         if (areas.isEmpty()) throw AccessToAreaException("Не указаны зоны доступа")
 
         val access = accessRepository.findByIdOrNull(accessId)?.let { access ->
-            access.phoneLabel = accessEditRequest.label?.trim()
+            access.phoneLabel = accessUpdateRequest.label?.trim()
             access.areas.clear()
             access.areas.addAll(areas)
             accessRepository.save(access)
         } ?: entityNotfound("Доступ" to accessId)
         //update cars
-        carService.updateCars(accessId, accessEditRequest.cars ?: setOf())
+        carService.updateCars(accessId, accessUpdateRequest.cars ?: setOf())
 
         return findByOwner(access.ownerIds.first())
     }
