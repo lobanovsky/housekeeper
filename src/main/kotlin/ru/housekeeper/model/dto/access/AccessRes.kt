@@ -4,6 +4,7 @@ import ru.housekeeper.model.dto.OwnerVO
 import ru.housekeeper.model.entity.access.AccessToArea
 import ru.housekeeper.model.entity.access.Car
 
+//Создание доступа
 data class CreateAccessResponse(
     val id: Long? = null,
     val phoneNumber: String,
@@ -15,7 +16,7 @@ data class CreateAccessResult(
     val reason: String? = null,
 )
 
-
+//Доступ с ключами, машинами и зонами
 data class AccessVO(
     val id: Long?,
     val owner: OwnerVO,
@@ -37,6 +38,13 @@ data class AreaVO(
     val places: Set<String>? = mutableSetOf(),
 )
 
+class CarVO(
+    val id: Long?,
+    val number: String,
+    val description: String? = null,
+)
+
+
 fun AccessToArea.toAreaVO(name: String?) = AreaVO(
     id = this.areaId,
     name = name,
@@ -44,14 +52,10 @@ fun AccessToArea.toAreaVO(name: String?) = AreaVO(
     places = this.places?.let { if (it.isEmpty()) null else this.places }
 )
 
-class CarVO(
-    val id: Long?,
-    val number: String,
-    val description: String? = null,
-)
-
 fun Car.toCarVO() = CarVO(this.id, this.plateNumber, this.description)
 
+
+//Обзор доступов для PWA
 data class OverviewAccessVO(
     val ownerName: String,
     val ownerRooms: String,
