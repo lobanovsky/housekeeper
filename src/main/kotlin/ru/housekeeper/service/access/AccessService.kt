@@ -124,6 +124,10 @@ class AccessService(
 
     fun findByPhoneNumber(phoneNumber: String, active: Boolean): AccessVO? {
         val access = findByPhone(phoneNumber, active)
+        if (access == null) {
+            logger().error("Не найден доступ по номеру [$phoneNumber]")
+            return null
+        }
         val owner = findById(access.ownerIds.first())
         return owner.id?.let { findByOwner(it, access.id) }
     }
