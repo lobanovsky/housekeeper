@@ -110,6 +110,8 @@ class AccessService(
         access.id?.let { carService.deactivateCar(it) }
     }
 
+    fun findAll() = accessRepository.findAll()
+
     fun findById(id: Long): Access = accessRepository.findByIdOrNull(id) ?: entityNotfound("Доступ" to id)
 
     fun findByPhone(phoneNumber: String, active: Boolean = true): Access? = accessRepository.findByPhoneNumber(phoneNumber, active)
@@ -146,7 +148,7 @@ class AccessService(
         val accessVO = AccessVO(
             id = accessId,
             owner = owner.toOwnerVO(roomService.findByIds(owner.rooms)),
-            keys = if (accessKeyVOS.isEmpty()) null else accessKeyVOS
+            keys = if (accessKeyVOS.isEmpty()) null else accessKeyVOS.sortedBy { it.phoneNumber }
         )
         return accessVO
     }

@@ -12,15 +12,14 @@ import ru.housekeeper.model.dto.access.Contact
 import ru.housekeeper.model.dto.access.CreateAccessRequest
 import ru.housekeeper.model.dto.access.CreateAccessResponse
 import ru.housekeeper.model.dto.access.UpdateAccessRequest
+import ru.housekeeper.model.dto.access.toCarRequest
 import ru.housekeeper.model.entity.Owner
 import ru.housekeeper.model.entity.access.AccessToArea
 import ru.housekeeper.model.entity.payment.IncomingPayment
 import ru.housekeeper.model.filter.IncomingPaymentsFilter
-import ru.housekeeper.repository.access.AccessRepository
 import ru.housekeeper.repository.payment.IncomingPaymentRepository
 import ru.housekeeper.service.access.AccessService
 import ru.housekeeper.service.access.CarService
-import ru.housekeeper.service.gate.GateService
 import ru.housekeeper.service.gate.LogEntryService
 import ru.housekeeper.utils.isValidRussianCarNumber
 import ru.housekeeper.utils.logger
@@ -34,16 +33,11 @@ import kotlin.collections.mutableSetOf
 class RepairService(
     private val paymentService: PaymentService,
     private val paymentRepository: IncomingPaymentRepository,
-    private val accessService: AccessService,
     private val roomService: RoomService,
-//    private val ownerRepository: OwnerRepository,
     private val ownerService: OwnerService,
-    private val carService: CarService,
     private val logEntryService: LogEntryService,
-    private val accessRepository: AccessRepository,
-    private val gateService: GateService,
-    private val buildingService: BuildingService,
-    private val areaService: AreaService,
+    private val accessService: AccessService,
+    private val carService: CarService,
 ) {
 
     @Transactional
@@ -181,7 +175,7 @@ class RepairService(
             val owners = findOwnersByRoom(contact.roomNumber, buildingId, RoomTypeEnum.GARAGE)
             if (owners.isEmpty()) continue
 
-            //просто добавляем как историяю, если контакт неактивен
+            //добавить новый неактивный
             if (contact.active == false) {
                 createAccess(areaId, contact, owners)
                 blockedCount++
@@ -189,34 +183,26 @@ class RepairService(
             }
 
             val existAccess = accessService.findByPhone(contact.phone)
+            val existCars = existAccess?.id?.let { carService.findByAccessId(it) }
 
+            //добавить новый
             if (existAccess == null) {
                 createAccess(areaId, contact, owners)
                 newCount++
                 continue
             }
 
-            //если контакт активен и есть уже такой же активный доступ, то обновляем
-            if (contact.phone == existAccess?.phoneNumber) {
+            //обновляем
+            if (contact.phone == existAccess.phoneNumber) {
                 val areas = mutableSetOf<AccessToArea>()
                 areas.addAll(existAccess.areas)
-                areas.add(
-                    AccessToArea(
-                        areaId,
-                        tenant = contact.tenant,
-                        places = setOf(contact.roomNumber)
-                    )
-                )
-                existAccess.id?.let {
-                    accessService.update(
-                        accessId = it,
-                        accessUpdateRequest = UpdateAccessRequest(
-                            label = existAccess.phoneLabel,
-                            areas = areas,
-                            cars = if (contact.carNumber?.isNotBlank() == true) setOf(CarRequest(contact.carNumber, contact.carDescription)) else null
-                        )
-                    )
-                }
+                areas.add(AccessToArea(areaId, tenant = contact.tenant, places = setOf(contact.roomNumber)))
+
+                val cars = mutableSetOf<CarRequest>()
+                cars.addAll(existCars?.map { it.toCarRequest() } ?: emptyList())
+                if (contact.carNumber?.isNotBlank() == true) cars.add(CarRequest(contact.carNumber, contact.carDescription))
+
+                existAccess.id?.let { accessService.update(it, UpdateAccessRequest(existAccess.phoneLabel, areas, cars)) }
                 updatedCount++
             }
         }
@@ -290,49 +276,21 @@ class RepairService(
         val carDescription: String? = null,
     )
 
-    fun blockExpiredPhoneNumbers(months: Int): List<Blocked> {
+    fun blockExpiredPhoneNumbers(months: Int): Int {
         //get all live phones
-        val allLiveEntries = logEntryService.getAllLastNMonths(months)
-        val liveEntries = allLiveEntries.map { it.phoneNumber }.toSet()
-        logger().info("Log entries count = ${allLiveEntries.size}")
-        val allAccess = accessRepository.findAll()
-        //заблокировать все телефоны, которые не пользовались шлагбаумом более n-месяцев
-        val blockedNumbers = allAccess.filterNot { liveEntries.contains(it.phoneNumber) }
+        val logEntries = logEntryService.getAllLastNMonths(months)
+        logger().info("Log entries count = ${logEntries.size} by last $months months")
+        val liveEntries = logEntries.map { it.phoneNumber }.toSet()
+        logger().info("Uniq phones count = ${liveEntries.size} by last $months months")
 
-        val allGates = gateService.getAllGates().associateBy { it.id }
-        val result = mutableListOf<Blocked>()
-        blockedNumbers.forEach { accessId ->
-            val lastEntry = logEntryService.lastEntryByPhoneNumber(accessId.phoneNumber)
-            result.add(
-                Blocked(
-                    accessId.id ?: 0,
-                    accessId.phoneNumber,
-                    lastEntry.lastEntry?.flatNumber,
-                    lastEntry.lastEntry?.userName,
-                    lastEntry.countLastEntries,
-                    lastEntry.lastEntry?.dateTime,
-                    lastEntry.lastEntry?.let { allGates[it.gateId] }?.name
-                )
-            )
-        }
+        //Найти все телефоны в доступах, которыми не пользовались более 3-х месяцев
+        val accessesForBlock = accessService.findAll().filterNot { liveEntries.contains(it.phoneNumber) }
+
         //block access by id
         val blockedDataTime = LocalDateTime.now()
         val blockedReason = AccessBlockReasonEnum.EXPIRED
-        result.forEach {
-            accessService.deactivateAccess(it.accessId, blockedDataTime, blockedReason)
-        }
-        logger().info("Blocked phones count = ${result.size}")
-        return result
+        accessesForBlock.forEach { it.id?.let { accessId -> accessService.deactivateAccess(accessId, blockedDataTime, blockedReason) } }
+        logger().info("Blocked phones count = ${accessesForBlock.size}")
+        return accessesForBlock.size
     }
-
-    data class Blocked(
-        val accessId: Long,
-        val phoneNumber: String,
-        //
-        val flatNumber: String?,
-        val userName: String?,
-        val countEntries: Int,
-        val lastEntry: LocalDateTime?,
-        val gate: String?
-    )
 }

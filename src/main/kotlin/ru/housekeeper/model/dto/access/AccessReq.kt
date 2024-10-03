@@ -1,6 +1,7 @@
 package ru.housekeeper.model.dto.access
 
 import ru.housekeeper.model.entity.access.AccessToArea
+import ru.housekeeper.model.entity.access.Car
 
 
 data class CreateAccessRequest(
@@ -29,5 +30,7 @@ data class UpdateAccessRequest(
     val areas: Set<AccessToArea>,
     val cars: Set<CarRequest>? = mutableSetOf(),
 )
+
+fun Car.toCarRequest() = CarRequest(plateNumber, description)
 
 
