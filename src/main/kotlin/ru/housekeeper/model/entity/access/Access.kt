@@ -35,7 +35,9 @@ data class Access(
     val areas: MutableSet<AccessToArea> = mutableSetOf(),
 
     //Кто выдаёт доступ
-    val ownerId: Long,
+    @Type(JsonType::class)
+    @Column(name = "owners", columnDefinition = "jsonb")
+    val ownerIds: Set<Long> = setOf(),
 
     //Ключ доступа
     val phoneNumber: String,
@@ -48,5 +50,5 @@ data class AccessToArea(
     //арендатор или владелец
     var tenant: Boolean? = null,
     //конкретные места
-    val places: Set<String>?,
+    val places: Set<String>? = null,
     )

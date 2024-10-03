@@ -10,4 +10,6 @@ interface AccessRepositoryCustom {
 
     fun findByAreaId(areaId: Long, active: Boolean = true): List<Access>
 
+    fun findByOwnerId(ownerId: Long, active: Boolean = true): List<Access>
+
 }

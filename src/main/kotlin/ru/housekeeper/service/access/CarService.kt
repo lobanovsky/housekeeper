@@ -1,7 +1,7 @@
 package ru.housekeeper.service.access
 
 import org.springframework.stereotype.Service
-import ru.housekeeper.model.dto.access.AccessCar
+import ru.housekeeper.model.dto.access.CarRequest
 import ru.housekeeper.model.entity.access.Car
 import ru.housekeeper.repository.access.CarRepository
 import ru.housekeeper.utils.isValidRussianCarNumber
@@ -14,8 +14,8 @@ class CarService(
 ) {
 
     fun createCar(
-        carNumber: String,
         accessId: Long,
+        carNumber: String,
         description: String? = null,
         active: Boolean = true,
     ): Car {
@@ -42,7 +42,7 @@ class CarService(
         )
     }
 
-    fun updateCars(accessId: Long, accessCars: Set<AccessCar>) {
+    fun updateCars(accessId: Long, accessCars: Set<CarRequest>) {
         val associateCarsFromReq = accessCars.associateBy { it.plateNumber }
 
         //get all cars by accessId
@@ -64,7 +64,7 @@ class CarService(
         }
         //save all cars that are in the request
         carNumbersToSave.forEach {
-            createCar(it, accessId, associateCarsFromReq[it]?.description)
+            createCar(accessId, it, associateCarsFromReq[it]?.description)
         }
         //update descriptions if change
         cars.forEach {
@@ -77,7 +77,7 @@ class CarService(
         }
     }
 
-    fun addCars(accessId: Long, cars: Set<AccessCar>, active: Boolean) = cars.forEach { createCar(it.plateNumber, accessId, it.description, active) }
+    fun addCars(accessId: Long, cars: Set<CarRequest>, active: Boolean) = cars.forEach { createCar(accessId, it.plateNumber, it.description, active) }
 
     fun findByAccessId(access: Long, active: Boolean = true): List<Car> = carRepository.findByAccessId(access, active)
 

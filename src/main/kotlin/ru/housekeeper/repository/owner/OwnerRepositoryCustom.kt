@@ -6,6 +6,6 @@ import ru.housekeeper.model.entity.Owner
 @Repository
 interface OwnerRepositoryCustom {
 
-    fun findByRoomId(roomId: Long, active: Boolean = true): List<Owner>
+    fun findByRoomId(roomId: Long, active: Boolean): List<Owner>
 
 }

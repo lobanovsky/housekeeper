@@ -13,16 +13,17 @@ import java.time.LocalDateTime
 interface AccessRepository : CrudRepository<Access, Long>, AccessRepositoryCustom {
 
     @Query("select p from Access p where p.phoneNumber like %:number% and p.active = :active")
+    fun findByPhoneNumberLike(
+        @Param("number") number: String,
+        @Param("active") active: Boolean = true
+    ): List<Access>
+
+    //find by phone number, exact match
+    @Query("select p from Access p where p.phoneNumber = :number and p.active = :active")
     fun findByPhoneNumber(
         @Param("number") number: String,
         @Param("active") active: Boolean = true
     ): Access?
-
-    @Query("select p from Access p where p.ownerId = :ownerId and p.active = :active")
-    fun findByOwnerId(
-        ownerId: Long,
-        active: Boolean = true
-    ): List<Access>
 
     //Deactivate all access by id
     @Modifying

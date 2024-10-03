@@ -6,15 +6,16 @@ import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import org.springframework.web.multipart.MultipartFile
 import ru.housekeeper.enums.AccessBlockReasonEnum
-import ru.housekeeper.model.dto.access.AccessPerson
+import ru.housekeeper.enums.RoomTypeEnum
+import ru.housekeeper.model.dto.access.CarRequest
 import ru.housekeeper.model.dto.access.Contact
 import ru.housekeeper.model.dto.access.CreateAccessRequest
 import ru.housekeeper.model.dto.access.UpdateAccessRequest
+import ru.housekeeper.model.entity.Owner
 import ru.housekeeper.model.entity.access.AccessToArea
 import ru.housekeeper.model.entity.payment.IncomingPayment
 import ru.housekeeper.model.filter.IncomingPaymentsFilter
 import ru.housekeeper.repository.access.AccessRepository
-import ru.housekeeper.repository.owner.OwnerRepository
 import ru.housekeeper.repository.payment.IncomingPaymentRepository
 import ru.housekeeper.service.access.AccessService
 import ru.housekeeper.service.access.CarService
@@ -34,7 +35,8 @@ class RepairService(
     private val paymentRepository: IncomingPaymentRepository,
     private val accessService: AccessService,
     private val roomService: RoomService,
-    private val ownerRepository: OwnerRepository,
+//    private val ownerRepository: OwnerRepository,
+    private val ownerService: OwnerService,
     private val carService: CarService,
     private val logEntryService: LogEntryService,
     private val accessRepository: AccessRepository,
@@ -109,6 +111,11 @@ class RepairService(
             .fold(BigDecimal.ZERO, BigDecimal::add)
     }
 
+    private fun findOwnersByRoom(roomNumber: String, buildingId: Long, roomType: RoomTypeEnum): List<Owner> {
+        val room = roomService.findByNumberAndBuildingIdAndType(roomNumber, buildingId, roomType)
+        return room?.id?.let { ownerService.findByRoomId(it) } ?: emptyList()
+    }
+
     fun initYard(file: MultipartFile): Int {
         val workbook = WorkbookFactory.create(file.inputStream)
         val yardSheet = workbook.getSheet("yard - №\tBlock\tАренда\tfirst nam")
@@ -125,33 +132,26 @@ class RepairService(
         var count = 0
         val now = LocalDateTime.now()
         for (contact in contacts) {
-            val room = roomService.findByNumberAndBuildingId(contact.roomNumber, buildingId)?.first()
-            val owners = room?.id?.let { ownerRepository.findByRoomId(it) }
-            if (owners == null) continue
-            val accessPerson = AccessPerson(
-                ownerId = owners[0].id ?: 0,
-                contacts = setOf(Contact(contact.phone, contact.label)),
-            )
-            val areas = AccessToArea(
-                areaId = areaId,
-                places = if (area.specificPlace == true) setOf(contact.roomNumber) else null
-            )
-            val accesses =
-                accessService.create(CreateAccessRequest(setOf(areas), accessPerson), contact.active)
-            //add cars
-            if (contact.carNumber?.isNotBlank() == true && accesses.isNotEmpty() && accesses.first().id != null) {
-                accesses.first().id?.let { accessId ->
-                    carService.createCar(
-                        contact.carNumber,
-                        accessId,
-                        contact.carDescription,
-                        active = contact.active
+            val owners = findOwnersByRoom(contact.roomNumber, buildingId, RoomTypeEnum.FLAT)
+            if (owners.isEmpty()) continue
+
+            val accesses = accessService.create(
+                createAccessRequest = CreateAccessRequest(
+                    areas = setOf<AccessToArea>(AccessToArea(areaId, tenant = contact.tenant)),
+                    ownerIds = owners.map { it.id }.filterNotNull().toSet(),
+                    contacts = setOf(
+                        Contact(
+                            contact.phone,
+                            contact.label,
+                            cars = if (contact.carNumber?.isNotBlank() == true) setOf(CarRequest(contact.carNumber, contact.carDescription)) else null
+                        )
                     )
-                }
-                countCarPlate++
-            }
+                ),
+                active = contact.active
+            )
             count += accesses.size
         }
+        logger().info("Created accesses count = $count")
         return count
     }
 
@@ -221,50 +221,50 @@ class RepairService(
         return count
     }
 
-    fun initGarage(
-        buildingId: Long,
-        areaId: Long,
-        sheet: Sheet,
-        skipFirstRows: Int
-    ): Int {
-        val contacts = sheetParser(sheet, skipFirstRows)
-        val area = areaService.findById(areaId)
-        var countCarPlate = 0
-        var count = 0
-        val now = LocalDateTime.now()
-        for (contact in contacts) {
-            val room = roomService.findByNumberAndBuildingId(contact.roomNumber, buildingId)?.first()
-            val owners = room?.id?.let { ownerRepository.findByRoomId(it) }
-            if (owners == null) continue
-            val accessPerson = AccessPerson(
-                ownerId = owners[0].id ?: 0,
-                contacts = setOf(Contact(contact.phone, contact.label)),
-            )
-            val areas = AccessToArea(
-                areaId = areaId,
-                places = if (area.specificPlace == true) setOf(contact.roomNumber) else null
-            )
-            val access = accessService.findByPhoneNumber(contact.phone, active = true)
-            if (access == null) {
-                val accesses =
-                    accessService.create(CreateAccessRequest(setOf(areas), accessPerson), contact.active)
-            }
-            //add cars
-//            if (contact.carNumber?.isNotBlank() == true && accesses.isNotEmpty() && accesses.first().id != null) {
-//                accesses.first().id?.let { accessId ->
-//                    carService.createCar(
-//                        contact.carNumber,
-//                        accessId,
-//                        contact.carDescription,
-//                        active = contact.active
-//                    )
-//                }
-//                countCarPlate++
+//    fun initGarage(
+//        buildingId: Long,
+//        areaId: Long,
+//        sheet: Sheet,
+//        skipFirstRows: Int
+//    ): Int {
+//        val contacts = sheetParser(sheet, skipFirstRows)
+//        val area = areaService.findById(areaId)
+//        var countCarPlate = 0
+//        var count = 0
+//        val now = LocalDateTime.now()
+//        for (contact in contacts) {
+//            val room = roomService.findByNumberAndBuildingId(contact.roomNumber, buildingId)?.first()
+//            val owners = room?.id?.let { ownerRepository.findByRoomId(it) }
+//            if (owners == null) continue
+//            val person = Person(
+//                ownerId = owners[0].id ?: 0,
+//                contacts = setOf(Contact(contact.phone, contact.label)),
+//            )
+//            val areas = AccessToArea(
+//                areaId = areaId,
+//                places = if (area.specificPlace == true) setOf(contact.roomNumber) else null
+//            )
+//            val access = accessService.findByPhoneNumber(contact.phone, active = true)
+//            if (access == null) {
+//                val accesses =
+//                    accessService.create(CreateAccessRequest(setOf(areas), person), contact.active)
 //            }
-//            count += accesses.size
-        }
-        return count
-    }
+//            //add cars
+////            if (contact.carNumber?.isNotBlank() == true && accesses.isNotEmpty() && accesses.first().id != null) {
+////                accesses.first().id?.let { accessId ->
+////                    carService.createCar(
+////                        contact.carNumber,
+////                        accessId,
+////                        contact.carDescription,
+////                        active = contact.active
+////                    )
+////                }
+////                countCarPlate++
+////            }
+////            count += accesses.size
+//        }
+//        return count
+//    }
 
     private fun sheetParser(
         gateSheet: Sheet,

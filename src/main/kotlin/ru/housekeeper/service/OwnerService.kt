@@ -10,7 +10,6 @@ import ru.housekeeper.utils.entityNotfound
 class OwnerService(
     private val ownerRepository: OwnerRepository
 ) {
-
     fun findByFullName(name: String): Owner? = ownerRepository.findByFullName(name)
 
     fun saveIfNotExist(owner: Owner): Owner = findByFullName(owner.fullName) ?: ownerRepository.save(owner)
@@ -19,5 +18,5 @@ class OwnerService(
 
     fun findAll(): List<Owner> = ownerRepository.findAll().toList()
 
-    fun findByRoomId(roomId: Long, active: Boolean): List<Owner> = ownerRepository.findByRoomId(roomId, active)
+    fun findByRoomId(roomId: Long, active: Boolean = true): List<Owner> = ownerRepository.findByRoomId(roomId, active)
 }
