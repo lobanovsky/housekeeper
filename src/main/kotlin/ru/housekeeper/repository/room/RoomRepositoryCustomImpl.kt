@@ -23,10 +23,10 @@ class RoomRepositoryCustomImpl(
         predicates["number"] = equalFilterBy("r.number", filter.number)
         predicates["ownerName"] = likeFilterBy("r.ownerName", filter.ownerName)
         predicates["type"] = equalFilterBy("r.type", filter.type)
-        predicates["building"] = equalFilterBy("r.building_id", filter.building)
+        predicates["building"] = equalFilterBy("r.buildingId", filter.building)
         val conditions = predicates.values.joinToString(separator = " ")
 
-        val sql = "SELECT r FROM Room r WHERE true = true $conditions ORDER BY r.building_id, r.account"
+        val sql = "SELECT r FROM Room r WHERE true = true $conditions ORDER BY r.buildingId, r.account"
         val sqlCount = "SELECT count(r) FROM Room r WHERE true = true $conditions"
 
         return getPage<Room>(entityManager, sql, sqlCount, pageNum, pageSize)
