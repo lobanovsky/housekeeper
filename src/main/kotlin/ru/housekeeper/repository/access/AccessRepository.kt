@@ -19,13 +19,6 @@ interface AccessRepository : CrudRepository<AccessEntity, Long>, AccessRepositor
         @Param("active") active: Boolean = true
     ): List<AccessEntity>
 
-    //find by phone number exact match
-    @Query("select a from AccessEntity a where a.phoneNumber = :number and a.active = :active")
-    fun findByPhoneNumber(
-        @Param("number") number: String,
-        @Param("active") active: Boolean = true
-    ): AccessEntity?
-
     //find by phone number and owner id
     @Query("select a from AccessEntity a where a.phoneNumber = :number and a.ownerId = :ownerId and a.active = :active")
     fun findByPhoneNumberAndOwnerId(
@@ -42,4 +35,8 @@ interface AccessRepository : CrudRepository<AccessEntity, Long>, AccessRepositor
         @Param("date") date: LocalDateTime,
         @Param("reason") reason: AccessBlockReasonEnum
     )
+
+    //find all active
+    @Query("select a from AccessEntity a where a.active = true")
+    fun findAllActive(): List<AccessEntity>
 }

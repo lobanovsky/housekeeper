@@ -271,14 +271,14 @@ class RepairService(
         val liveEntries = logEntries.map { it.phoneNumber }.toSet()
         logger().info("Uniq phones count = ${liveEntries.size} by last $months months")
 
+        val findAllActive = accessService.findAllActive()
+        logger().info("All phones count = ${findAllActive.size}")
         //Найти все телефоны в доступах, которыми не пользовались более 3-х месяцев
-        val accessesForBlock = accessService.findAll().filterNot { liveEntries.contains(it.phoneNumber) }
+        val accessesForBlock = findAllActive.filterNot { liveEntries.contains(it.phoneNumber) }
         logger().info("Phones for block count = ${accessesForBlock.size}")
 
         //block access by id
-        val blockedDataTime = LocalDateTime.now()
-        val blockedReason = AccessBlockReasonEnum.EXPIRED
-        accessService.deactivateAccessByIds(accessesForBlock.mapNotNull { it.id }, blockedDataTime, blockedReason)
+        accessService.deactivateAccessByIds(accessesForBlock.mapNotNull { it.id }, LocalDateTime.now(), AccessBlockReasonEnum.EXPIRED)
         logger().info("Blocked phones count = ${accessesForBlock.size}")
         return accessesForBlock.size
     }

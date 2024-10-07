@@ -78,6 +78,8 @@ class AccessService(
 
     fun findAll() = accessRepository.findAll()
 
+    fun findAllActive() = accessRepository.findAllActive()
+
     fun findAllArea() = areaService.findAll().associateBy({ it.id }, { it.name })
 
     fun findById(accessId: Long): AccessEntity = accessRepository.findByIdOrNull(accessId) ?: throw AccessToAreaException("Доступ не найден")
