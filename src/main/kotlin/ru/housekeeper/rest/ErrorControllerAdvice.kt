@@ -48,7 +48,7 @@ class ErrorControllerAdvice {
                 ErrorResponse(
                     status = httpStatus.value(),
                     error = httpStatus.reasonPhrase,
-                    message = getRootCauseMessage(e)
+                    message = e.message
                 )
             )
     }

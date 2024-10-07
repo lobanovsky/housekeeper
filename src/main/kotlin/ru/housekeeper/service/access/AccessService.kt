@@ -2,233 +2,134 @@ package ru.housekeeper.service.access
 
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
-import org.springframework.transaction.annotation.Transactional
 import ru.housekeeper.enums.AccessBlockReasonEnum
 import ru.housekeeper.exception.AccessToAreaException
-import ru.housekeeper.model.dto.access.*
-import ru.housekeeper.model.dto.access.OverviewAccessVO
+import ru.housekeeper.model.dto.access.AccessResponse
+import ru.housekeeper.model.dto.access.CreateAccessRequest
+import ru.housekeeper.model.dto.access.OverviewResponse
+import ru.housekeeper.model.dto.access.UpdateAccessRequest
+import ru.housekeeper.model.dto.access.toAccessResponse
+import ru.housekeeper.model.dto.access.toArea
+import ru.housekeeper.model.dto.access.toCar
+import ru.housekeeper.model.dto.access.toOverviewResponse
 import ru.housekeeper.model.dto.eldes.EldesContact
-import ru.housekeeper.model.dto.toOwnerVO
-import ru.housekeeper.model.entity.access.Access
-import ru.housekeeper.model.entity.access.AccessToArea
+import ru.housekeeper.model.entity.access.AccessEntity
 import ru.housekeeper.repository.access.AccessRepository
 import ru.housekeeper.service.AreaService
 import ru.housekeeper.service.OwnerService
 import ru.housekeeper.service.RoomService
-import ru.housekeeper.utils.*
+import ru.housekeeper.utils.MAX_ELDES_LABEL_LENGTH
+import ru.housekeeper.utils.beautifulPhonePrint
 import java.time.LocalDateTime
 
 @Service
 class AccessService(
     private val accessRepository: AccessRepository,
-    private val roomService: RoomService,
-    private val carService: CarService,
     private val ownerService: OwnerService,
     private val areaService: AreaService,
+    private val roomService: RoomService,
 ) {
 
-    @Transactional
-    fun create(
-        createAccessRequest: CreateAccessRequest,
-        active: Boolean = true
-    ): List<CreateAccessResponse> {
-        if (createAccessRequest.areas.isEmpty()) throw AccessToAreaException("Не указаны зоны доступа")
-        if (createAccessRequest.contacts.isEmpty()) throw AccessToAreaException("Не указаны телефоны")
+    fun create(request: CreateAccessRequest, active: Boolean = true): List<AccessResponse> {
+        if (request.accesses.isEmpty()) throw AccessToAreaException("Не указаны зоны доступа")
 
-        val results = mutableListOf<CreateAccessResponse>()
-
-        for (contact in createAccessRequest.contacts) {
-            try {
-                //create access
-                val access = create(
-                    ownerIds = createAccessRequest.ownerIds,
-                    contact = contact,
-                    areas = createAccessRequest.areas,
+        val result = mutableListOf<AccessResponse>()
+        for (access in request.accesses) {
+            val existAccess = findByOwnerIdAndPhone(request.ownerId, access.phoneNumber)
+            //если собственник уже добавлял данный номер телефона
+            if (existAccess != null && active) {
+                throw AccessToAreaException("У собственника [${ownerService.findById(request.ownerId).fullName}], номер [${access.phoneNumber.beautifulPhonePrint()}] уже зарегистрирован")
+            }
+            val access = accessRepository.save(
+                AccessEntity(
+                    ownerId = request.ownerId,
+                    areas = access.areas.map { it.toArea() }.toMutableList(),
+                    phoneNumber = access.phoneNumber,
+                    phoneLabel = access.contactLabel,
+                    tenant = access.tenant,
+                    cars = access.cars?.map { it.toCar() }?.toMutableList(),
                     active = active
                 )
-                //add cars
-                access.id?.let { contact.cars?.let { cars -> carService.addCars(it, cars, active) } }
-                //add response
-                results.add(CreateAccessResponse(access.id, access.phoneNumber.beautifulPhonePrint()))
-            } catch (e: AccessToAreaException) {
-                logger().error("[$contact] Ошибка: $e")
-                results.add(
-                    CreateAccessResponse(
-                        phoneNumber = contact.number,
-                        result = CreateAccessResult(false, e.message)
-                    )
-                )
-            }
+            )
+            result.add(access.toAccessResponse(findAllArea()))
         }
-
-        return results
+        return result
     }
 
-    private fun create(
-        ownerIds: Set<Long>,
-        contact: Contact,
-        areas: Set<AccessToArea>,
-        active: Boolean
-    ): Access {
-        val phoneNumber = contact.number.onlyNumbers()
-        phoneNumberValidator(phoneNumber, active)
-        val access = Access(
-            ownerIds = ownerIds,
-            phoneNumber = phoneNumber,
-            phoneLabel = contact.label?.trim(),
-            active = active
-        ).apply {
-            this.areas.addAll(areas)
-        }
-        return accessRepository.save(access)
-    }
+    fun update(accessId: Long, request: UpdateAccessRequest): AccessResponse {
+        val newAreas = request.areas
+        if (newAreas.isEmpty()) throw AccessToAreaException("Не указаны зоны доступа")
 
-    @Transactional
-    fun update(accessId: Long, accessUpdateRequest: UpdateAccessRequest): AccessVO {
-        val areas = accessUpdateRequest.areas
-        if (areas.isEmpty()) throw AccessToAreaException("Не указаны зоны доступа")
+        val existAccess = findById(accessId)
+        //new label
+        existAccess.phoneLabel = request.phoneLabel
+        //new areas
+        val existAreas = existAccess.areas
+        existAreas.clear()
+        existAreas.addAll(newAreas.map { it.toArea() })
+        //new cars
+        val existCars = existAccess.cars
+        existCars?.clear()
+        existCars?.addAll(request.cars?.map { it.toCar() } ?: emptyList())
 
-        val access = accessRepository.findByIdOrNull(accessId)?.let { access ->
-            access.phoneLabel = accessUpdateRequest.label?.trim()
-            access.areas.clear()
-            access.areas.addAll(areas)
-            accessRepository.save(access)
-        } ?: entityNotfound("Доступ" to accessId)
-        //update cars
-        carService.updateCars(accessId, accessUpdateRequest.cars ?: setOf())
-
-        return findByOwner(access.ownerIds.first())
-    }
-
-    @Transactional
-    fun deactivateAccess(
-        accessId: Long,
-        blockedDateTime: LocalDateTime = LocalDateTime.now(),
-        blockReason: AccessBlockReasonEnum = AccessBlockReasonEnum.MANUAL
-    ) = findById(accessId).also { access ->
-        access.id?.let { deactivateAccessById(it, blockedDateTime, blockReason) }
-        access.id?.let { carService.deactivateCar(it) }
-    }
-
-    @Transactional
-    fun deactivateAccess(
-        accessIds: List<Long>,
-        blockedDateTime: LocalDateTime = LocalDateTime.now(),
-        blockReason: AccessBlockReasonEnum = AccessBlockReasonEnum.MANUAL
-    ) {
-        deactivateAccessByIds(accessIds, blockedDateTime, blockReason)
-        carService.deactivateCars(accessIds)
+        val updatedAccess = accessRepository.save(existAccess)
+        return updatedAccess.toAccessResponse(findAllArea())
     }
 
     fun findAll() = accessRepository.findAll()
 
-    fun findById(id: Long): Access = accessRepository.findByIdOrNull(id) ?: entityNotfound("Доступ" to id)
+    fun findAllArea() = areaService.findAll().associateBy({ it.id }, { it.name })
 
-    fun findByPhone(phoneNumber: String, active: Boolean = true): Access? = accessRepository.findByPhoneNumber(phoneNumber, active)
+    fun findById(accessId: Long): AccessEntity = accessRepository.findByIdOrNull(accessId) ?: throw AccessToAreaException("Доступ не найден")
 
-    private fun deactivateAccessById(accessId: Long, blockedDateTime: LocalDateTime, blockReason: AccessBlockReasonEnum) =
-        accessRepository.deactivateById(accessId, blockedDateTime, blockReason)
+    fun findByOwnerIdAndPhone(ownerId: Long, phoneNumber: String, active: Boolean = true): AccessEntity? =
+        accessRepository.findByPhoneNumberAndOwnerId(phoneNumber, ownerId, active)
 
-    private fun deactivateAccessByIds(accessIds: List<Long>, blockedDateTime: LocalDateTime, blockReason: AccessBlockReasonEnum) =
-        accessRepository.deactivateByIds(accessIds, blockedDateTime, blockReason)
-
-    fun findByRoom(roomId: Long, active: Boolean): AccessVO? {
+    fun findByRoom(roomId: Long, active: Boolean): List<AccessResponse> {
         val owners = ownerService.findByRoomId(roomId, active)
-        return owners[0].id?.let { findByOwner(it) }
+        val existAccesses = owners.flatMap { accessRepository.findByOwnerId(it.id!!) }
+        return existAccesses.map { it.toAccessResponse(findAllArea()) }
     }
 
-    fun findByPhoneNumber(phoneNumber: String, active: Boolean): AccessVO? {
-        val access = findByPhone(phoneNumber, active)
-        if (access == null) {
-            logger().error("Не найден доступ по номеру [$phoneNumber]")
-            return null
-        }
-        val owner = findById(access.ownerIds.first())
-        return owner.id?.let { findByOwner(it, access.id) }
+    fun deactivateAccess(accessId: Long): AccessResponse {
+        val access = findById(accessId)
+        access.active = false
+        val savedAccess = accessRepository.save(access)
+        return savedAccess.toAccessResponse(findAllArea())
     }
 
-    fun findByCarNumber(carNumber: String, active: Boolean): AccessVO? {
-        val cars = carService.findByNumberLike(carNumber, active)
-        if (cars.size > 1) throw AccessToAreaException("Найдено несколько автомобилей с номером [$carNumber]. Уточните номер автомобиля")
-        val access = findById(cars[0].accessId)
-        val owner = ownerService.findById(access.ownerIds.first())
-        return owner.id?.let { findByOwner(it, access.id) }
-    }
+    fun deactivateAccessByIds(accessIds: List<Long>, blockedDateTime: LocalDateTime, reason: AccessBlockReasonEnum) =
+        accessRepository.deactivateByIds(accessIds, blockedDateTime, reason)
 
-    private fun findByOwner(ownerId: Long, accessId: Long? = null): AccessVO {
-        val owner = ownerService.findById(ownerId)
-        val accessKeyVOS = accessKeyVOS(accessRepository.findByOwnerId(ownerId))
-        val accessVO = AccessVO(
-            id = accessId,
-            owner = owner.toOwnerVO(roomService.findByIds(owner.rooms)),
-            keys = if (accessKeyVOS.isEmpty()) null else accessKeyVOS.sortedBy { it.phoneNumber }
-        )
-        return accessVO
-    }
 
-    private fun accessKeyVOS(accesses: List<Access>): List<KeyVO> {
-        val existAreas = areaService.findAll().associateBy { it.id }
-        return accesses.map { access ->
-            KeyVO(
-                id = access.id,
-                phoneNumber = access.phoneNumber.beautifulPhonePrint(),
-                phoneLabel = access.phoneLabel,
-                areas = access.areas.map { it.toAreaVO(existAreas[it.areaId]?.name) },
-                cars = if (carService.findByAccessId(access.id!!).isEmpty()) null else carService.findByAccessId(access.id).map { it.toCarVO() }
-            )
-        }
-    }
+    fun getOverview(plateNumber: String, active: Boolean): OverviewResponse {
+        val accesses = accessRepository.findByPlateNumber(plateNumber)
+        if (accesses.size > 1) throw AccessToAreaException("Найдено более одного доступа по номеру автомобиля [$plateNumber]")
+        val first = accesses.first()
+        return first.toOverviewResponse(
+            allAreas = findAllArea(),
+            ownerName = ownerService.findById(first.ownerId).fullName,
+            ownerRooms = roomService.findByIds(ownerService.findById(first.ownerId).rooms).sortedBy { it.type }
+                .joinToString { it.type.shortDescription + "" + it.number })
 
-    private fun phoneNumberValidator(phoneNumber: String, active: Boolean) {
-        if (phoneNumber.first() != '7') throw AccessToAreaException("Номер телефона [$phoneNumber] должен начинаться с 7")
-        if (phoneNumber.length != PHONE_NUMBER_LENGTH) throw AccessToAreaException("Номер телефона [$phoneNumber] должен содержать 11 цифр")
-        //check only active phone number
-        if (active) {
-            accessRepository.findByPhoneNumber(phoneNumber)?.let { access ->
-                val owner = ownerService.findById(access.ownerIds.first())
-                val rooms = owner.let { it1 -> roomService.findByIds(it1.rooms) }.map { it.toRoomVO() }
-                throw AccessToAreaException("Данный номер [${phoneNumber}] уже зарегистрирован. Собственник: ${owner.fullName}: ${rooms.map { it.type.description + " " + it.number }}")
-            }
-        }
     }
 
     fun getEldesContact(areadId: Long): List<String> {
         val accesses = accessRepository.findByAreaId(areadId)
-        val contacts = mutableListOf<String>()
-        contacts.add("User Name;Tel Number;Relay No.;Sch.1 (1-true 0-false);Sch.2 (1-true 0-false);Sch.3 (1-true 0-false);Sch.4 (1-true 0-false);Sch.5 (1-true 0-false);Sch.6 (1-true 0-false);Sch.7 (1-true 0-false);Sch.8 (1-true 0-false);Year (Valid until);Month (Valid until);Day (Valid until);Hour (Valid until);Minute (Valid until);Ring Counter;Ring Counter Status")
+        val result = mutableListOf<String>()
+        result.add("User Name;Tel Number;Relay No.;Sch.1 (1-true 0-false);Sch.2 (1-true 0-false);Sch.3 (1-true 0-false);Sch.4 (1-true 0-false);Sch.5 (1-true 0-false);Sch.6 (1-true 0-false);Sch.7 (1-true 0-false);Sch.8 (1-true 0-false);Year (Valid until);Month (Valid until);Day (Valid until);Hour (Valid until);Minute (Valid until);Ring Counter;Ring Counter Status")
         accesses.forEach { access ->
-            val owner = ownerService.findById(access.ownerIds.first())
+            val owner = ownerService.findById(access.ownerId)
             val firstRoom = roomService.findByIds(owner.rooms).sortedBy { it.type }.first();
             val label = firstRoom.number + "-" + firstRoom.type.name
-            contacts.add(
+            result.add(
                 EldesContact(
                     userName = if (label.length > MAX_ELDES_LABEL_LENGTH) label.substring(0, MAX_ELDES_LABEL_LENGTH) else label,
                     telNumber = access.phoneNumber,
                 ).toCSVLine()
             )
         }
-        return contacts
+        return result
     }
-
-    fun getOverview(plateNumber: String, active: Boolean): List<OverviewAccessVO> =
-        carService.findByNumberLike(plateNumber, active).map { car ->
-            val access = findById(car.accessId)
-            val owner = ownerService.findById(access.ownerIds.first())
-            OverviewAccessVO(
-                ownerName = owner.fullName,
-                ownerRooms = roomService.findByIds(owner.rooms).sortedBy { it.type }.joinToString { it.type.shortDescription + "" + it.number },
-                phoneNumber = access.phoneNumber.beautifulPhonePrint(),
-                phoneLabel = access.phoneLabel,
-                carNumber = car.plateNumber,
-                carDescription = car.description,
-                overviewAreas = access.areas.map { areaToAccess ->
-                    OverviewArea(
-                        areaName = areaService.findById(areaToAccess.areaId).name,
-                        tenant = areaToAccess.tenant,
-                        places = areaToAccess.places
-                    )
-                }
-            )
-        }
 
 }

@@ -7,19 +7,17 @@ import org.springframework.transaction.annotation.Transactional
 import org.springframework.web.multipart.MultipartFile
 import ru.housekeeper.enums.AccessBlockReasonEnum
 import ru.housekeeper.enums.RoomTypeEnum
+import ru.housekeeper.model.dto.access.AccessRequest
+import ru.housekeeper.model.dto.access.AreaRequest
 import ru.housekeeper.model.dto.access.CarRequest
-import ru.housekeeper.model.dto.access.Contact
 import ru.housekeeper.model.dto.access.CreateAccessRequest
-import ru.housekeeper.model.dto.access.CreateAccessResponse
-import ru.housekeeper.model.dto.access.UpdateAccessRequest
-import ru.housekeeper.model.dto.access.toCarRequest
+import ru.housekeeper.model.dto.access.toArea
+import ru.housekeeper.model.dto.access.toCar
 import ru.housekeeper.model.entity.Owner
-import ru.housekeeper.model.entity.access.AccessToArea
 import ru.housekeeper.model.entity.payment.IncomingPayment
 import ru.housekeeper.model.filter.IncomingPaymentsFilter
 import ru.housekeeper.repository.payment.IncomingPaymentRepository
 import ru.housekeeper.service.access.AccessService
-import ru.housekeeper.service.access.CarService
 import ru.housekeeper.service.gate.LogEntryService
 import ru.housekeeper.utils.isValidRussianCarNumber
 import ru.housekeeper.utils.logger
@@ -37,7 +35,6 @@ class RepairService(
     private val ownerService: OwnerService,
     private val logEntryService: LogEntryService,
     private val accessService: AccessService,
-    private val carService: CarService,
 ) {
 
     @Transactional
@@ -121,39 +118,34 @@ class RepairService(
         val buildingId = 1L
         val areaId = 1L
 
-        val contacts = contactParser(yardSheet, 15)
+        val rows = accessRowParser(yardSheet, 15)
         var count = 0
-        for (contact in contacts) {
-            val owners = findOwnersByRoom(contact.roomNumber, buildingId, RoomTypeEnum.FLAT)
+        for (row in rows) {
+            val owners = findOwnersByRoom(row.roomNumber, buildingId, RoomTypeEnum.FLAT)
             if (owners.isEmpty()) continue
+            val ownerId = owners.first().id!!
 
-            val accesses = createAccess(areaId, contact, owners)
-            count += accesses.size
+            val accessResponses = createAccess(ownerId, areaId, row)
+
+            count += accessResponses.size
         }
         logger().info("Created accesses count = $count")
         return count
     }
 
-    private fun createAccess(
-        areaId: Long,
-        contact: RepairService.Contact,
-        owners: List<Owner>
-    ): List<CreateAccessResponse> {
-        return accessService.create(
-            createAccessRequest = CreateAccessRequest(
-                areas = setOf<AccessToArea>(AccessToArea(areaId, tenant = contact.tenant)),
-                ownerIds = owners.map { it.id }.filterNotNull().toSet(),
-                contacts = setOf(
-                    Contact(
-                        contact.phone,
-                        contact.label,
-                        cars = if (contact.carNumber?.isNotBlank() == true) setOf(CarRequest(contact.carNumber, contact.carDescription)) else null
-                    )
-                )
-            ),
-            active = contact.active
-        )
-    }
+    private fun createAccess(ownerId: Long, areaId: Long, row: AccessRow) = accessService.create(
+        request = CreateAccessRequest(
+            ownerId = ownerId,
+            accesses = setOf(AccessRequest(
+                areas = if (areaId == 2L) listOf(AreaRequest(areaId, places = setOf(row.roomNumber))) else listOf(AreaRequest(areaId)),
+                phoneNumber = row.phone,
+                contactLabel = row.label,
+                tenant = row.tenant,
+                cars = row.carNumber?.let { setOf(CarRequest(it, row.carDescription)) }
+            )),
+        ),
+        active = row.active
+    )
 
     fun initGarage(file: MultipartFile): Int {
         val workbook = WorkbookFactory.create(file.inputStream)
@@ -165,44 +157,39 @@ class RepairService(
         val buildingId = 2L
         val areaId = 2L
 
-        val contacts = contactParser(parkingSheet, 5)
+        val rows = accessRowParser(parkingSheet, 5)
 
         var blockedCount = 0
         var newCount = 0
         var updatedCount = 0
 
-        for (contact in contacts) {
-            val owners = findOwnersByRoom(contact.roomNumber, buildingId, RoomTypeEnum.GARAGE)
+        for (row in rows) {
+            val owners = findOwnersByRoom(row.roomNumber, buildingId, RoomTypeEnum.GARAGE)
             if (owners.isEmpty()) continue
+            val ownerId = owners.first().id!!
 
             //добавить новый неактивный
-            if (contact.active == false) {
-                createAccess(areaId, contact, owners)
+            if (row.active == false) {
+                createAccess(ownerId, areaId, row)
                 blockedCount++
                 continue
             }
 
-            val existAccess = accessService.findByPhone(contact.phone)
-            val existCars = existAccess?.id?.let { carService.findByAccessId(it) }
+            val existAccess = accessService.findByOwnerIdAndPhone(ownerId, row.phone)
 
             //добавить новый
             if (existAccess == null) {
-                createAccess(areaId, contact, owners)
+                createAccess(ownerId, areaId, row)
                 newCount++
                 continue
             }
 
             //обновляем
-            if (contact.phone == existAccess.phoneNumber) {
-                val areas = mutableSetOf<AccessToArea>()
-                areas.addAll(existAccess.areas)
-                areas.add(AccessToArea(areaId, tenant = contact.tenant, places = setOf(contact.roomNumber)))
-
-                val cars = mutableSetOf<CarRequest>()
-                cars.addAll(existCars?.map { it.toCarRequest() } ?: emptyList())
-                if (contact.carNumber?.isNotBlank() == true) cars.add(CarRequest(contact.carNumber, contact.carDescription))
-
-                existAccess.id?.let { accessService.update(it, UpdateAccessRequest(existAccess.phoneLabel, areas, cars)) }
+            if (row.phone == existAccess.phoneNumber) {
+                //добавить доступ в гараж на определенное место
+                existAccess.areas.add(AreaRequest(areaId, setOf(row.roomNumber)).toArea())
+                //добавить авто
+                row.carNumber?.let { CarRequest(it, row.carDescription) }?.let { existAccess.cars?.add(it.toCar()) }
                 updatedCount++
             }
         }
@@ -211,11 +198,11 @@ class RepairService(
     }
 
 
-    private fun contactParser(
+    private fun accessRowParser(
         gateSheet: Sheet,
         skipFirstRows: Int,
-    ): MutableList<Contact> {
-        val contacts = mutableListOf<Contact>()
+    ): MutableList<AccessRow> {
+        val accessRows = mutableListOf<AccessRow>()
         var count = 0
         for (i in skipFirstRows..gateSheet.lastRowNum) {
             val row = gateSheet.getRow(i)
@@ -237,8 +224,8 @@ class RepairService(
             }
 
             if (phone.isBlank()) continue
-            contacts.add(
-                makeContact(
+            accessRows.add(
+                makeAccessRow(
                     flat,
                     phone,
                     label.ifBlank { null },
@@ -250,10 +237,10 @@ class RepairService(
             count++
         }
         logger().info("Sheet row count [${gateSheet.sheetName}] = $count")
-        return contacts
+        return accessRows
     }
 
-    private fun makeContact(
+    private fun makeAccessRow(
         flat: String,
         phone: String,
         label: String?,
@@ -261,12 +248,12 @@ class RepairService(
         active: Boolean,
         carNumber: String?,
         carDescription: String?
-    ): Contact {
+    ): AccessRow {
         val roomNumber = flat.split("-")[0]
-        return Contact(roomNumber, phone, label, tenant, active, carNumber, carDescription)
+        return AccessRow(roomNumber, phone, label, tenant, active, carNumber, carDescription)
     }
 
-    data class Contact(
+    data class AccessRow(
         val roomNumber: String,
         val phone: String,
         val label: String? = null,
@@ -290,7 +277,7 @@ class RepairService(
         //block access by id
         val blockedDataTime = LocalDateTime.now()
         val blockedReason = AccessBlockReasonEnum.EXPIRED
-        accessService.deactivateAccess(accessesForBlock.mapNotNull { it.id }, blockedDataTime, blockedReason)
+        accessService.deactivateAccessByIds(accessesForBlock.mapNotNull { it.id }, blockedDataTime, blockedReason)
         logger().info("Blocked phones count = ${accessesForBlock.size}")
         return accessesForBlock.size
     }

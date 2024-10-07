@@ -33,17 +33,10 @@ class AccessController(
     @Operation(summary = "Edit the area access by the phone number")
     fun updateAccess(
         @PathVariable("access-id") accessId: Long,
-        @RequestBody accessEditRequest: UpdateAccessRequest
-    ) = accessService.update(accessId, accessEditRequest)
+        @RequestBody updateAccessRequest: UpdateAccessRequest
+    ) = accessService.update(accessId, updateAccessRequest)
 
-    //remove the area access by phone number
-    @DeleteMapping("/{access-id}")
-    @Operation(summary = "Remove the area access by the phone number")
-    fun deleteAccess(
-        @PathVariable("access-id") accessId: Long
-    ) = accessService.deactivateAccess(accessId)
-
-
+    //Get accesses by room-id
     @GetMapping("/rooms/{room-id}")
     @Operation(summary = "Get the access by the room id")
     fun findByRoom(
@@ -52,20 +45,28 @@ class AccessController(
     ) = accessService.findByRoom(roomId, active)
 
 
-    @GetMapping("/phones/{phone-number}")
-    @Operation(summary = "Get the access by the phone number")
-    fun findByPhone(
-        @PathVariable("phone-number") phoneNumber: String,
-        @RequestParam active: Boolean = true,
-    ) = accessService.findByPhoneNumber(phoneNumber, active)
+    //Block the area access by phone number
+    @DeleteMapping("/{access-id}")
+    @Operation(summary = "Block the area access by the phone number")
+    fun deleteAccess(
+        @PathVariable("access-id") accessId: Long
+    ) = accessService.deactivateAccess(accessId)
 
 
-    @GetMapping("/cars/{car-number}")
-    @Operation(summary = "Get the access by the car number")
-    fun findByCarNumber(
-        @PathVariable("car-number") carNumber: String,
-        @RequestParam active: Boolean = true,
-    ) = accessService.findByCarNumber(carNumber, active)
+//    @GetMapping("/phones/{phone-number}")
+//    @Operation(summary = "Get the access by the phone number")
+//    fun findByPhone(
+//        @PathVariable("phone-number") phoneNumber: String,
+//        @RequestParam active: Boolean = true,
+//    ) = accessService.findByPhoneNumber(phoneNumber, active)
+//
+//
+//    @GetMapping("/cars/{car-number}")
+//    @Operation(summary = "Get the access by the car number")
+//    fun findByCarNumber(
+//        @PathVariable("car-number") carNumber: String,
+//        @RequestParam active: Boolean = true,
+//    ) = accessService.findByCarNumber(carNumber, active)
 
     //export access to .csv by area
     @GetMapping("/export/{area-id}")
@@ -90,8 +91,8 @@ class AccessController(
     @GetMapping("/overview/{plate-number}")
     @Operation(summary = "Get the overview by the plate number")
     fun overview(
-        @PathVariable("plate-number") carNumber: String,
+        @PathVariable("plate-number") plateNumber: String,
         @RequestParam active: Boolean = true,
-    ) = accessService.getOverview(carNumber, active)
+    ) = accessService.getOverview(plateNumber, active)
 
 }

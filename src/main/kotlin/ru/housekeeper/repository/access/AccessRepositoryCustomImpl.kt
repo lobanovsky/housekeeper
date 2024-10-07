@@ -2,27 +2,22 @@ package ru.housekeeper.repository.access
 
 import jakarta.persistence.EntityManager
 import jakarta.persistence.PersistenceContext
-import ru.housekeeper.model.entity.access.Access
+import ru.housekeeper.model.entity.access.AccessEntity
 
 class AccessRepositoryCustomImpl(
     @PersistenceContext private val entityManager: EntityManager,
 ) : AccessRepositoryCustom {
 
-    override fun findByRoomId(roomId: Long, active: Boolean): List<Access> {
-        val sql = "select * from access where rooms @> '[$roomId]' and active = $active"
-        val query = entityManager.createNativeQuery(sql, Access::class.java)
-        return query.resultList as List<Access>
+    override fun findByPlateNumber(plateNumber: String, active: Boolean): List<AccessEntity> {
+        val sql = "SELECT * FROM access, jsonb_array_elements(cars) AS car WHERE car->>'plateNumber' LIKE '%$plateNumber%'"
+        val query = entityManager.createNativeQuery(sql, AccessEntity::class.java)
+        return query.resultList as List<AccessEntity>
     }
 
-    override fun findByAreaId(areaId: Long, active: Boolean): List<Access> {
-        val sql = "select * from access where areas @> '[$areaId]' and active = $active"
-        val query = entityManager.createNativeQuery(sql, Access::class.java)
-        return query.resultList as List<Access>
-    }
-
-    override fun findByOwnerId(ownerId: Long, active: Boolean): List<Access> {
-        val sql = "select * from access where owners @> '[$ownerId]' and active = $active"
-        val query = entityManager.createNativeQuery(sql, Access::class.java)
-        return query.resultList as List<Access>
+    //find by areaId
+    override fun findByAreaId(areaId: Long): List<AccessEntity> {
+        val sql = "SELECT * FROM access, jsonb_array_elements(places) AS area WHERE area->>'areaId'=$areaId"
+        val query = entityManager.createNativeQuery(sql, AccessEntity::class.java)
+        return query.resultList as List<AccessEntity>
     }
 }

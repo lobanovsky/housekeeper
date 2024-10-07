@@ -2,7 +2,7 @@ package ru.housekeeper.service
 
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
-import ru.housekeeper.model.entity.Area
+import ru.housekeeper.model.entity.AreaEntity
 import ru.housekeeper.repository.AreaRepository
 import ru.housekeeper.utils.entityNotfound
 
@@ -11,10 +11,10 @@ class AreaService(
     private val areaRepository: AreaRepository
 ) {
 
-    fun findAll(): List<Area> = areaRepository.findAll().toList()
+    fun findAll(): List<AreaEntity> = areaRepository.findAll().toList()
 
-    fun findById(id: Long): Area = areaRepository.findByIdOrNull(id) ?: entityNotfound("Зона доступа" to id)
+    fun findById(id: Long): AreaEntity = areaRepository.findByIdOrNull(id) ?: entityNotfound("Зона доступа" to id)
 
-    fun findAllByIdIn(ids: Set<Long>): List<Area> = areaRepository.findAllByIdIn(ids)
+    fun findAllByIdIn(ids: Set<Long>): List<AreaEntity> = areaRepository.findAllByIdIn(ids)
 
 }

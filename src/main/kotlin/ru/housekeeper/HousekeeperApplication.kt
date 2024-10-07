@@ -11,5 +11,5 @@ import org.springframework.scheduling.annotation.EnableScheduling
 class HousekeeperApplication
 
 fun main(args: Array<String>) {
-    runApplication<ru.housekeeper.HousekeeperApplication>(*args)
+    runApplication<HousekeeperApplication>(*args)
 }

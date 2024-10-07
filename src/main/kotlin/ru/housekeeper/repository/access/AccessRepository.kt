@@ -1,46 +1,43 @@
 package ru.housekeeper.repository.access
 
-import org.springframework.data.jpa.repository.Modifying
 import org.springframework.data.jpa.repository.Query
 import org.springframework.data.repository.CrudRepository
 import org.springframework.data.repository.query.Param
 import org.springframework.stereotype.Repository
 import ru.housekeeper.enums.AccessBlockReasonEnum
-import ru.housekeeper.model.entity.access.Access
+import ru.housekeeper.model.entity.access.AccessEntity
 import java.time.LocalDateTime
 
 @Repository
-interface AccessRepository : CrudRepository<Access, Long>, AccessRepositoryCustom {
+interface AccessRepository : CrudRepository<AccessEntity, Long>, AccessRepositoryCustom {
 
-    @Query("select p from Access p where p.phoneNumber like %:number% and p.active = :active")
-    fun findByPhoneNumberLike(
-        @Param("number") number: String,
+    //find by owner id
+    @Query("select a from AccessEntity a where a.ownerId = :ownerId and a.active = :active")
+    fun findByOwnerId(
+        @Param("ownerId") ownerId: Long,
         @Param("active") active: Boolean = true
-    ): List<Access>
+    ): List<AccessEntity>
 
-    //find by phone number, exact match
-    @Query("select p from Access p where p.phoneNumber = :number and p.active = :active")
+    //find by phone number exact match
+    @Query("select a from AccessEntity a where a.phoneNumber = :number and a.active = :active")
     fun findByPhoneNumber(
         @Param("number") number: String,
         @Param("active") active: Boolean = true
-    ): Access?
+    ): AccessEntity?
 
-    //Deactivate all access by id
-    @Modifying
-    @Query("update Access p set p.active = false, p.blockDateTime = :blockedDateTime, p.blockReason = :blockReason where p.id = :id")
-    fun deactivateById(
-        id: Long,
-        blockedDateTime: LocalDateTime,
-        blockReason: AccessBlockReasonEnum
-    )
+    //find by phone number and owner id
+    @Query("select a from AccessEntity a where a.phoneNumber = :number and a.ownerId = :ownerId and a.active = :active")
+    fun findByPhoneNumberAndOwnerId(
+        @Param("number") number: String,
+        @Param("ownerId") ownerId: Long,
+        @Param("active") active: Boolean = true
+    ): AccessEntity?
 
-    //Deactivate all access by ids
-    @Modifying
-    @Query("update Access p set p.active = false, p.blockDateTime = :blockedDateTime, p.blockReason = :blockReason where p.id in :ids")
+    //deactivate by ids
+    @Query("update AccessEntity a set a.active = false, a.blockReason = :reason, a.blockDateTime = :date where a.id in :ids")
     fun deactivateByIds(
-        ids: List<Long>,
-        blockedDateTime: LocalDateTime,
-        blockReason: AccessBlockReasonEnum
+        @Param("ids") ids: List<Long>,
+        @Param("date") date: LocalDateTime,
+        @Param("reason") reason: AccessBlockReasonEnum
     )
-
 }

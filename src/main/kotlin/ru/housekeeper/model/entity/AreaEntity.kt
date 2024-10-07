@@ -1,12 +1,12 @@
-package ru.housekeeper.model.entity.access
+package ru.housekeeper.model.entity
 
 import jakarta.persistence.*
 import org.hibernate.annotations.CreationTimestamp
 import java.time.LocalDateTime
 
 @Entity
-@Table(name = "car")
-data class Car(
+@Table(name = "area")
+data class AreaEntity(
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     val id: Long? = null,
@@ -15,11 +15,13 @@ data class Car(
     @Column(updatable = false)
     var createDate: LocalDateTime = LocalDateTime.now(),
 
-    var active: Boolean = true,
+    val active: Boolean = true,
 
-    val accessId: Long,
+    val name: String,
 
-    val plateNumber: String,
+    //specific place with diapason of area
+    val specificPlace: Boolean? = false,
+    val fromNumber: Int? = null,
+    val toNumber: Int? = null,
 
-    var description: String? = null,
     )

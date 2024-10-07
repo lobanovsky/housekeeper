@@ -22,7 +22,6 @@ class FileImporterController(
     private val counterpartyService: CounterpartyService,
     private val paymentService: PaymentService,
     private val roomService: RoomService,
-    private val contactService: ContactService,
     private val decisionService: DecisionService,
     private val counterService: CounterService,
     private val logEntryService: LogEntryService,
@@ -106,27 +105,6 @@ class FileImporterController(
     data class AnswerInfoResponse(
         val fileName: String? = "",
         val totalSize: Int = 0,
-    )
-
-
-    @Operation(summary = "Import contacts from *.xlsx")
-    @PostMapping(value = ["/contacts/importer"])
-    fun importContacts(
-        @RequestPart file: MultipartFile,
-    ): ContactInfoResponse {
-        fileService.isExtensionEqual(file)
-        val checkSum = fileService.isDuplicateAndGetChecksum(file)
-        val (totalSize, officeSize, flatSize, garageSize) = contactService.parseAndSave(file, checkSum)
-        fileService.saveFileInfo(file.originalFilename ?: "", file.size, checkSum, FileTypeEnum.CONTACTS)
-        return ContactInfoResponse(file.originalFilename, totalSize, officeSize, flatSize, garageSize)
-    }
-
-    data class ContactInfoResponse(
-        val fileName: String? = "",
-        val totalSize: Int = 0,
-        val officeEmailSize: Int = 0,
-        val flatEmailSize: Int = 0,
-        val garageEmailSize: Int = 0,
     )
 
 
