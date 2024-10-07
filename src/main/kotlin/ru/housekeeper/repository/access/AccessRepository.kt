@@ -1,5 +1,6 @@
 package ru.housekeeper.repository.access
 
+import org.springframework.data.jpa.repository.Modifying
 import org.springframework.data.jpa.repository.Query
 import org.springframework.data.repository.CrudRepository
 import org.springframework.data.repository.query.Param
@@ -34,6 +35,7 @@ interface AccessRepository : CrudRepository<AccessEntity, Long>, AccessRepositor
     ): AccessEntity?
 
     //deactivate by ids
+    @Modifying
     @Query("update AccessEntity a set a.active = false, a.blockReason = :reason, a.blockDateTime = :date where a.id in :ids")
     fun deactivateByIds(
         @Param("ids") ids: List<Long>,

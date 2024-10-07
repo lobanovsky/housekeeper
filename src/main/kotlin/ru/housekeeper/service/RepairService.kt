@@ -263,6 +263,7 @@ class RepairService(
         val carDescription: String? = null,
     )
 
+    @Transactional
     fun blockExpiredPhoneNumbers(months: Int): Int {
         //get all live phones
         val logEntries = logEntryService.getAllLastNMonths(months)
