@@ -136,17 +136,17 @@ class FileImporterController(
     )
 
 
-    @Operation(summary = "Import accounts from \"HOMEOWNER\" from *.xlsx")
-    @PostMapping(value = ["/homeowner/accounts/importer"])
-    fun importAccountsFromHomeowners(
-        @RequestPart file: MultipartFile,
-    ): AccountHomeownersResponse {
-        fileService.isExtensionEqual(file)
-        val checkSum = fileService.isDuplicateAndGetChecksum(file)
-        val (roomSize, ownerSize, totalSquare, totalPercentage) = roomService.parseAndSave(file, checkSum)
-        fileService.saveFileInfo(file.originalFilename ?: "", file.size, checkSum, FileTypeEnum.ACCOUNTS)
-        return AccountHomeownersResponse(file.originalFilename, roomSize, ownerSize, totalSquare, totalPercentage)
-    }
+//    @Operation(summary = "Import accounts from \"HOMEOWNER\" from *.xlsx")
+//    @PostMapping(value = ["/homeowner/accounts/importer"])
+//    fun importAccountsFromHomeowners(
+//        @RequestPart file: MultipartFile,
+//    ): AccountHomeownersResponse {
+//        fileService.isExtensionEqual(file)
+//        val checkSum = fileService.isDuplicateAndGetChecksum(file)
+//        val (roomSize, ownerSize, totalSquare, totalPercentage) = roomService.parseAndSave(file, checkSum)
+//        fileService.saveFileInfo(file.originalFilename ?: "", file.size, checkSum, FileTypeEnum.ACCOUNTS)
+//        return AccountHomeownersResponse(file.originalFilename, roomSize, ownerSize, totalSquare, totalPercentage)
+//    }
 
     data class AccountHomeownersResponse(
         val fileName: String? = "",

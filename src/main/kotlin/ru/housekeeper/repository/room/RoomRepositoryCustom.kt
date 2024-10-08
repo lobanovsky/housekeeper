@@ -14,4 +14,5 @@ interface RoomRepositoryCustom {
         filter: RoomFilter
     ): Page<Room>
 
+    fun findByOwnerId(ownerId: Long): List<Room>
 }

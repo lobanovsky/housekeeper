@@ -30,7 +30,13 @@ class RoomRepositoryCustomImpl(
         val sqlCount = "SELECT count(r) FROM Room r WHERE true = true $conditions"
 
         return getPage<Room>(entityManager, sql, sqlCount, pageNum, pageSize)
-
     }
+
+    override fun findByOwnerId(ownerId: Long): List<Room> {
+        val sql = "select * from room where owners @> '[$ownerId]'"
+        val query = entityManager.createNativeQuery(sql, Room::class.java)
+        return query.resultList as List<Room>
+    }
+
 
 }

@@ -3,13 +3,10 @@ package ru.housekeeper.service
 import org.springframework.data.domain.Page
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
-import org.springframework.transaction.annotation.Transactional
 import org.springframework.web.multipart.MultipartFile
 import ru.housekeeper.enums.RoomTypeEnum
-import ru.housekeeper.model.dto.OwnerVO
 import ru.housekeeper.model.entity.Room
 import ru.housekeeper.model.filter.RoomFilter
-import ru.housekeeper.parser.HomeownerAccountParser
 import ru.housekeeper.parser.RegistryParser
 import ru.housekeeper.repository.room.RoomRepository
 import ru.housekeeper.utils.MAX_SIZE_PER_PAGE
@@ -20,7 +17,7 @@ import java.math.BigDecimal
 @Service
 class RoomService(
     private val roomRepository: RoomRepository,
-    private val ownerService: OwnerService,
+//    private val ownerService: OwnerService,
 ) {
 
     data class RegistryInfo(
@@ -68,41 +65,41 @@ class RoomService(
         val totalPercentage: BigDecimal,
     )
 
-    @Transactional
-    fun parseAndSave(file: MultipartFile, checksum: String): HomeownerInfo {
-        val roomVOs = HomeownerAccountParser(file).parse()
-
-        logger().info("Parsed ${roomVOs.size} rooms")
-        var countSavedRoom = 0;
-        var countSavedOwner = 0;
-        roomVOs.forEach { roomVO ->
-            val room = roomVO.toRoom(checksum)
-
-            //save owners
-            val savedOwner = ownerService.saveIfNotExist(
-                if (roomVO.owners != null && roomVO.owners.size > 1) {
-                    OwnerVO(fullName = roomVO.owners.joinToString(separator = ",") { it.fullName }).toOwner(checksum)
-                } else if (roomVO.owners != null) {
-                    roomVO.owners.first().toOwner(checksum)
-                } else {
-                    OwnerVO(fullName = roomVO.ownerName).toOwner(checksum)
-                }
-            )
-            countSavedOwner++
-            room.owners.add(savedOwner.id)
-
-            //save room
-            val savedRoom = roomRepository.save(room)
-            savedRoom.id?.let { savedOwner.rooms.add(it) }
-            countSavedRoom++
-        }
-        logger().info("Saved rooms = [$countSavedRoom], owners = [$countSavedOwner]")
-        return HomeownerInfo(
-            countSavedRoom,
-            countSavedOwner,
-            roomVOs.sumOf { it.square },
-            roomVOs.sumOf { it.percentage })
-    }
+//    @Transactional
+//    fun parseAndSave(file: MultipartFile, checksum: String): HomeownerInfo {
+//        val roomVOs = HomeownerAccountParser(file).parse()
+//
+//        logger().info("Parsed ${roomVOs.size} rooms")
+//        var countSavedRoom = 0;
+//        var countSavedOwner = 0;
+//        roomVOs.forEach { roomVO ->
+//            val room = roomVO.toRoom(checksum)
+//
+//            //save owners
+//            val savedOwner = ownerService.saveIfNotExist(
+//                if (roomVO.owners != null && roomVO.owners.size > 1) {
+//                    OwnerVO(fullName = roomVO.owners.joinToString(separator = ",") { it.fullName }).toOwner(checksum)
+//                } else if (roomVO.owners != null) {
+//                    roomVO.owners.first().toOwner(checksum)
+//                } else {
+//                    OwnerVO(fullName = roomVO.ownerName).toOwner(checksum)
+//                }
+//            )
+//            countSavedOwner++
+//            room.owners.add(savedOwner.id)
+//
+//            //save room
+//            val savedRoom = roomRepository.save(room)
+//            savedRoom.id?.let { savedOwner.rooms.add(it) }
+//            countSavedRoom++
+//        }
+//        logger().info("Saved rooms = [$countSavedRoom], owners = [$countSavedOwner]")
+//        return HomeownerInfo(
+//            countSavedRoom,
+//            countSavedOwner,
+//            roomVOs.sumOf { it.square },
+//            roomVOs.sumOf { it.percentage })
+//    }
 
     fun findAll(): List<Room> = roomRepository.findAll().toList()
 
@@ -117,5 +114,7 @@ class RoomService(
     fun findByRoomNumbersAndType(roomNumbers: Set<String>): List<Room> = roomRepository.findByRoomNumbersAndType(roomNumbers)
 
     fun findByNumberAndBuildingIdAndType(number: String, buildingId: Long, type: RoomTypeEnum): Room? = roomRepository.findByNumberAndBuildingIdAndType(number, buildingId, type)
+
+    fun findByOwnerId(ownerId: Long): List<Room> = roomRepository.findByOwnerId(ownerId)
 
 }
