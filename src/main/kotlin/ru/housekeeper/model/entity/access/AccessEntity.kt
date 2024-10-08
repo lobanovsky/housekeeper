@@ -30,9 +30,8 @@ data class AccessEntity(
     //кто даёт доступ (собственник)
     val ownerId: Long,
 
-    //конкретные места в зоне доступа
     @Type(JsonType::class)
-    @Column(name = "places", columnDefinition = "jsonb")
+    @Column(name = "areas", columnDefinition = "jsonb")
     val areas: MutableList<Area> = mutableListOf(),
 
     //Ключ доступа (телефон)
