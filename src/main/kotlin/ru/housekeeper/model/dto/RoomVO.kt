@@ -23,8 +23,7 @@ data class RoomVO(
     val type: RoomTypeEnum,
     val typeDescription: String = type.description,
 
-    val owners: MutableSet<OwnerVO>? = null,
-    val tenants: MutableSet<OwnerVO>? = null,
+    val ownerIds: List<Long>,
 ) {
     fun toRoom(checksum: String): Room {
         return Room(

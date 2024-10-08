@@ -5,6 +5,7 @@ import org.springframework.http.HttpHeaders
 import org.springframework.http.MediaType
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
+import ru.housekeeper.model.dto.access.AccessResponse
 import ru.housekeeper.model.dto.access.CreateAccessRequest
 import ru.housekeeper.model.dto.access.UpdateAccessRequest
 import ru.housekeeper.service.AreaService
@@ -42,7 +43,7 @@ class AccessController(
     fun findByRoom(
         @PathVariable("room-id") roomId: Long,
         @RequestParam active: Boolean = true,
-    ) = accessService.findByRoom(roomId, active)
+    ): List<AccessResponse> = accessService.findByRoom(roomId, active)
 
 
     //Block the area access by phone number

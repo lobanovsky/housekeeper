@@ -36,7 +36,7 @@ class Room(
 
     @Type(JsonType::class)
     @Column(name = "owners", columnDefinition = "jsonb")
-    val owners: MutableSet<Long?> = mutableSetOf(),
+    val owners: MutableSet<Long> = mutableSetOf(),
 
     @Type(JsonType::class)
     @Column(name = "tenants", columnDefinition = "jsonb")

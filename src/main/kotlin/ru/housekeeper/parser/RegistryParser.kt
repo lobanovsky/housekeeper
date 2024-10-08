@@ -5,7 +5,6 @@ import org.apache.poi.ss.usermodel.Sheet
 import org.apache.poi.ss.usermodel.WorkbookFactory
 import org.springframework.web.multipart.MultipartFile
 import ru.housekeeper.enums.RoomTypeEnum
-import ru.housekeeper.model.dto.OwnerVO
 import ru.housekeeper.model.dto.RoomVO
 import ru.housekeeper.utils.logger
 import java.math.BigDecimal
@@ -56,10 +55,11 @@ class RegistryParser(private val file: MultipartFile) {
                     cadastreNumber = cadastreNumber,
                     number = number,
                     square = BigDecimal(square).setScale(2, RoundingMode.HALF_UP),
-                    owners = owners.split(",").map { OwnerVO(fullName = it.trim()) }.toMutableSet(),
                     type = if (number.isNotEmpty()) RoomTypeEnum.FLAT else RoomTypeEnum.GARAGE,
                     certificate = description,
-                    building = if (number.isNotEmpty()) 1 else 2
+                    building = if (number.isNotEmpty()) 1 else 2,
+//                    owners = owners.split(",").map { OwnerVO(fullName = it.trim()) }.toMutableSet(),
+                    ownerIds = emptyList()
                 )
             )
         }

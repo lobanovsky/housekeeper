@@ -5,7 +5,6 @@ import org.apache.poi.ss.usermodel.Sheet
 import org.apache.poi.ss.usermodel.WorkbookFactory
 import org.springframework.web.multipart.MultipartFile
 import ru.housekeeper.enums.RoomTypeEnum
-import ru.housekeeper.model.dto.OwnerVO
 import ru.housekeeper.model.dto.RoomVO
 import ru.housekeeper.utils.logger
 import java.math.BigDecimal
@@ -67,8 +66,8 @@ class HomeownerAccountParser(private val file: MultipartFile) {
                     ownerName = owners,
                     number = account.trimStart('0').drop(1).trimStart('0'),
                     square = BigDecimal(square).setScale(2, RoundingMode.HALF_UP),
-                    owners = owners.split(",").map { OwnerVO(fullName = it.trim()) }.toMutableSet(),
                     type = if (number.startsWith("Оф")) RoomTypeEnum.OFFICE else if (number.startsWith("А/м")) RoomTypeEnum.GARAGE else RoomTypeEnum.FLAT,
+                    ownerIds = emptyList()
                 )
             )
         }

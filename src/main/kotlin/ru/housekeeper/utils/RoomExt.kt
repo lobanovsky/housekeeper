@@ -19,6 +19,7 @@ fun Room.toRoomVO(): RoomVO {
         square = square,
         percentage = percentage,
         type = type,
+        ownerIds = owners.toList()
     )
 }
 
