@@ -13,7 +13,7 @@ import ru.housekeeper.model.dto.access.CarRequest
 import ru.housekeeper.model.dto.access.CreateAccessRequest
 import ru.housekeeper.model.dto.access.toArea
 import ru.housekeeper.model.dto.access.toCar
-import ru.housekeeper.model.entity.Owner
+import ru.housekeeper.model.entity.OwnerEntity
 import ru.housekeeper.model.entity.payment.IncomingPayment
 import ru.housekeeper.model.filter.IncomingPaymentsFilter
 import ru.housekeeper.repository.payment.IncomingPaymentRepository
@@ -103,7 +103,7 @@ class RepairService(
             .fold(BigDecimal.ZERO, BigDecimal::add)
     }
 
-    private fun findOwnersByRoom(roomNumber: String, buildingId: Long, roomType: RoomTypeEnum): List<Owner> {
+    private fun findOwnersByRoom(roomNumber: String, buildingId: Long, roomType: RoomTypeEnum): List<OwnerEntity> {
         val room = roomService.findByNumberAndBuildingIdAndType(roomNumber, buildingId, roomType)
         return room?.id?.let { ownerService.findByRoomId(it) } ?: emptyList()
     }
@@ -281,5 +281,29 @@ class RepairService(
         accessService.deactivateAccessByIds(accessesForBlock.mapNotNull { it.id }, LocalDateTime.now(), AccessBlockReasonEnum.EXPIRED)
         logger().info("Blocked phones count = ${accessesForBlock.size}")
         return accessesForBlock.size
+    }
+
+    fun addAvailablelAccessAreas() {
+        val owners = ownerService.findAll()
+        owners.forEach { owner ->
+            ownerService.findRoomsByOwnerId(owner.id!!).let { rooms ->
+                val areas = when {
+                    rooms.any { it.type == RoomTypeEnum.FLAT } && rooms.any { it.type == RoomTypeEnum.GARAGE } -> listOf(1L, 2L)
+                    rooms.any { it.type == RoomTypeEnum.FLAT } -> listOf(1L)
+                    rooms.any { it.type == RoomTypeEnum.GARAGE } -> listOf(2L)
+                    else -> emptyList()
+                }
+                if (areas.isNotEmpty()) {
+                    if (owner.availableAccessArea == null) {
+                        owner.availableAccessArea = mutableListOf()
+                        owner.availableAccessArea?.addAll(areas)
+                    } else {
+                        owner.availableAccessArea?.clear()
+                        owner.availableAccessArea?.addAll(areas)
+                    }
+                    ownerService.save(owner)
+                }
+            }
+        }
     }
 }

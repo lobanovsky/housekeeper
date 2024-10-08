@@ -68,4 +68,9 @@ class RepairController(
         @RequestParam months: Int,
     ) = repairService.blockExpiredPhoneNumbers(months)
 
+    /**
+     * Добавление списка зон доступа, которые может указывать собственник
+     */
+    @GetMapping("/add-availabel-access-areas")
+    fun addAreas() = repairService.addAvailablelAccessAreas()
 }

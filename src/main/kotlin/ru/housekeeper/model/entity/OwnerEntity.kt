@@ -10,7 +10,7 @@ import java.time.LocalDateTime
 
 @Entity
 @Table(name = "owner")
-class Owner(
+class OwnerEntity(
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     val id: Long? = null,
@@ -41,5 +41,9 @@ class Owner(
     @CreationTimestamp
     @Column(updatable = false)
     val createDate: LocalDateTime = LocalDateTime.now(),
+
+    @Type(JsonType::class)
+    @Column(name = "available_access_area", columnDefinition = "jsonb")
+    var availableAccessArea: MutableList<Long>? = mutableListOf(),
 
     )
