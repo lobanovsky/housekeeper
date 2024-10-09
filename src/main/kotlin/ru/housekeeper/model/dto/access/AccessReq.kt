@@ -34,6 +34,7 @@ data class CarRequest(
 
 data class UpdateAccessRequest(
     val phoneLabel: String? = null,
+    val tenant: Boolean? = null,
     val cars: List<CarRequest>?,
     val areas: List<AreaRequest>,
 )

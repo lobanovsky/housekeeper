@@ -63,6 +63,8 @@ class AccessService(
         val existAccess = findById(accessId)
         //new label
         existAccess.phoneLabel = request.phoneLabel
+        //tenant
+        existAccess.tenant = request.tenant
         //new areas
         val existAreas = existAccess.areas
         existAreas.clear()
