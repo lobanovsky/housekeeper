@@ -9,7 +9,7 @@ class AccessRepositoryCustomImpl(
 ) : AccessRepositoryCustom {
 
     override fun findByPlateNumber(plateNumber: String, active: Boolean): List<AccessEntity> {
-        val sql = "SELECT * FROM access, jsonb_array_elements(cars) AS car WHERE car->>'plateNumber' LIKE '%$plateNumber%'"
+        val sql = "SELECT * FROM access, jsonb_array_elements(areas) AS car WHERE car->>'plateNumber' LIKE '%$plateNumber%'"
         val query = entityManager.createNativeQuery(sql, AccessEntity::class.java)
         return query.resultList as List<AccessEntity>
     }

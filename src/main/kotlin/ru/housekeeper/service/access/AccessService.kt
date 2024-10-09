@@ -108,6 +108,7 @@ class AccessService(
 
     fun getOverview(plateNumber: String, active: Boolean): OverviewResponse {
         val accesses = accessRepository.findByPlateNumber(plateNumber)
+        if (accesses.isEmpty()) throw AccessToAreaException("Не найдено доступа по номеру автомобиля [$plateNumber]")
         if (accesses.size > 1) throw AccessToAreaException("Найдено более одного доступа по номеру автомобиля [$plateNumber]")
         val first = accesses.first()
         return first.toOverviewResponse(
