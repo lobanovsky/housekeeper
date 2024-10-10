@@ -33,4 +33,6 @@ interface LogEntryRepositoryCustom {
     fun getLastEntriesByPhoneNumber(phoneNumber: String, n: Int = 6): List<LogEntry>
 
     fun getFirstEntryByPhoneNumber(phoneNumber: String): LogEntry?
+
+    fun findAllLastMonthByGateId(gateId: Long): List<LogEntry>
 }

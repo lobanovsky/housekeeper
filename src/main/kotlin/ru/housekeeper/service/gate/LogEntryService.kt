@@ -46,7 +46,7 @@ class LogEntryService(
     }
 
     private fun removeDuplicates(logEntries: List<LogEntry>, gateId: Long): List<LogEntry> {
-        val existed = logEntryRepository.findByGateId(gateId = gateId).map { it.uuid }.toSet()
+        val existed = logEntryRepository.findAllLastMonthByGateId(gateId = gateId).map { it.uuid }.toSet()
         val uploaded = logEntries.map { it.uuid }.toSet()
         val duplicates = uploaded intersect existed
         logger().info("Uploaded ${logEntries.size}, unique -> ${(uploaded subtract existed).size}")
