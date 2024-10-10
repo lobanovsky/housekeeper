@@ -3,12 +3,14 @@ package ru.housekeeper.service.gate
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import org.springframework.web.multipart.MultipartFile
+import ru.housekeeper.model.dto.gate.LogEntryOverview
 import ru.housekeeper.model.entity.gate.LogEntry
 import ru.housekeeper.model.filter.LogEntryFilter
 import ru.housekeeper.parser.gate.LogEntryParser
 import ru.housekeeper.repository.gate.LogEntryRepository
 import ru.housekeeper.rest.gate.LogEntryController
 import ru.housekeeper.utils.logger
+import ru.housekeeper.utils.toLogEntryResponse
 import java.time.LocalDate
 
 @Service
@@ -76,15 +78,16 @@ class LogEntryService(
 
     fun getAllLastNMonths(n: Int) = logEntryRepository.getAllLastNMonths(n)
 
-    fun lastEntryByPhoneNumber(phoneNumber: String): LastEntries {
-        val entries = logEntryRepository.lastEntryByPhoneNumber(phoneNumber)
-        if (entries.isEmpty()) return LastEntries(0, null)
-        val lastEntry = entries.first()
-        return LastEntries(entries.count(), lastEntry)
+    fun getOverview(phoneNumber: String): LogEntryOverview {
+        val firstEntry = logEntryRepository.getFirstEntryByPhoneNumber(phoneNumber)
+        if (firstEntry == null) throw IllegalArgumentException("Не найдены открытия шлагбаума или ворот с помощью телефона [$phoneNumber]")
+        val logEntries = logEntryRepository.getLastEntriesByPhoneNumber(phoneNumber)
+        val totalSize = logEntryRepository.countByPhoneNumber(phoneNumber)
+        return LogEntryOverview(
+            lastLogEntry = logEntries.first().toLogEntryResponse(),
+            lastLogEntries = logEntries.map { it.toLogEntryResponse() }.subList(0, 5),
+            firstLogEntry = firstEntry.toLogEntryResponse(),
+            totalSize = totalSize,
+        )
     }
-
-    data class LastEntries(
-        val countLastEntries: Int,
-        val lastEntry: LogEntry?,
-    )
 }

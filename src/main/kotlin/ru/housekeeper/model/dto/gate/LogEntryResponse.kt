@@ -13,3 +13,11 @@ data class LogEntryResponse(
     val gateId: Long? = null,
     val gateName: String? = null,
 )
+
+
+data class LogEntryOverview(
+    val lastLogEntry: LogEntryResponse,
+    val lastLogEntries: List<LogEntryResponse>,
+    val firstLogEntry: LogEntryResponse?,
+    val totalSize: Int,
+)

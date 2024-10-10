@@ -85,8 +85,26 @@ class LogEntryRepositoryCustomImpl(
         val startDate = LocalDateTime.now().minus(n.toLong(), ChronoUnit.MONTHS)
 
         val sql = "SELECT p FROM LogEntry p WHERE p.dateTime >= :startDate ORDER BY p.dateTime DESC"
-        val query = entityManager.createQuery(sql)
+        val query = entityManager.createQuery(sql, LogEntry::class.java)
         query.setParameter("startDate", startDate)
         return query.resultList as List<LogEntry>
     }
+
+    override fun getLastEntriesByPhoneNumber(phoneNumber: String, n: Int): List<LogEntry> {
+        val sql = "SELECT p FROM LogEntry p WHERE p.phoneNumber = :phoneNumber ORDER BY p.dateTime DESC"
+        val query = entityManager.createQuery(sql, LogEntry::class.java)
+        query.setParameter("phoneNumber", phoneNumber)
+        query.maxResults = n
+        return query.resultList as List<LogEntry>
+    }
+
+    override fun getFirstEntryByPhoneNumber(phoneNumber: String): LogEntry? {
+        val sql = "SELECT p FROM LogEntry p WHERE p.phoneNumber = :phoneNumber ORDER BY p.dateTime ASC"
+        val query = entityManager.createQuery(sql, LogEntry::class.java)
+        query.setParameter("phoneNumber", phoneNumber)
+        query.maxResults = 1
+        val result = query.resultList as List<LogEntry>
+        return if (result.isEmpty()) null else result[0]
+    }
+
 }

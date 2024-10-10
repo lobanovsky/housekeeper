@@ -72,6 +72,10 @@ class LogEntryController(
         @RequestParam(value = "endDate", required = false) endDate: LocalDate?,
     ) = logEntryService.getTop(gateId, FieldFilter.PHONE_NUMBER, startDate, endDate)
 
+    @Operation(summary = "Get log entry overview by phone number")
+    @GetMapping("/overview/{phone-number}")
+    fun getLastByPhoneNumber(@PathVariable("phone-number") phoneNumber: String) = logEntryService.getOverview(phoneNumber)
+
 
     enum class FieldFilter(name: String) {
         FLAT_NUMBER("flat-number"),
