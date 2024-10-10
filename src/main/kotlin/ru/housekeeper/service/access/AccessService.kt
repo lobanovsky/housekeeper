@@ -19,6 +19,7 @@ import ru.housekeeper.service.AreaService
 import ru.housekeeper.service.OwnerService
 import ru.housekeeper.service.RoomService
 import ru.housekeeper.utils.MAX_ELDES_LABEL_LENGTH
+import ru.housekeeper.utils.PHONE_NUMBER_LENGTH
 import ru.housekeeper.utils.beautifulPhonePrint
 import java.time.LocalDateTime
 
@@ -32,6 +33,7 @@ class AccessService(
 
     fun create(request: CreateAccessRequest, active: Boolean = true): List<AccessResponse> {
         if (request.accesses.isEmpty()) throw AccessToAreaException("Не указаны зоны доступа")
+        phoneNumberValidator(request.accesses.first().phoneNumber)
 
         val result = mutableListOf<AccessResponse>()
         for (access in request.accesses) {
@@ -136,4 +138,8 @@ class AccessService(
         return result
     }
 
+    private fun phoneNumberValidator(phoneNumber: String) {
+        if (phoneNumber.first() != '7') throw AccessToAreaException("Номер телефона [$phoneNumber] должен начинаться с 7")
+        if (phoneNumber.length != PHONE_NUMBER_LENGTH) throw AccessToAreaException("Номер телефона [$phoneNumber] должен содержать 11 цифр")
+    }
 }
