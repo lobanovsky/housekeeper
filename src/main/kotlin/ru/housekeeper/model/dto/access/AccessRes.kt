@@ -34,7 +34,7 @@ data class CarResponse(
 )
 
 
-fun AccessEntity.toAccessResponse(allAreas: Map<Long?, String>) = AccessResponse(
+fun AccessEntity.toAccessResponse(allAreas: Map<Long?, String>, active: Boolean = true) = AccessResponse(
     accessId = id!!,
     active = active,
     ownerId = ownerId,
@@ -42,8 +42,9 @@ fun AccessEntity.toAccessResponse(allAreas: Map<Long?, String>) = AccessResponse
     phoneNumber = phoneNumber,
     phoneLabel = phoneLabel,
     tenant = tenant,
-    cars = cars?.map { it.toCarResponse() },
+    cars = cars?.filter { it.active == active }?.map { it.toCarResponse() },
 )
+
 fun Area.toAreaResponse(allAreas: Map<Long?, String>) = AreaResponse(areaId, allAreas[areaId], places)
 fun Car.toCarResponse() = CarResponse(plateNumber, description, active)
 
@@ -60,7 +61,7 @@ data class OverviewResponse(
 
     val ownerName: String,
     val ownerRooms: String,
-    )
+)
 
 data class OverviewArea(
     val areaName: String,
