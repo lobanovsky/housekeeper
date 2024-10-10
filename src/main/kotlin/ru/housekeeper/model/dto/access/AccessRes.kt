@@ -30,6 +30,7 @@ data class AreaResponse(
 data class CarResponse(
     val plateNumber: String,
     val description: String? = null,
+    val active: Boolean = true,
 )
 
 
@@ -44,7 +45,7 @@ fun AccessEntity.toAccessResponse(allAreas: Map<Long?, String>) = AccessResponse
     cars = cars?.map { it.toCarResponse() },
 )
 fun Area.toAreaResponse(allAreas: Map<Long?, String>) = AreaResponse(areaId, allAreas[areaId], places)
-fun Car.toCarResponse() = CarResponse(plateNumber, description)
+fun Car.toCarResponse() = CarResponse(plateNumber, description, active)
 
 
 //Обзор доступов для PWA

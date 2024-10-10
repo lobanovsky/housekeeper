@@ -48,7 +48,7 @@ data class AccessEntity(
     //cars json
     @Type(JsonType::class)
     @Column(name = "cars", columnDefinition = "jsonb")
-    val cars: MutableList<Car>? = null,
+    var cars: MutableList<Car>? = null,
 )
 
 data class Area(
@@ -59,4 +59,5 @@ data class Area(
 data class Car(
     val plateNumber: String,
     var description: String? = null,
+    var active: Boolean = true,
 )

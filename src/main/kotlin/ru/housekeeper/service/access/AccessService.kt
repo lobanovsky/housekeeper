@@ -5,6 +5,7 @@ import org.springframework.stereotype.Service
 import ru.housekeeper.enums.AccessBlockReasonEnum
 import ru.housekeeper.exception.AccessToAreaException
 import ru.housekeeper.model.dto.access.AccessResponse
+import ru.housekeeper.model.dto.access.CarRequest
 import ru.housekeeper.model.dto.access.CreateAccessRequest
 import ru.housekeeper.model.dto.access.OverviewResponse
 import ru.housekeeper.model.dto.access.UpdateAccessRequest
@@ -14,6 +15,7 @@ import ru.housekeeper.model.dto.access.toCar
 import ru.housekeeper.model.dto.access.toOverviewResponse
 import ru.housekeeper.model.dto.eldes.EldesContact
 import ru.housekeeper.model.entity.access.AccessEntity
+import ru.housekeeper.model.entity.access.Car
 import ru.housekeeper.repository.access.AccessRepository
 import ru.housekeeper.service.AreaService
 import ru.housekeeper.service.OwnerService
@@ -22,6 +24,7 @@ import ru.housekeeper.utils.MAX_ELDES_LABEL_LENGTH
 import ru.housekeeper.utils.PHONE_NUMBER_LENGTH
 import ru.housekeeper.utils.beautifulPhonePrint
 import java.time.LocalDateTime
+import kotlin.collections.mutableListOf
 
 @Service
 class AccessService(
@@ -71,12 +74,50 @@ class AccessService(
         existAreas.clear()
         existAreas.addAll(newAreas.map { it.toArea() })
         //new cars
-        val existCars = existAccess.cars
-        existCars?.clear()
-        existCars?.addAll(request.cars?.map { it.toCar() } ?: emptyList())
+        val carMerge = carMerge(request.cars ?: emptyList(), existAccess.cars ?: emptyList())
+        if (carMerge.isNotEmpty()) existAccess.cars = mutableListOf()
+        existAccess.cars?.clear()
+        existAccess.cars?.addAll(carMerge)
 
         val updatedAccess = accessRepository.save(existAccess)
         return updatedAccess.toAccessResponse(findAllArea())
+    }
+
+    /**
+     *  функция, на вход которой приходит список автомобилей, состоящий из двух свойств: номер авто и описание
+     *  функция должна взять имеющийся список из базы данных и сделать слияние, то есть
+     *  если нет данного номера авто в списке, то добавить
+     *  если не пришёл номер, который есть в базе, то заблокировать - active=false
+     *  если описание изменилось, то изменить, только описание
+     *  если авто с таким же номером, а в базе заблокирован, то разблокировать
+     */
+    fun carMerge(cars: List<CarRequest>, existCars: List<Car>): List<Car> {
+        val result = mutableListOf<Car>()
+        val existCarsMap = existCars.associateBy { it.plateNumber }
+        cars.forEach { car ->
+            val existCar = existCarsMap[car.plateNumber]
+            if (existCar == null) {
+                result.add(Car(car.plateNumber, car.description))
+            } else {
+                if (existCar.active) {
+                    if (existCar.description != car.description) {
+                        existCar.description = car.description
+                    }
+                    result.add(existCar)
+                } else {
+                    existCar.active = true
+                    existCar.description = car.description
+                    result.add(existCar)
+                }
+            }
+        }
+        existCarsMap.forEach { (key, value) ->
+            if (!cars.any { it.plateNumber == key }) {
+                value.active = false
+                result.add(value)
+            }
+        }
+        return result
     }
 
     fun findAll() = accessRepository.findAll()
@@ -92,7 +133,7 @@ class AccessService(
 
     fun findByRoom(roomId: Long, active: Boolean): List<AccessResponse> {
         val owners = ownerService.findByRoomId(roomId, active)
-        val existAccesses = owners.flatMap { accessRepository.findByOwnerId(it.id!!) }
+        val existAccesses = owners.flatMap { accessRepository.findByOwnerId(it.id!!, active) }
         return existAccesses.map { it.toAccessResponse(findAllArea()) }
     }
 
