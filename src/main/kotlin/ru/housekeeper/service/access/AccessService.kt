@@ -32,29 +32,28 @@ class AccessService(
 ) {
 
     fun create(request: CreateAccessRequest, active: Boolean = true): List<AccessResponse> {
-        if (request.accesses.isEmpty()) throw AccessToAreaException("Не указаны зоны доступа")
-        phoneNumberValidator(request.accesses.first().phoneNumber)
+        val access = request.accesses.first()
+        if (access.areas.isEmpty()) throw AccessToAreaException("Не указаны зоны доступа")
+        phoneNumberValidator(access.phoneNumber)
 
         val result = mutableListOf<AccessResponse>()
-        for (access in request.accesses) {
-            val existAccess = findByOwnerIdAndPhone(request.ownerId, access.phoneNumber)
-            //если собственник уже добавлял данный номер телефона
-            if (existAccess != null && active) {
-                throw AccessToAreaException("У собственника [${ownerService.findById(request.ownerId).fullName}], номер [${access.phoneNumber.beautifulPhonePrint()}] уже зарегистрирован")
-            }
-            val access = accessRepository.save(
-                AccessEntity(
-                    ownerId = request.ownerId,
-                    areas = access.areas.map { it.toArea() }.toMutableList(),
-                    phoneNumber = access.phoneNumber,
-                    phoneLabel = access.phoneLabel,
-                    tenant = access.tenant,
-                    cars = access.cars?.map { it.toCar() }?.toMutableList(),
-                    active = active
-                )
-            )
-            result.add(access.toAccessResponse(findAllArea()))
+        val existAccess = findByOwnerIdAndPhone(request.ownerId, access.phoneNumber)
+        //если собственник уже добавлял данный номер телефона
+        if (existAccess != null && active) {
+            throw AccessToAreaException("У собственника [${ownerService.findById(request.ownerId).fullName}], номер [${access.phoneNumber.beautifulPhonePrint()}] уже зарегистрирован")
         }
+        val savedAccess = accessRepository.save(
+            AccessEntity(
+                ownerId = request.ownerId,
+                areas = access.areas.map { it.toArea() }.toMutableList(),
+                phoneNumber = access.phoneNumber,
+                phoneLabel = access.phoneLabel,
+                tenant = access.tenant,
+                cars = access.cars?.map { it.toCar() }?.toMutableList(),
+                active = active
+            )
+        )
+        result.add(savedAccess.toAccessResponse(findAllArea()))
         return result
     }
 
