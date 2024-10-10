@@ -45,7 +45,7 @@ class AccessService(
                     ownerId = request.ownerId,
                     areas = access.areas.map { it.toArea() }.toMutableList(),
                     phoneNumber = access.phoneNumber,
-                    phoneLabel = access.contactLabel,
+                    phoneLabel = access.phoneLabel,
                     tenant = access.tenant,
                     cars = access.cars?.map { it.toCar() }?.toMutableList(),
                     active = active

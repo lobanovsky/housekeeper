@@ -16,7 +16,7 @@ data class AccessRequest(
     val areas: List<AreaRequest>,
     //кому
     val phoneNumber: String,
-    val contactLabel: String? = null,
+    val phoneLabel: String? = null,
     val tenant: Boolean? = null,
     //автомобили
     val cars: Set<CarRequest>? = mutableSetOf(),

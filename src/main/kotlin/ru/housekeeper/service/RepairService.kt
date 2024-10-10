@@ -139,7 +139,7 @@ class RepairService(
             accesses = setOf(AccessRequest(
                 areas = if (areaId == 2L) listOf(AreaRequest(areaId, places = setOf(row.roomNumber))) else listOf(AreaRequest(areaId)),
                 phoneNumber = row.phone,
-                contactLabel = row.label,
+                phoneLabel = row.label,
                 tenant = row.tenant,
                 cars = row.carNumber?.let { setOf(CarRequest(it, row.carDescription)) }
             )),
