@@ -134,7 +134,7 @@ class AccessService(
     fun findByRoom(roomId: Long, active: Boolean): List<AccessResponse> {
         val owners = ownerService.findByRoomId(roomId, active)
         val existAccesses = owners.flatMap { accessRepository.findByOwnerId(it.id!!, active) }
-        return existAccesses.map { it.toAccessResponse(findAllArea()) }
+        return existAccesses.map { it.toAccessResponse(findAllArea()) }.sortedBy { it.phoneNumber }
     }
 
     fun deactivateAccess(accessId: Long): AccessResponse {
