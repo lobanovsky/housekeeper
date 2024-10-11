@@ -68,9 +68,9 @@ data class OverviewArea(
     val places: Set<String>?,
 )
 
-fun AccessEntity.toOverviewResponse(allAreas: Map<Long?, String>, ownerName: String, ownerRooms: String) = OverviewResponse(
-    carNumber = cars?.firstOrNull()?.plateNumber ?: "",
-    carDescription = cars?.firstOrNull()?.description,
+fun AccessEntity.toOverviewResponse(allAreas: Map<Long?, String>, ownerName: String, ownerRooms: String, car: Car) = OverviewResponse(
+    carNumber = car.plateNumber,
+    carDescription =car.description,
     phoneNumber = phoneNumber,
     phoneLabel = phoneLabel,
     tenant = tenant,

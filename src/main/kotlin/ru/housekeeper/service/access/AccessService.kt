@@ -152,12 +152,15 @@ class AccessService(
         val accesses = accessRepository.findByPlateNumber(plateNumber)
         if (accesses.isEmpty()) throw AccessToAreaException("Не найдено доступа по номеру автомобиля [$plateNumber]")
         val first = accesses.first()
+        //find car by plate number
+        val car = first.cars?.find { it.plateNumber.contains(plateNumber) } ?: throw AccessToAreaException("Не найдено автомобиля по номеру [$plateNumber]")
         return first.toOverviewResponse(
             allAreas = findAllArea(),
             ownerName = ownerService.findById(first.ownerId).fullName,
             ownerRooms = roomService.findByIds(ownerService.findById(first.ownerId).rooms).sortedBy { it.type }
-                .joinToString { it.type.shortDescription + "" + it.number })
-
+                .joinToString { it.type.shortDescription + "" + it.number },
+            car = car
+        )
     }
 
     fun getEldesContact(areadId: Long): List<String> {
