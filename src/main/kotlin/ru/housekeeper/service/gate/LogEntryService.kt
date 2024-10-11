@@ -85,7 +85,7 @@ class LogEntryService(
         val totalSize = logEntryRepository.countByPhoneNumber(phoneNumber)
         return LogEntryOverview(
             lastLogEntry = logEntries.first().toLogEntryResponse(),
-            lastLogEntries = logEntries.map { it.toLogEntryResponse() }.subList(0, 5),
+            lastLogEntries = logEntries.map { it.toLogEntryResponse() }.subList(0, if (logEntries.size < 5) logEntries.size else 5),
             firstLogEntry = firstEntry.toLogEntryResponse(),
             totalSize = totalSize,
         )
