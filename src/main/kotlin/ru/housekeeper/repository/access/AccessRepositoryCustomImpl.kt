@@ -14,9 +14,8 @@ class AccessRepositoryCustomImpl(
         return query.resultList as List<AccessEntity>
     }
 
-    //find by areaId
     override fun findByAreaId(areaId: Long): List<AccessEntity> {
-        val sql = "SELECT * FROM access, jsonb_array_elements(places) AS area WHERE area->>'areaId'=$areaId"
+        val sql = "SELECT * FROM access, jsonb_array_elements(areas) AS area WHERE area->>'areaId'='$areaId' and active=true"
         val query = entityManager.createNativeQuery(sql, AccessEntity::class.java)
         return query.resultList as List<AccessEntity>
     }

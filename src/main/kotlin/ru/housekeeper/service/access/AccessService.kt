@@ -165,19 +165,23 @@ class AccessService(
 
     fun getEldesContact(areadId: Long): List<String> {
         val accesses = accessRepository.findByAreaId(areadId)
-        val result = mutableListOf<String>()
-        result.add("User Name;Tel Number;Relay No.;Sch.1 (1-true 0-false);Sch.2 (1-true 0-false);Sch.3 (1-true 0-false);Sch.4 (1-true 0-false);Sch.5 (1-true 0-false);Sch.6 (1-true 0-false);Sch.7 (1-true 0-false);Sch.8 (1-true 0-false);Year (Valid until);Month (Valid until);Day (Valid until);Hour (Valid until);Minute (Valid until);Ring Counter;Ring Counter Status")
+        val contacts = mutableListOf<EldesContact>()
         accesses.forEach { access ->
             val owner = ownerService.findById(access.ownerId)
             val firstRoom = roomService.findByIds(owner.rooms).sortedBy { it.type }.first();
             val label = firstRoom.number + "-" + firstRoom.type.name
-            result.add(
+            contacts.add(
                 EldesContact(
+                    sortField = firstRoom.number.padStart(3, '0'),
                     userName = if (label.length > MAX_ELDES_LABEL_LENGTH) label.substring(0, MAX_ELDES_LABEL_LENGTH) else label,
                     telNumber = access.phoneNumber,
-                ).toCSVLine()
+                )
             )
         }
+        val lines = contacts.sortedBy { it.sortField }.map { it.toCSVLine() }
+        val result = mutableListOf<String>()
+        result.add("User Name;Tel Number;Relay No.;Sch.1 (1-true 0-false);Sch.2 (1-true 0-false);Sch.3 (1-true 0-false);Sch.4 (1-true 0-false);Sch.5 (1-true 0-false);Sch.6 (1-true 0-false);Sch.7 (1-true 0-false);Sch.8 (1-true 0-false);Year (Valid until);Month (Valid until);Day (Valid until);Hour (Valid until);Minute (Valid until);Ring Counter;Ring Counter Status")
+        result.addAll(lines)
         return result
     }
 
