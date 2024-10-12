@@ -3,6 +3,7 @@ package ru.housekeeper.service.access
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
 import ru.housekeeper.enums.AccessBlockReasonEnum
+import ru.housekeeper.enums.RoomTypeEnum
 import ru.housekeeper.exception.AccessToAreaException
 import ru.housekeeper.model.dto.access.AccessResponse
 import ru.housekeeper.model.dto.access.CarRequest
@@ -153,7 +154,8 @@ class AccessService(
         if (accesses.isEmpty()) throw AccessToAreaException("Не найдено доступа по номеру автомобиля [$plateNumber]")
         val first = accesses.first()
         //find car by plate number
-        val car = first.cars?.find { it.plateNumber.contains(plateNumber) } ?: throw AccessToAreaException("Не найдено автомобиля по номеру [$plateNumber]")
+        val car =
+            first.cars?.find { it.plateNumber.contains(plateNumber) } ?: throw AccessToAreaException("Не найдено автомобиля по номеру [$plateNumber]")
         return first.toOverviewResponse(
             allAreas = findAllArea(),
             ownerName = ownerService.findById(first.ownerId).fullName,
@@ -168,11 +170,26 @@ class AccessService(
         val contacts = mutableListOf<EldesContact>()
         accesses.forEach { access ->
             val owner = ownerService.findById(access.ownerId)
-            val firstRoom = roomService.findByIds(owner.rooms).sortedBy { it.type }.first();
-            val label = firstRoom.number + "-" + firstRoom.type.name
+            //если areaId = 1, то найти rooms с типом FLAT"
+            //если areaId = 2, то взять из areas, places - первое значение
+            var number: String = "-"
+            var label: String = "-"
+            when (areadId) {
+                1L -> {
+                    number = roomService.findByIds(owner.rooms).filter { it.type == RoomTypeEnum.FLAT }.first().number
+                    val numbers = roomService.findByIds(owner.rooms).filter { it.type == RoomTypeEnum.FLAT }.joinToString(",") { it.number }
+                    label = numbers + "-" + RoomTypeEnum.FLAT
+                }
+
+                2L -> {
+                    number = access.areas.filter { it.areaId == 2L }.first().places?.first() ?: "-"
+                    val numbers = access.areas.filter { it.areaId == 2L }.first().places?.joinToString(",") ?: "-"
+                    label = numbers + "-" + RoomTypeEnum.GARAGE
+                }
+            }
             contacts.add(
                 EldesContact(
-                    sortField = firstRoom.number.padStart(3, '0'),
+                    sortField = number.padStart(3, '0'),
                     userName = if (label.length > MAX_ELDES_LABEL_LENGTH) label.substring(0, MAX_ELDES_LABEL_LENGTH) else label,
                     telNumber = access.phoneNumber,
                 )
