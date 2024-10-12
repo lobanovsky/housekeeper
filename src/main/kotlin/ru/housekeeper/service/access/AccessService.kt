@@ -176,9 +176,11 @@ class AccessService(
             var label: String = "-"
             when (areadId) {
                 1L -> {
-                    number = roomService.findByIds(owner.rooms).filter { it.type == RoomTypeEnum.FLAT }.first().number
-                    val numbers = roomService.findByIds(owner.rooms).filter { it.type == RoomTypeEnum.FLAT }.joinToString(",") { it.number }
-                    label = numbers + "-" + RoomTypeEnum.FLAT
+                    val room = roomService.findByIds(owner.rooms).filter { it.type == RoomTypeEnum.FLAT || it.type == RoomTypeEnum.OFFICE }.first()
+                    number = room.number
+                    val numbers = roomService.findByIds(owner.rooms).filter { it.type == RoomTypeEnum.FLAT || it.type == RoomTypeEnum.OFFICE }
+                        .joinToString(",") { it.number }
+                    label = numbers + "-" + room.type.name
                 }
 
                 2L -> {
