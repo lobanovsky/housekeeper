@@ -11,6 +11,7 @@ import ru.housekeeper.repository.filterByDate
 import ru.housekeeper.repository.likeFilterBy
 import ru.housekeeper.rest.gate.LogEntryController
 import ru.housekeeper.utils.getPage
+import ru.housekeeper.utils.onlyNumbers
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.temporal.ChronoUnit
@@ -25,7 +26,7 @@ class LogEntryRepositoryCustomImpl(
     ): Page<LogEntry> {
         val predicates = mutableMapOf<String, String>()
         predicates["gateId"] = equalFilterBy("p.gateId", filter.gateId)
-        predicates["phoneNumber"] = likeFilterBy("p.phoneNumber", filter.phoneNumber)
+        predicates["phoneNumber"] = likeFilterBy("p.phoneNumber", filter.phoneNumber?.onlyNumbers())
         predicates["userName"] = likeFilterBy("p.userName", filter.userName)
         predicates["flatNumber"] = equalFilterBy("p.flatNumber", filter.flatNumber)
         predicates["status"] = equalFilterBy("p.status", filter.status)
