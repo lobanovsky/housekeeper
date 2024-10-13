@@ -24,6 +24,7 @@ import ru.housekeeper.service.RoomService
 import ru.housekeeper.utils.MAX_ELDES_LABEL_LENGTH
 import ru.housekeeper.utils.PHONE_NUMBER_LENGTH
 import ru.housekeeper.utils.beautifulPhonePrint
+import ru.housekeeper.utils.isValidRussianCarNumber
 import java.time.LocalDateTime
 import kotlin.collections.mutableListOf
 
@@ -39,7 +40,7 @@ class AccessService(
         val access = request.accesses.first()
         if (access.areas.isEmpty()) throw AccessToAreaException("Не указаны зоны доступа")
         phoneNumberValidator(access.phoneNumber)
-
+        validatePlateCarNumber(access.cars?.map { it.plateNumber } ?: emptyList())
         val result = mutableListOf<AccessResponse>()
         val existAccess = findByOwnerIdAndPhone(request.ownerId, access.phoneNumber)
         //если собственник уже добавлял данный номер телефона
@@ -98,7 +99,7 @@ class AccessService(
         cars.forEach { car ->
             val existCar = existCarsMap[car.plateNumber]
             if (existCar == null) {
-                result.add(Car(car.plateNumber, car.description))
+                result.add(car.toCar())
             } else {
                 if (existCar.active) {
                     if (existCar.description != car.description) {
@@ -207,5 +208,13 @@ class AccessService(
     private fun phoneNumberValidator(phoneNumber: String) {
         if (phoneNumber.first() != '7') throw AccessToAreaException("Номер телефона [$phoneNumber] должен начинаться с 7")
         if (phoneNumber.length != PHONE_NUMBER_LENGTH) throw AccessToAreaException("Номер телефона [$phoneNumber] должен содержать 11 цифр")
+    }
+
+    private fun validatePlateCarNumber(plateNumbers: List<String>) {
+        plateNumbers.forEach { plateNumber ->
+            if (isValidRussianCarNumber(plateNumber)) {
+                throw AccessToAreaException("Номер автомобиля [${plateNumber}] не соответствует формату")
+            }
+        }
     }
 }

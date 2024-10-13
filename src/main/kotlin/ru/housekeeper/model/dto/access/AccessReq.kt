@@ -39,7 +39,7 @@ data class UpdateAccessRequest(
     val areas: List<AreaRequest>,
 )
 
-fun CarRequest.toCar() = Car(plateNumber, description)
+fun CarRequest.toCar() = Car(plateNumber.lowercase(), description)
 fun AreaRequest.toArea() = Area(areaId, places)
 
 
