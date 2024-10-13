@@ -52,7 +52,7 @@ class AccessService(
                 ownerId = request.ownerId,
                 areas = access.areas.map { it.toArea() }.toMutableList(),
                 phoneNumber = access.phoneNumber,
-                phoneLabel = access.phoneLabel,
+                phoneLabel = access.phoneLabel?.trim(),
                 tenant = access.tenant,
                 cars = access.cars?.map { it.toCar() }?.toMutableList(),
                 active = active
