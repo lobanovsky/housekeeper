@@ -117,4 +117,5 @@ class RoomService(
 
     fun findByOwnerId(ownerId: Long): List<Room> = roomRepository.findByOwnerId(ownerId)
 
+    fun findByBuildingIdsAndOwnerIds(buildingIds: Set<Long>, ownerId: Long): List<Room> = roomRepository.findByBuildingIdsAndOwnerIds(buildingIds, ownerId)
 }

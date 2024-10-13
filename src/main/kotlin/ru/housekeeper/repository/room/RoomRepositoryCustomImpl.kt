@@ -38,5 +38,15 @@ class RoomRepositoryCustomImpl(
         return query.resultList as List<Room>
     }
 
+    override fun findByBuildingIdsAndOwnerIds(
+        buildingIds: Set<Long>,
+        ownerId: Long,
+    ): List<Room> {
+        val sql = "select * from room where building_id in (:buildingIds) AND owners @> '[$ownerId]'"
+        val query = entityManager.createNativeQuery(sql, Room::class.java)
+        query.setParameter("buildingIds", buildingIds)
+        return query.resultList as List<Room>
+    }
+
 
 }

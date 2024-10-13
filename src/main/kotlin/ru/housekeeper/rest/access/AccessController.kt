@@ -5,10 +5,13 @@ import org.springframework.http.HttpHeaders
 import org.springframework.http.MediaType
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
+import ru.housekeeper.excel.toExcelAccesses
 import ru.housekeeper.model.dto.access.AccessResponse
 import ru.housekeeper.model.dto.access.CreateAccessRequest
 import ru.housekeeper.model.dto.access.UpdateAccessRequest
 import ru.housekeeper.service.AreaService
+import ru.housekeeper.service.OwnerService
+import ru.housekeeper.service.RoomService
 import ru.housekeeper.service.access.AccessService
 import ru.housekeeper.utils.yyyyMMddHHmmssDateFormat
 import java.nio.charset.Charset
@@ -20,6 +23,8 @@ import java.time.LocalDateTime
 class AccessController(
     private val accessService: AccessService,
     private val areaService: AreaService,
+    private val roomService: RoomService,
+    private val ownerService: OwnerService,
 ) {
 
     //create the area access by phone number
@@ -88,7 +93,6 @@ class AccessController(
             )
     }
 
-    //get info by car number
     @GetMapping("/overview/{plate-number}")
     @Operation(summary = "Get the overview by the plate number")
     fun overview(
@@ -96,4 +100,17 @@ class AccessController(
         @RequestParam active: Boolean = true,
     ) = accessService.getOverview(plateNumber, active)
 
+    //export accesses to excel
+    @GetMapping("/export")
+    @Operation(summary = "Export the accesses to excel")
+    fun exportAccesses(): ResponseEntity<ByteArray> {
+        val accesses = accessService.findAllActive()
+        val areas = areaService.findAll()
+        val fileName = "Accesses_${LocalDateTime.now().format(yyyyMMddHHmmssDateFormat())}.xlsx"
+        return ResponseEntity.ok()
+            .contentType(MediaType.APPLICATION_OCTET_STREAM)
+            .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"$fileName\"")
+            .header(HttpHeaders.ACCESS_CONTROL_EXPOSE_HEADERS, HttpHeaders.CONTENT_DISPOSITION)
+            .body(toExcelAccesses(areas, accesses, roomService))
+    }
 }

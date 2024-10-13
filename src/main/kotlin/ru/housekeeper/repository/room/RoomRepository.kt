@@ -36,7 +36,6 @@ interface RoomRepository : CrudRepository<Room, Long>, RoomRepositoryCustom {
         @Param("type") type: RoomTypeEnum = RoomTypeEnum.FLAT
     ): List<Room>
 
-    //find by ids
     @Query("select r from Room r where r.id in (:ids)")
     fun findByIds(@Param("ids") ids: Set<Long>): List<Room>
 }
