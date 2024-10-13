@@ -75,7 +75,7 @@ class AccessController(
 //    ) = accessService.findByCarNumber(carNumber, active)
 
     //export access to .csv by area
-    @GetMapping("/export/{area-id}")
+    @GetMapping("/export/eldes/{area-id}")
     @Operation(summary = "Export the access to .csv by the area id")
     fun exportAccess(
         @PathVariable("area-id") areaId: Long
