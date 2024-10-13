@@ -68,7 +68,7 @@ class AccessService(
 
         val existAccess = findById(accessId)
         //new label
-        existAccess.phoneLabel = request.phoneLabel
+        existAccess.phoneLabel = request.phoneLabel?.trim()
         //tenant
         existAccess.tenant = request.tenant
         //new areas
@@ -103,12 +103,12 @@ class AccessService(
             } else {
                 if (existCar.active) {
                     if (existCar.description != car.description) {
-                        existCar.description = car.description
+                        existCar.description = car.description?.trim()
                     }
                     result.add(existCar)
                 } else {
                     existCar.active = true
-                    existCar.description = car.description
+                    existCar.description = car.description?.trim()
                     result.add(existCar)
                 }
             }
