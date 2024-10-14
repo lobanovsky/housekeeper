@@ -25,13 +25,12 @@ class RuleService(
             logger().warn("Cчета не найдены")
             return emptyList()
         }
-        val payments = paymentRepository.findByToAccountsAndAccountIsNull(accounts)
-            .filterNot { rules(it) }
+        val payments = paymentRepository.findByToAccountsAndTypeIsNull(accounts).filterNot { rules(it) }
 
         var count = 0
         val updateAccountDateTime = LocalDateTime.now()
         for (payment in payments) {
-            val account = findAccount(payment, specialAccount)
+            val account = accountIdentification(payment, specialAccount)
             if (account == null) {
                 payment.type = IncomingPaymentTypeEnum.UNKNOWN_ACCOUNT
                 logger().error("Account not found for: UUID: ${payment.uuid}, FromName: ${payment.fromName}, Purpose: ${payment.purpose}")
@@ -49,7 +48,7 @@ class RuleService(
 
 
     //Поиск Лицевого счета в строке назначения платежа
-    fun findAccount(payment: IncomingPayment, specialAccount: Boolean): String? {
+    fun accountIdentification(payment: IncomingPayment, specialAccount: Boolean): String? {
         //find by rules
         var account = if (specialAccount) findSpecialAccountByRules(payment) else findAccountByRules(payment)
         if (account != null) return account

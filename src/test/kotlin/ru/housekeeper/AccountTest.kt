@@ -41,6 +41,6 @@ class AccountTest {
 
     private fun getAccount(fromName: String = "", purpose: String): String? {
         val payment = IncomingPayment(fromName = fromName, purpose = purpose)
-        return specialRuleService.findAccount(payment, true)
+        return specialRuleService.accountIdentification(payment, true)
     }
 }
