@@ -42,8 +42,9 @@ class PaymentParser(private val file: MultipartFile) {
         val payments = mutableListOf<PaymentVO>()
         for (i in findDate.first..sheet.lastRowNum) {
             val row = sheet.getRow(i) ?: continue
+            // Хак. Пропускаем последние строки, после таблицы
             if (row.getCell(voNum).stringCellValue.trim().isEmpty()) {
-                logger().info("$i: Checking the VO cell for emtpy: VO is null, continue")
+                logger().info("$i: Если поле ВО пустое (дошли до конца таблицы) - пропускаем строку")
                 continue
             }
             val payer = counterpartyParser(row.getCell(payerNum).stringCellValue.trim())
@@ -66,8 +67,6 @@ class PaymentParser(private val file: MultipartFile) {
             val outgoingSum = getSumOrNull(row.getCell(outgoingSumNum))
             val incomingSum = getSumOrNull(row.getCell(incomingSumNum))
             val purpose = row.getCell(findPurpose.second).stringCellValue.trim()
-
-            logger().info("#$i: date=$date, num=$docNumber, out=$outgoingSum, in=$incomingSum, purpose=$purpose")
 
             payments.add(
                 PaymentVO(
