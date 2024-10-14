@@ -212,7 +212,7 @@ class AccessService(
 
     private fun validatePlateCarNumber(plateNumbers: List<String>) {
         plateNumbers.forEach { plateNumber ->
-            if (isValidRussianCarNumber(plateNumber)) {
+            if (!isValidRussianCarNumber(plateNumber)) {
                 throw AccessToAreaException("Номер автомобиля [${plateNumber}] не соответствует формату")
             }
         }
