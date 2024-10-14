@@ -60,10 +60,8 @@ class PaymentService(
                 outgoingPayments.add(payment.toOutgoingPayment(now, fileName, checksum))
             }
         }
-        val uniqIncomingPayments =
-            removeDuplicates(incomingPayments) { incomingPaymentRepository.findAllUUIDs().toSet() }
-        val uniqOutgoingPayments =
-            removeDuplicates(outgoingPayments) { outgoingPaymentRepository.findAllUUIDs().toSet() }
+        val uniqIncomingPayments = removeDuplicates(incomingPayments, "Incoming payment") { incomingPaymentRepository.findAllUUIDs().toSet() }
+        val uniqOutgoingPayments = removeDuplicates(outgoingPayments, "Outgoing payment") { outgoingPaymentRepository.findAllUUIDs().toSet() }
         logger().info("Try to save ${uniqIncomingPayments.size} incoming payments in the amount: ${uniqIncomingPayments.sum()}")
         logger().info("Try to save ${uniqOutgoingPayments.size} outgoing payments in the amount: ${uniqOutgoingPayments.sum()}")
         incomingPaymentRepository.saveAll(uniqIncomingPayments)
@@ -79,11 +77,11 @@ class PaymentService(
         )
     }
 
-    private fun removeDuplicates(payments: List<Payment>, savedUUIDs: () -> Set<String>): List<Payment> {
+    private fun removeDuplicates(payments: List<Payment>, description: String? = "", savedUUIDs: () -> Set<String>): List<Payment> {
         val saved = savedUUIDs()
         val uploaded = payments.map { it.uuid }.toSet()
         val duplicates = uploaded intersect saved
-        logger().info("Uploaded ${uploaded.size}, unique -> ${(uploaded subtract saved).size}")
+        logger().info("$description [${uploaded.size}], unique -> [${(uploaded subtract saved).size}]")
         val groupedPayments = payments.associateBy { it.uuid }.toMutableMap()
         duplicates.forEach(groupedPayments::remove)
         return groupedPayments.values.toList()
