@@ -9,7 +9,7 @@ repositories {
 }
 
 plugins {
-    val springBootVersion = "3.0.6"
+    val springBootVersion = "3.3.4"
     val kotlinVersion = "2.0.10"
     id("org.springframework.boot") version springBootVersion
     id("io.spring.dependency-management") version "1.1.0"
