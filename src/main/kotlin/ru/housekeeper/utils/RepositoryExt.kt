@@ -11,14 +11,26 @@ inline fun <reified T> getPage(
     sql: String,
     sqlCount: String,
     pageNum: Int,
-    pageSize: Int
+    pageSize: Int,
+    useNativeQuery: Boolean = false
 ): Page<T> {
-    val query = entityManager.createQuery(sql, T::class.java)
+    val query = if (!useNativeQuery) {
+        entityManager.createQuery(sql, T::class.java)
+    } else {
+        entityManager.createNativeQuery(sql, T::class.java)
+    }
+
     val pageable: Pageable = PageRequest.of(pageNum, pageSize)
     query.firstResult = pageSize * pageNum
     query.maxResults = pageable.pageSize
     return PageableExecutionUtils.getPage(
-        query.resultList,
+        query.resultList as List<T>,
         pageable
-    ) { entityManager.createQuery(sqlCount).resultList[0] as Long }
+    ) {
+        if (!useNativeQuery) {
+            entityManager.createQuery(sqlCount).resultList[0]
+        } else {
+            entityManager.createNativeQuery(sqlCount).resultList[0]
+        } as Long
+    }
 }
