@@ -33,7 +33,7 @@ spring:
   jpa:
     generate-ddl: true
     database: POSTGRESQL
-    #    show-sql: true
+#    show-sql: true
     hibernate:
       ddl-auto: update
     properties:
