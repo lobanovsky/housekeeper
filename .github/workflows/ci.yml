@@ -56,6 +56,7 @@ jobs:
           echo "MY_INN=${{ secrets.MY_INN}}" >> .env
           echo "MY_NAME=${{ secrets.MY_NAME}}" >> .env
           echo "MY_ACCOUNT=${{ secrets.MY_ACCOUNT}}" >> .env
+          echo "AUTH_TOKEN_KEY=${{ secrets.AUTH_TOKEN_KEY }}" >> .env
 
       - name: copy files to host
         uses: appleboy/scp-action@v0.1.4

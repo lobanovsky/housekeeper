@@ -19,6 +19,7 @@ services:
       MY_ACCOUNT: ${MY_ACCOUNT}
       MY_INN: ${MY_INN}
       MY_NAME: ${MY_NAME}
+      AUTH_TOKEN_KEY: ${AUTH_TOKEN_KEY}
     ports:
       - "8080:8080"
     volumes:
