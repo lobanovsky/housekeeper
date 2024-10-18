@@ -8,6 +8,7 @@ data class LogEntryResponse(
     val status: String,
     val userName: String? = null,
     val flatNumber: String? = null,
+    val buildingId: Long? = null,
     val method: String? = null,
     val phoneNumber: String? = null,
     val gateId: Long? = null,
