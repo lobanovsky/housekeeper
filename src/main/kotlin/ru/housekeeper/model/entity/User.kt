@@ -35,7 +35,7 @@ data class User(
     var code: String,
 
     @Enumerated(EnumType.STRING)
-    var role: UserRoleEnum = UserRoleEnum.USER,
+    var role: UserRoleEnum,
 
     //ref to workspace
     @Column
