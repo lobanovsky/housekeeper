@@ -30,10 +30,10 @@ fun <T : Enum<T>> equalFilterBy(parameterName: String, enumValue: Enum<T>?) =
 fun filterByDate(parameterName: String, startDate: LocalDate?, endDate: LocalDate?) =
     if (startDate != null || endDate != null) {
         if (startDate != null && endDate != null) {
-            "AND ($parameterName BETWEEN '${startDate}' AND '${endDate}')"
+            "AND ($parameterName BETWEEN date ${startDate} AND date ${endDate})"
         } else if (startDate != null) {
-            "AND ($parameterName >= '${startDate}')"
+            "AND ($parameterName >= date ${startDate})"
         } else {
-            "AND ($parameterName <= '${endDate}')"
+            "AND ($parameterName <= date ${endDate})"
         }
     } else ""
