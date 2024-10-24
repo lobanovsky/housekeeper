@@ -5,6 +5,7 @@ import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import ru.housekeeper.model.entity.Workspace
 import ru.housekeeper.model.request.WorkspaceRequest
+import ru.housekeeper.model.response.toResponse
 import ru.housekeeper.repository.workspace.WorkspaceRepository
 import ru.housekeeper.utils.entityNotfound
 import kotlin.let
@@ -26,7 +27,7 @@ class WorkspaceService(
         pageNum: Int,
         pageSize: Int,
         name: String?,
-    ) = workspaceRepository.findBy(pageNum, pageSize, name)
+    ) = workspaceRepository.findBy(pageNum, pageSize, name).toResponse(pageNum, pageSize)
 
     fun findById(id: Long): Workspace =
         workspaceRepository.findByIdOrNull(id) ?: entityNotfound("Рабочее пространство" to id)

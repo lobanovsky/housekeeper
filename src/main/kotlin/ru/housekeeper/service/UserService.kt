@@ -110,8 +110,7 @@ class UserService(
     fun deactivate(userId: Long) = userRepository.updateActiveById(userId, false)
 
     fun sendInvitation(userid: String) {
-        val existingUser = (userRepository.findActiveById(userid.toLong())
-            ?: throw IllegalArgumentException("Пользователь не найден"))
+        val existingUser = (userRepository.findActiveById(userid.toLong()) ?: throw IllegalArgumentException("Пользователь не найден"))
         emailService.sendInvitation(
             existingUser.email,
             existingUser.name,
