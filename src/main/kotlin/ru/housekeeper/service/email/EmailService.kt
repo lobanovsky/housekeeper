@@ -8,30 +8,34 @@ import ru.housekeeper.utils.logger
 import java.io.File
 
 @Service
-class MailService(
+class EmailService(
     private val mailSender: JavaMailSender,
 ) {
 
     fun sendMessage(
+        from: String = "dom@mr17dom1.ru",
         to: String,
         subject: String,
         body: String,
-    ): Boolean = sendMessageWithAttachment(to, subject, body)
+        html: Boolean = false,
+    ): Boolean = sendMessageWithAttachment(from, to, subject, body, html = html)
 
     fun sendMessageWithAttachment(
+        from: String = "dom@mr17dom1.ru",
         to: String,
         subject: String,
         body: String,
         attachmentFilename: String? = null,
-        attachmentFile: File? = null
+        attachmentFile: File? = null,
+        html: Boolean = false,
     ): Boolean {
         val message: MimeMessage = mailSender.createMimeMessage()
         return try {
-            val helper = MimeMessageHelper(message, true)
-            helper.setFrom("dom@mr17dom1.ru")
+            val helper = MimeMessageHelper(message, "utf-8")
+            helper.setFrom(from)
             helper.setTo(to)
             helper.setSubject(subject)
-            helper.setText(body)
+            helper.setText(body, html)
             if (attachmentFilename != null && attachmentFile != null) {
                 helper.addAttachment(attachmentFilename, attachmentFile)
             }

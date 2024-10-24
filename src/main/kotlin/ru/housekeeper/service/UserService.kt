@@ -16,13 +16,14 @@ import ru.housekeeper.model.response.UserResponse
 import ru.housekeeper.model.response.toResponse
 import ru.housekeeper.repository.UserRepository
 import ru.housekeeper.security.UserDetailsAdapter
+import ru.housekeeper.service.email.MailingService
 import ru.housekeeper.utils.entityNotfound
 import kotlin.let
 
 @Service
 class UserService(
     private val userRepository: UserRepository,
-    private val emailService: EmailService,
+    private val mailingService: MailingService,
     private val workspaceService: WorkspaceService,
     @Lazy /* TODO: remove lazy */ private val passwordEncoder: org.springframework.security.crypto.password.PasswordEncoder
 ) : org.springframework.security.core.userdetails.UserDetailsService {
@@ -111,7 +112,7 @@ class UserService(
 
     fun sendInvitation(userid: String) {
         val existingUser = (userRepository.findActiveById(userid.toLong()) ?: throw IllegalArgumentException("Пользователь не найден"))
-        emailService.sendInvitation(
+        mailingService.sendInvitation(
             existingUser.email,
             existingUser.name,
             existingUser.password,

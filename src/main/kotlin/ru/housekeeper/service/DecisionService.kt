@@ -8,7 +8,7 @@ import ru.housekeeper.model.entity.Decision
 import ru.housekeeper.model.entity.Room
 import ru.housekeeper.parser.AnswerParser
 import ru.housekeeper.repository.DecisionRepository
-import ru.housekeeper.service.email.MailService
+import ru.housekeeper.service.email.EmailService
 import ru.housekeeper.utils.logger
 import java.io.File
 import java.math.BigDecimal
@@ -20,7 +20,7 @@ class DecisionService(
     private val ownerService: OwnerService,
     private val roomService: RoomService,
     private val decisionRepository: DecisionRepository,
-    private val mailService: MailService,
+    private val emailService: EmailService,
     private val docFileService: ru.housekeeper.docs.DocFileService,
 ) {
 
@@ -80,7 +80,7 @@ class DecisionService(
             attachmentFile.writeBytes(file.toByteArray())
             decision.emails.forEach { email ->
                 logger().info("Send ${numberOfMailsSent + 1} of $totalEmails")
-                val result = mailService.sendMessageWithAttachment(
+                val result = emailService.sendMessageWithAttachment(
                     to = email,
                     subject = subject,
                     body = commonBody.replace("{{fullName}}", decision.fullName),

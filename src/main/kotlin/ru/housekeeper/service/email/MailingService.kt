@@ -1,5 +1,6 @@
 package ru.housekeeper.service.email
 
+import org.springframework.core.io.ResourceLoader
 import org.springframework.scheduling.annotation.Async
 import org.springframework.stereotype.Service
 import ru.housekeeper.model.entity.Room
@@ -10,18 +11,39 @@ import ru.housekeeper.utils.logger
 
 @Service
 class MailingService(
-    private val mailService: MailService,
+    private val emailService: EmailService,
     private val ownerService: OwnerService,
     private val roomService: RoomService,
     private val templateService: TemplateService,
+    private val resourceLoader: ResourceLoader,
 ) {
 
     fun ping(email: String) {
-        mailService.sendMessage(
+        emailService.sendMessage(
             to = email,
             subject = "Ping",
             body = "Ping"
         )
+    }
+
+    fun sendInvitation(
+        email: String,
+        name: String,
+        password: String,
+        code: String
+    ) {
+        logger().info("Sending invitation email for $email")
+        emailService.sendMessage(
+            to = email,
+            subject = "Приглашение в сервис Хаускипер",
+            body = String(resourceLoader.getResource("classpath:email/invitation.html").inputStream.readBytes())
+                .replace("{{host}}", "https://housekeeper.docduck.io")
+                .replace("{{login}}", email)
+                .replace("{{password}}", password)
+                .replace("{{code}}", code),
+            html = true
+        )
+        logger().info("Email for $email has been sent")
     }
 
     @Async
@@ -37,7 +59,7 @@ class MailingService(
         for (owner in owners) {
             val rooms = getRooms(owner.rooms.toList(), existRooms)
             owner.emails.forEach {
-                val sent = mailService.sendMessage(
+                val sent = emailService.sendMessage(
                     to = it,
                     subject = template?.subject ?: "",
                     body = template?.body
