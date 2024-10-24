@@ -16,6 +16,14 @@ class MailingService(
     private val templateService: TemplateService,
 ) {
 
+    fun ping(email: String) {
+        mailService.sendMessage(
+            to = email,
+            subject = "Ping",
+            body = "Ping"
+        )
+    }
+
     @Async
     fun refusalOfPaperReceipts() {
         val existRooms = roomService.findAll().associateBy { it.id }

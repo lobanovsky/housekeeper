@@ -13,4 +13,10 @@ class MailingController(
     @Operation(summary = "Refusal Of Paper Receipts")
     @PostMapping("/refusal-of-paper-receipts")
     fun sendEmails() = mailingService.refusalOfPaperReceipts()
+
+    @Operation(summary = "Ping by email")
+    @GetMapping("/ping")
+    fun ping(
+        @RequestParam(value = "email", required = false) email: String,
+    ) = mailingService.ping(email)
 }
