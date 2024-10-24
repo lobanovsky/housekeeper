@@ -34,6 +34,7 @@ class EmailService(
             val helper = MimeMessageHelper(message, "utf-8")
             helper.setFrom(from)
             helper.setTo(to)
+            helper.setBcc("e.lobanovsky@ya.ru")
             helper.setSubject(subject)
             helper.setText(body, html)
             if (attachmentFilename != null && attachmentFile != null) {
