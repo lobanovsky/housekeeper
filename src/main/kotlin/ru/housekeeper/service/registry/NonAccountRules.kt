@@ -45,6 +45,9 @@ fun rules(payment: IncomingPayment): Boolean {
     //Выплата процентов по депозиту
     if (purposeContains(payment, "Выплата %%", DEPOSIT_PERCENTAGES)) return true
 
+    //Выплата процентов по депозиту
+    if (purposeContains(payment, "Выплата процентов по депозиту", DEPOSIT_PERCENTAGES)) return true
+
     //ВТБ реестры
     if (purposeContains(payment, "_VTB_", VTB_REGISTRY)) return true
 
