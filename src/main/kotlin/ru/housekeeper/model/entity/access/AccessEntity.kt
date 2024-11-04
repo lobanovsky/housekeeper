@@ -49,6 +49,11 @@ data class AccessEntity(
     @Type(JsonType::class)
     @Column(name = "cars", columnDefinition = "jsonb")
     var cars: MutableList<Car>? = null,
+
+    @CreationTimestamp
+    @Column(updatable = true)
+    var updateDate: LocalDateTime? = null,
+
 )
 
 data class Area(

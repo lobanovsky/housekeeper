@@ -81,6 +81,8 @@ class AccessService(
         existAccess.cars?.clear()
         existAccess.cars?.addAll(carMerge)
 
+        existAccess.updateDate = LocalDateTime.now()
+
         val updatedAccess = accessRepository.save(existAccess)
         return updatedAccess.toAccessResponse(findAllArea())
     }
@@ -142,6 +144,7 @@ class AccessService(
     fun deactivateAccess(accessId: Long): AccessResponse {
         val access = findById(accessId)
         access.active = false
+        access.updateDate = LocalDateTime.now()
         val savedAccess = accessRepository.save(access)
         return savedAccess.toAccessResponse(findAllArea())
     }
