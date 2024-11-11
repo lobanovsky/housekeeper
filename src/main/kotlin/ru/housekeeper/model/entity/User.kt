@@ -41,6 +41,7 @@ data class User(
     @Column
     var workspaces: List<Long> = listOf(),
 
+    //link with owner
     val ownerId: Long? = null,
 )
 
