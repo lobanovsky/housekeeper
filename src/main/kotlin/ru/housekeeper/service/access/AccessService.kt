@@ -141,6 +141,11 @@ class AccessService(
         return existAccesses.map { it.toAccessResponse(findAllArea()) }.sortedBy { it.phoneNumber }
     }
 
+    fun findByOwner(ownerId: Long, active: Boolean): List<AccessResponse> {
+        val existAccesses = accessRepository.findByOwnerId(ownerId, active)
+        return existAccesses.map { it.toAccessResponse(findAllArea()) }.sortedBy { it.phoneNumber }
+    }
+
     fun deactivateAccess(accessId: Long): AccessResponse {
         val access = findById(accessId)
         access.active = false

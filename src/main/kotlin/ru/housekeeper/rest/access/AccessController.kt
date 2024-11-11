@@ -50,6 +50,14 @@ class AccessController(
         @RequestParam active: Boolean = true,
     ): List<AccessResponse> = accessService.findByRoom(roomId, active)
 
+    //Get accesses by owner-id
+    @GetMapping("/owners/{owner-id}")
+    @Operation(summary = "Get the access by the owner id")
+    fun findByOwner(
+        @PathVariable("owner-id") ownerId: Long,
+        @RequestParam active: Boolean = true,
+    ): List<AccessResponse> = accessService.findByOwner(ownerId, active)
+
 
     //Block the area access by phone number
     @DeleteMapping("/{access-id}")

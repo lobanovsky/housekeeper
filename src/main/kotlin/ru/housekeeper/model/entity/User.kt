@@ -39,6 +39,8 @@ data class User(
 
     //ref to workspace
     @Column
-    var workspaces: List<Long> = listOf()
+    var workspaces: List<Long> = listOf(),
+
+    val ownerId: Long? = null,
 )
 
