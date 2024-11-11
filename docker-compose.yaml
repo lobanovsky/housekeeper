@@ -26,10 +26,10 @@ services:
       - ./logs:/opt/app/logs
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.housekpr.rule=Host(`housekpr.ru`) && PathPrefix(`/api`)"
+      - "traefik.http.routers.housekeeper.rule=Host(`housekeeper.docduck.io`) && PathPrefix(`/api`)"
     networks:
-      - housekpr-network
+      - printdown-network
 
 networks:
-  housekpr-network:
+  printdown-network:
     external: true
