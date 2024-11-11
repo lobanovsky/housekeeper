@@ -18,6 +18,7 @@ data class UserResponse(
     var workspaces: Set<AvailableWorkspaceResponse>,
     val role: UserController.RoleResponse,
     val code: String?,
+    val ownerId: Long? = null,
 )
 
 data class AvailableWorkspaceResponse(
@@ -35,7 +36,8 @@ fun User.toResponse(workspaces: Collection<Workspace>) = UserResponse(
     description = description,
     workspaces = workspaces.map { it.toAvailableWorkspaceResponse() }.toSet(),
     role = UserController.RoleResponse(role.name, role.roleName, role.description),
-    code = code
+    code = code,
+    ownerId = ownerId,
 )
 
 fun Workspace.toAvailableWorkspaceResponse() = AvailableWorkspaceResponse(
