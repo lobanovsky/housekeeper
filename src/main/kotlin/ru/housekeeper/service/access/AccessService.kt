@@ -5,15 +5,7 @@ import org.springframework.stereotype.Service
 import ru.housekeeper.enums.AccessBlockReasonEnum
 import ru.housekeeper.enums.RoomTypeEnum
 import ru.housekeeper.exception.AccessToAreaException
-import ru.housekeeper.model.dto.access.AccessResponse
-import ru.housekeeper.model.dto.access.CarRequest
-import ru.housekeeper.model.dto.access.CreateAccessRequest
-import ru.housekeeper.model.dto.access.OverviewResponse
-import ru.housekeeper.model.dto.access.UpdateAccessRequest
-import ru.housekeeper.model.dto.access.toAccessResponse
-import ru.housekeeper.model.dto.access.toArea
-import ru.housekeeper.model.dto.access.toCar
-import ru.housekeeper.model.dto.access.toOverviewResponse
+import ru.housekeeper.model.dto.access.*
 import ru.housekeeper.model.dto.eldes.EldesContact
 import ru.housekeeper.model.entity.access.AccessEntity
 import ru.housekeeper.model.entity.access.Car
@@ -26,7 +18,6 @@ import ru.housekeeper.utils.PHONE_NUMBER_LENGTH
 import ru.housekeeper.utils.beautifulPhonePrint
 import ru.housekeeper.utils.isValidRussianCarNumber
 import java.time.LocalDateTime
-import kotlin.collections.mutableListOf
 
 @Service
 class AccessService(
@@ -159,7 +150,8 @@ class AccessService(
 
 
     fun getOverview(plateNumber: String, active: Boolean): OverviewResponse {
-        val accesses = accessRepository.findByPlateNumber(plateNumber)
+        if (plateNumber.isBlank()) throw AccessToAreaException("Не указан номер автомобиля")
+        val accesses = accessRepository.findByPlateNumber(plateNumber, active)
         if (accesses.isEmpty()) throw AccessToAreaException("Не найдено доступа по номеру автомобиля [$plateNumber]")
         val first = accesses.first()
         //find car by plate number

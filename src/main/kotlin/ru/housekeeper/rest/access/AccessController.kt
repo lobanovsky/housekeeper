@@ -106,7 +106,7 @@ class AccessController(
     fun overview(
         @PathVariable("plate-number") plateNumber: String,
         @RequestParam active: Boolean = true,
-    ) = accessService.getOverview(plateNumber, active)
+    ) = accessService.getOverview(plateNumber.trim().lowercase(), active)
 
     //export accesses to excel
     @GetMapping("/export")
