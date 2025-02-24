@@ -3,9 +3,6 @@ version: '3.9'
 services:
 
   housekeeper:
-    build:
-      context: .
-      dockerfile: ${DOCKERFILE:-Dockerfile}
     image: ${CONTAINER_REGISTRY}/housekeeper:${TAG}
     container_name: housekeeper
     restart: always

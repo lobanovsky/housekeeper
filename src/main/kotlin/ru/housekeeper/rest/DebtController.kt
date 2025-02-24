@@ -18,4 +18,10 @@ class DebtController(
     ) {
         debtService.parseAndSave(file)
     }
+
+    @GetMapping(value = ["/generator"])
+    fun generateDebts() {
+        debtService.generateDebts()
+    }
+
 }
