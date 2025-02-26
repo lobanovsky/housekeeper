@@ -91,7 +91,6 @@ class DebtService(
         val offices = debts.filter { it.roomType == RoomTypeEnum.OFFICE }.sortedByDescending { it.sum }
 
         toExcelDebt(flats + garages + offices)
-        if (true) return
 
         debts.forEach {
             val replacements = mapOf(
