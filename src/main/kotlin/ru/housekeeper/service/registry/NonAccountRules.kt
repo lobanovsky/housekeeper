@@ -12,26 +12,25 @@ import ru.housekeeper.utils.getOfficeAccount
 
 //Правила пропуска платежей для обычного счёта для квартир и машиномест
 fun rules(payment: IncomingPayment): Boolean {
-    //--- специальный счёт ---
+
     if (purposeAndFromContains(
             payment = payment,
             from = "Департамент финансов города",
-            purpose = "0313064",
+            purposes = setOf("0313064"),
             type = SUBSIDY
         )
     ) return true
+
     if (purposeAndFromContains(
             payment = payment,
             from = "Департамент финансов города",
-            purpose = "0313068",
+            purposes = setOf("0313068"),
             type = SUBSIDY_FOR_CAPITAL_REPAIR
         )
     ) return true
 
     if (fromContains(payment, "Департамент финансов города", UNKNOWN)) return true
     if (purposeContains(payment, "Уплачены проценты за период", UNKNOWN)) return true
-
-    //--- обычный счёт ---
 
     //Сбер реестры
     if (purposeContains(payment, "EPS", SBER_REGISTRY)) return true
@@ -49,7 +48,7 @@ fun rules(payment: IncomingPayment): Boolean {
     if (purposeContains(payment, "Выплата процентов по депозиту", DEPOSIT_PERCENTAGES)) return true
 
     //ВТБ реестры
-    if (purposeContains(payment, "_VTB_", VTB_REGISTRY)) return true
+    if (purposeAndFromContains(payment, "ВТБ", setOf("_VTB_", "_VTБz"), VTB_REGISTRY)) return true
 
     //ЕГР, Возврат кредиторской задолженности
     if (purposeContains(payment, "ЕГР", UNKNOWN)) return true
@@ -90,7 +89,11 @@ private fun taxableEqInn(payment: IncomingPayment, inn: String): Boolean {
     return false
 }
 
-private fun purposeContains(payment: IncomingPayment, other: String, type: IncomingPaymentTypeEnum): Boolean {
+private fun purposeContains(
+    payment: IncomingPayment,
+    other: String,
+    type: IncomingPaymentTypeEnum
+): Boolean {
     if (payment.purpose.contains(other, ignoreCase = true)) {
         payment.type = type
         return true
@@ -98,7 +101,11 @@ private fun purposeContains(payment: IncomingPayment, other: String, type: Incom
     return false
 }
 
-private fun fromContains(payment: IncomingPayment, other: String, type: IncomingPaymentTypeEnum): Boolean {
+private fun fromContains(
+    payment: IncomingPayment,
+    other: String,
+    type: IncomingPaymentTypeEnum
+): Boolean {
     if (payment.fromName.contains(other, ignoreCase = true)) {
         payment.type = type
         return true
@@ -109,14 +116,13 @@ private fun fromContains(payment: IncomingPayment, other: String, type: Incoming
 private fun purposeAndFromContains(
     payment: IncomingPayment,
     from: String,
-    purpose: String,
+    purposes: Set<String>,
     type: IncomingPaymentTypeEnum
 ): Boolean {
-    if (payment.fromName.contains(other = from, ignoreCase = true) && payment.purpose.contains(
-            purpose,
-            ignoreCase = true
-        )
+    if (payment.fromName.contains(other = from, ignoreCase = true) &&
+        purposes.any { purpose -> payment.purpose.contains(purpose, ignoreCase = true) }
     ) {
+
         payment.type = type
         return true
     }
