@@ -64,18 +64,18 @@ jobs:
           host: ${{ secrets.MR17_HOST_IP }}
           username: ${{ secrets.MR17_HOST_USERNAME }}
           key: ${{ secrets.MR17_HOST_KEY }}
-          source: ".env, docker-compose.yaml"
+          source: ".env, docker-compose.yml"
           target: ${{ secrets.MR17_HOST_PROJECT_PATH }}
 
-#      - name: docker pull && up
-#        uses: appleboy/ssh-action@master
-#        with:
-#          host: ${{ secrets.MR17_HOST_IP }}
-#          username: ${{ secrets.MR17_HOST_USERNAME }}
-#          key: ${{ secrets.MR17_HOST_KEY }}
-#          script: |
-#            echo ${{ secrets.YA_OAUTH }} |docker login --username oauth --password-stdin cr.yandex
-#            cd ${{ secrets.MR17_HOST_PROJECT_PATH }}
-#            docker compose pull
-#            docker compose up -d
-#            docker logout cr.yandex
+      - name: docker pull && up
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.MR17_HOST_IP }}
+          username: ${{ secrets.MR17_HOST_USERNAME }}
+          key: ${{ secrets.MR17_HOST_KEY }}
+          script: |
+            echo ${{ secrets.YA_OAUTH }} |docker login --username oauth --password-stdin cr.yandex
+            cd ${{ secrets.MR17_HOST_PROJECT_PATH }}
+            docker compose pull
+            docker compose up -d
+            docker logout cr.yandex
