@@ -30,7 +30,8 @@ class Counter(
     @Enumerated(EnumType.STRING)
     val counterOwner: CounterOwnerEnum = CounterOwnerEnum.INDIVIDUAL,
 
-    //ref to room
+    val buildingId: Long,
+
     val roomId: Long?,
 
     val account: String?,
