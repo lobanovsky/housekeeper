@@ -1,8 +1,8 @@
 name: Build and Deploy
 
 on:
-#  push:
-#    branches: [ "master" ]
+  push:
+    branches: [ "master" ]
   workflow_dispatch:
 
 permissions:
@@ -49,7 +49,7 @@ jobs:
           echo "TAG=${{ github.sha }}" >> .env
           echo "POSTGRES_USER=${{ secrets.POSTGRES_USER}}" >> .env
           echo "POSTGRES_PASSWORD=${{ secrets.POSTGRES_PASSWORD}}" >> .env
-          echo "POSTGRES_URL=${{ secrets.POSTGRES_URL}}" >> .env
+          echo "POSTGRES_URL=${{ secrets.MR17_POSTGRES_URL}}" >> .env
           echo "MAIL_HOST=${{ secrets.MAIL_HOST}}" >> .env
           echo "MAIL_USER_NAME=${{ secrets.MAIL_USER_NAME}}" >> .env
           echo "MAIL_USER_PASSWORD=${{ secrets.MAIL_USER_PASSWORD}}" >> .env
@@ -61,21 +61,21 @@ jobs:
       - name: copy files to host
         uses: appleboy/scp-action@v0.1.4
         with:
-          host: ${{ secrets.HOST_IP }}
-          username: ${{ secrets.HOST_USERNAME }}
-          key: ${{ secrets.HOST_KEY }}
+          host: ${{ secrets.MR17_HOST_IP }}
+          username: ${{ secrets.MR17_HOST_USERNAME }}
+          key: ${{ secrets.MR17_HOST_KEY }}
           source: ".env, docker-compose.yaml"
-          target: ${{ secrets.HOST_PROJECT_PATH }}
-
-      - name: docker pull && up
-        uses: appleboy/ssh-action@master
-        with:
-          host: ${{ secrets.HOST_IP }}
-          username: ${{ secrets.HOST_USERNAME }}
-          key: ${{ secrets.HOST_KEY }}
-          script: |
-            echo ${{ secrets.YA_OAUTH }} |docker login --username oauth --password-stdin cr.yandex
-            cd ${{ secrets.HOST_PROJECT_PATH }}            
-            docker compose pull
-            docker compose up -d
-            docker logout cr.yandex
+          target: ${{ secrets.MR17_HOST_PROJECT_PATH }}
+#
+#      - name: docker pull && up
+#        uses: appleboy/ssh-action@master
+#        with:
+#          host: ${{ secrets.MR17_HOST_IP }}
+#          username: ${{ secrets.MR17_HOST_USERNAME }}
+#          key: ${{ secrets.MR17_HOST_KEY }}
+#          script: |
+#            echo ${{ secrets.YA_OAUTH }} |docker login --username oauth --password-stdin cr.yandex
+#            cd ${{ secrets.MR17_HOST_PROJECT_PATH }}
+#            docker compose pull
+#            docker compose up -d
+#            docker logout cr.yandex
