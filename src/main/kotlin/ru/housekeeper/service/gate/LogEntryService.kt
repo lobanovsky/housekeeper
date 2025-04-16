@@ -25,14 +25,15 @@ class LogEntryService(
     fun createLogEntry(logEntryRequest: LogEntryRequest): LogEntry {
         val gate = gateService.getAllGates()
             .firstOrNull { it.deviceId == logEntryRequest.deviceId }
-        if (gate == null) let { throw IllegalArgumentException("Ограждающее устройство с deviceId = ${logEntryRequest.deviceId}/${logEntryRequest.gateName} не найдено в базе данных") }
+        if (gate == null) let { throw IllegalArgumentException("Ограждающее устройство с deviceId = ${logEntryRequest.deviceId} не найдено в базе данных") }
         return logEntryRepository.save(
             logEntryRequest.toLogEntry(
                 gateId = gate.id,
+                gateName = gate.name,
                 userName = logEntryRequest.userName,
                 flatNumber = logEntryRequest.flatNumber,
             ).let { logEntry ->
-                logger().info("Try to save log entry: ${logEntryRequest.deviceId}/${logEntryRequest.gateName}")
+                logger().info("Try to save log entry: ${logEntryRequest.deviceId}/${gate.name}")
                 logEntryRepository.save(logEntry)
             })
     }

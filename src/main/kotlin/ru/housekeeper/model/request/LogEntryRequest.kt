@@ -9,7 +9,6 @@ import java.util.*
 data class LogEntryRequest(
     val deviceId: String?,
     val deviceKey: String?,
-    val gateName: String,
     val dateTime: LocalDateTime = LocalDateTime.now(),
     val status: LogEntryStatusEnum = LogEntryStatusEnum.OPENED,
     val method: LogEntryAccessMethodEnum = LogEntryAccessMethodEnum.CLOUD,
@@ -20,6 +19,7 @@ data class LogEntryRequest(
 
 fun LogEntryRequest.toLogEntry(
     gateId: Long,
+    gateName: String,
     userName: String?,
     flatNumber: String?
 ): LogEntry {
