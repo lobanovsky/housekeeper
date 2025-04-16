@@ -32,7 +32,7 @@ class LogEntryService(
                 userName = logEntryRequest.userName,
                 flatNumber = logEntryRequest.flatNumber,
             ).let { logEntry ->
-                logger().info("Try to save log entry: $logEntry")
+                logger().info("Try to save log entry: ${logEntryRequest.deviceId}/${logEntryRequest.gateName}")
                 logEntryRepository.save(logEntry)
             })
     }
