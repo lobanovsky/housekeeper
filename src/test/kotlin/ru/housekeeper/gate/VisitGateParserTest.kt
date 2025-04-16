@@ -71,6 +71,7 @@ class VisitGateParserTest {
             name = "name",
             phoneNumber = "1234567890",
             firmware = "firmware",
+            deviceId = "38344"
         )
         //opened
         val openedLine = "Opened by user:tehnik(call R:1):+79991112233"

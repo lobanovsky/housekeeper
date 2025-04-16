@@ -13,4 +13,5 @@ class GateService(
 
     fun getAllGates(): List<Gate> = gateRepository.findAll().toList()
 
+
 }

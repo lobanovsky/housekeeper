@@ -28,4 +28,6 @@ class Gate(
 
     @Column(nullable = true)
     val active: Boolean = true,
+
+    val deviceId: String,
 )

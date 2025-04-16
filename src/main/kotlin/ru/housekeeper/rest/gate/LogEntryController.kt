@@ -7,6 +7,7 @@ import ru.housekeeper.enums.gate.LogEntryAccessMethodEnum
 import ru.housekeeper.enums.gate.LogEntryStatusEnum
 import ru.housekeeper.model.dto.gate.LogEntryResponse
 import ru.housekeeper.model.filter.LogEntryFilter
+import ru.housekeeper.model.request.LogEntryRequest
 import ru.housekeeper.service.gate.LogEntryService
 import ru.housekeeper.utils.toLogEntryResponse
 import java.time.LocalDate
@@ -81,5 +82,11 @@ class LogEntryController(
         FLAT_NUMBER("flat-number"),
         PHONE_NUMBER("phone-number")
     }
+
+    @Operation(summary = "Создать запись в журнале")
+    @PostMapping("/entries")
+    fun createLogEntry(
+        @RequestBody logEntryRequest: LogEntryRequest
+    ) = logEntryService.createLogEntry(logEntryRequest)
 
 }

@@ -6,6 +6,8 @@ import org.springframework.web.multipart.MultipartFile
 import ru.housekeeper.model.dto.gate.LogEntryOverview
 import ru.housekeeper.model.entity.gate.LogEntry
 import ru.housekeeper.model.filter.LogEntryFilter
+import ru.housekeeper.model.request.LogEntryRequest
+import ru.housekeeper.model.request.toLogEntry
 import ru.housekeeper.parser.gate.LogEntryParser
 import ru.housekeeper.repository.gate.LogEntryRepository
 import ru.housekeeper.rest.gate.LogEntryController
@@ -18,6 +20,22 @@ class LogEntryService(
     private val gateService: GateService,
     private val logEntryRepository: LogEntryRepository,
 ) {
+
+    @Transactional
+    fun createLogEntry(logEntryRequest: LogEntryRequest): LogEntry {
+        val gate = gateService.getAllGates()
+            .firstOrNull { it.deviceId == logEntryRequest.deviceId }
+        if (gate == null) let { throw IllegalArgumentException("Ограждающее устройство с deviceId = ${logEntryRequest.deviceId}/${logEntryRequest.gateName} не найдено в базе данных") }
+        return logEntryRepository.save(
+            logEntryRequest.toLogEntry(
+                gateId = gate.id,
+                userName = logEntryRequest.userName,
+                flatNumber = logEntryRequest.flatNumber,
+            ).let { logEntry ->
+                logger().info("Try to save log entry: $logEntry")
+                logEntryRepository.save(logEntry)
+            })
+    }
 
     data class UploadLogEntriesInfo(
         val totalSize: Int,

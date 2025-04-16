@@ -23,7 +23,7 @@ class LogEntry(
     @Column(updatable = false)
     var createDate: LocalDateTime = LocalDateTime.now(),
 
-    val source: String,
+    val source: String? = null,
 
     val gateId: Long,
 
@@ -39,15 +39,19 @@ class LogEntry(
 
     val flatNumber: String?,
 
-    val cell: String?,
+    val cell: String? = null,
 
     @Enumerated(EnumType.STRING)
     val method: LogEntryAccessMethodEnum?,
 
     val phoneNumber: String?,
 
-    val line: String,
+    val line: String? = null,
 
     @Column(updatable = false, unique = true)
     val uuid: String,
+
+    val deviceId: String? = null,
+
+    val deviceKey: String? = null,
 )
