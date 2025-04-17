@@ -34,7 +34,7 @@ class LogEntryService(
                 flatNumber = entryRequest.flatNumber,
             ).let { logEntry ->
                 val entry = logEntryRepository.save(logEntry)
-                logger().info("Save log entry: ${entryRequest.dateTime}:${entryRequest.deviceId}/${gate.name}")
+                logger().info("Save log entry: id=${entry.id} ${entryRequest.dateTime}:${entryRequest.deviceId}/${gate.name}")
                 return entry
             })
     }
