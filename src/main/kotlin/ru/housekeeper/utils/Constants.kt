@@ -2,8 +2,6 @@ package ru.housekeeper.utils
 
 import java.math.BigDecimal
 
-const val DEFAULT_TIME_ZONE_MOSCOW = "Europe/Moscow"
-
 //todo move to settings table
 val FLAT_SQUARE: BigDecimal = BigDecimal.valueOf(9054.9)
 val GARAGE_SQUARE: BigDecimal = BigDecimal.valueOf(2002.1)
