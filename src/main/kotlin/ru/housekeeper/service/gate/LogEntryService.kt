@@ -22,19 +22,20 @@ class LogEntryService(
 ) {
 
     @Transactional
-    fun createLogEntry(logEntryRequest: LogEntryRequest): LogEntry {
+    fun createLogEntry(entryRequest: LogEntryRequest): LogEntry {
         val gate = gateService.getAllGates()
-            .firstOrNull { it.deviceId == logEntryRequest.deviceId }
-        if (gate == null) let { throw IllegalArgumentException("Ограждающее устройство с deviceId = ${logEntryRequest.deviceId} не найдено в базе данных") }
+            .firstOrNull { it.deviceId == entryRequest.deviceId }
+        if (gate == null) let { throw IllegalArgumentException("Ограждающее устройство с deviceId = ${entryRequest.deviceId} не найдено в базе данных") }
         return logEntryRepository.save(
-            logEntryRequest.toLogEntry(
+            entryRequest.toLogEntry(
                 gateId = gate.id,
                 gateName = gate.name,
-                userName = logEntryRequest.userName,
-                flatNumber = logEntryRequest.flatNumber,
+                userName = entryRequest.userName,
+                flatNumber = entryRequest.flatNumber,
             ).let { logEntry ->
-                logger().info("Try to save log entry: ${logEntryRequest.deviceId}/${gate.name}")
-                logEntryRepository.save(logEntry)
+                val entry = logEntryRepository.save(logEntry)
+                logger().info("Save log entry: ${entryRequest.dateTime}:${entryRequest.deviceId}/${gate.name}")
+                return entry
             })
     }
 
