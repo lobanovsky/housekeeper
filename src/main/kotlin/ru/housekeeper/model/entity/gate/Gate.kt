@@ -30,4 +30,6 @@ class Gate(
     val active: Boolean = true,
 
     val deviceId: String,
+
+    val areaId: String? = null,
 )

@@ -22,6 +22,7 @@ class GateController(
             name = it.name,
             phoneNumber = it.phoneNumber,
             imei = it.imei,
+            areaId = it.areaId,
         )
     }
 
@@ -30,6 +31,7 @@ class GateController(
         val name: String,
         val phoneNumber: String?,
         val imei: String,
+        val areaId: String?
     )
 
 }
