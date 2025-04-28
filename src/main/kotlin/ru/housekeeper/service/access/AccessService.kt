@@ -123,6 +123,8 @@ class AccessService(
 
     fun findById(accessId: Long): AccessEntity = accessRepository.findByIdOrNull(accessId) ?: throw AccessToAreaException("Доступ не найден")
 
+    fun findByPhoneNumber(phoneNumber: String, active: Boolean = true) = accessRepository.findByPhoneNumber(phoneNumber, active)
+
     fun findByOwnerIdAndPhone(ownerId: Long, phoneNumber: String, active: Boolean = true): AccessEntity? =
         accessRepository.findByPhoneNumberAndOwnerId(phoneNumber, ownerId, active)
 

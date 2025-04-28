@@ -12,6 +12,13 @@ import java.time.LocalDateTime
 @Repository
 interface AccessRepository : CrudRepository<AccessEntity, Long>, AccessRepositoryCustom {
 
+    //find by phone number
+    @Query("select a from AccessEntity a where a.phoneNumber = :number and a.active = :active")
+    fun findByPhoneNumber(
+        @Param("number") number: String,
+        @Param("active") active: Boolean = true
+    ): List<AccessEntity>
+
     //find by owner id
     @Query("select a from AccessEntity a where a.ownerId = :ownerId and a.active = :active")
     fun findByOwnerId(

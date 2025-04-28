@@ -27,54 +27,49 @@ class AccessController(
     private val ownerService: OwnerService,
 ) {
 
-    //create the area access by phone number
     @PostMapping
-    @Operation(summary = "Create the area access by the phone number")
+    @Operation(summary = "Создание доступа к территории по номеру телефона")
     fun createAccess(
         @RequestBody createAccessRequest: CreateAccessRequest
     ) = accessService.create(createAccessRequest)
 
-    //Edit the area access by phone number
     @PutMapping("/{access-id}")
-    @Operation(summary = "Edit the area access by the phone number")
+    @Operation(summary = "Редактирование доступа к территории по номеру телефона")
     fun updateAccess(
         @PathVariable("access-id") accessId: Long,
         @RequestBody updateAccessRequest: UpdateAccessRequest
     ) = accessService.update(accessId, updateAccessRequest)
 
-    //Get accesses by room-id
     @GetMapping("/rooms/{room-id}")
-    @Operation(summary = "Get the access by the room id")
+    @Operation(summary = "Получить доступы по id комнаты")
     fun findByRoom(
         @PathVariable("room-id") roomId: Long,
         @RequestParam active: Boolean = true,
     ): List<AccessResponse> = accessService.findByRoom(roomId, active)
 
-    //Get accesses by owner-id
     @GetMapping("/owners/{owner-id}")
-    @Operation(summary = "Get the access by the owner id")
+    @Operation(summary = "Получить доступы по id владельца")
     fun findByOwner(
         @PathVariable("owner-id") ownerId: Long,
         @RequestParam active: Boolean = true,
     ): List<AccessResponse> = accessService.findByOwner(ownerId, active)
 
 
-    //Block the area access by phone number
     @DeleteMapping("/{access-id}")
-    @Operation(summary = "Block the area access by the phone number")
+    @Operation(summary = "Заблокировать доступ к территории по номеру телефона")
     fun deleteAccess(
         @PathVariable("access-id") accessId: Long
     ) = accessService.deactivateAccess(accessId)
 
 
-//    @GetMapping("/phones/{phone-number}")
-//    @Operation(summary = "Get the access by the phone number")
-//    fun findByPhone(
-//        @PathVariable("phone-number") phoneNumber: String,
-//        @RequestParam active: Boolean = true,
-//    ) = accessService.findByPhoneNumber(phoneNumber, active)
-//
-//
+    @GetMapping("/phones/{phone-number}")
+    @Operation(summary = "Get the access by the phone number")
+    fun findByPhone(
+        @PathVariable("phone-number") phoneNumber: String,
+        @RequestParam active: Boolean = true,
+    ) = accessService.findByPhoneNumber(phoneNumber, active)
+
+
 //    @GetMapping("/cars/{car-number}")
 //    @Operation(summary = "Get the access by the car number")
 //    fun findByCarNumber(
@@ -84,7 +79,7 @@ class AccessController(
 
     //export access to .csv by area
     @GetMapping("/export/eldes/{area-id}")
-    @Operation(summary = "Export the access to .csv by the area id")
+    @Operation(summary = "Экспорт доступов в Eldes-формат по id территории")
     fun exportAccess(
         @PathVariable("area-id") areaId: Long
     ): ResponseEntity<ByteArray> {
@@ -102,7 +97,7 @@ class AccessController(
     }
 
     @GetMapping("/overview/{plate-number}")
-    @Operation(summary = "Get the overview by the plate number")
+    @Operation(summary = "Получить обзор доступа по номеру автомобиля")
     fun overview(
         @PathVariable("plate-number") plateNumber: String,
         @RequestParam active: Boolean = true,
