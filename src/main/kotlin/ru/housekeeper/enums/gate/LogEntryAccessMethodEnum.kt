@@ -4,6 +4,7 @@ enum class LogEntryAccessMethodEnum(val description: String) {
     CALL("Звонок"),
     APP("Приложение"),
     CLOUD("Облачный доступ"),
+    PROGRESSIVE_WEB_APPS("Прогрессивное веб-приложение"),
     UNDEFINED("Не определено");
 
     companion object {
@@ -12,6 +13,7 @@ enum class LogEntryAccessMethodEnum(val description: String) {
                 "call" -> CALL
                 "APP" -> APP
                 "CLOUD" -> CLOUD
+                "PROGRESSIVE_WEB_APPS" -> PROGRESSIVE_WEB_APPS
                 else -> UNDEFINED
             }
         }
