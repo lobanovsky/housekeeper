@@ -12,16 +12,15 @@ data class LogEntryRequest(
     val dateTime: LocalDateTime = LocalDateTime.now(),
     val status: LogEntryStatusEnum = LogEntryStatusEnum.OPENED,
     val method: LogEntryAccessMethodEnum = LogEntryAccessMethodEnum.CLOUD,
-    val userName: String?,
-    val flatNumber: String?,
-    val phoneNumber: String?,
+    val phoneNumber: String,
 )
 
 fun LogEntryRequest.toLogEntry(
     gateId: Long,
     gateName: String,
     userName: String?,
-    flatNumber: String?
+    flatNumber: String?,
+    line: String?,
 ): LogEntry {
     return LogEntry(
         gateId = gateId,
@@ -35,6 +34,7 @@ fun LogEntryRequest.toLogEntry(
         uuid = UUID.randomUUID().toString(),
         deviceId = deviceId,
         deviceKey = deviceKey,
+        line = line,
     )
 }
 

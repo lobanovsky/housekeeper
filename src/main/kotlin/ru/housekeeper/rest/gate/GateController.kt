@@ -31,7 +31,7 @@ class GateController(
         val name: String,
         val phoneNumber: String?,
         val imei: String,
-        val areaId: String?
+        val areaId: Long?
     )
 
 }

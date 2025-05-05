@@ -46,7 +46,7 @@ class LogEntry(
 
     val phoneNumber: String?,
 
-    val line: String? = null,
+    var line: String? = null,
 
     @Column(updatable = false, unique = true)
     val uuid: String,

@@ -31,5 +31,5 @@ class Gate(
 
     val deviceId: String,
 
-    val areaId: String? = null,
+    val areaId: Long? = null,
 )

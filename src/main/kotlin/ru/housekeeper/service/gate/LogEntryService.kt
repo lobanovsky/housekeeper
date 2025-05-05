@@ -11,6 +11,8 @@ import ru.housekeeper.model.request.toLogEntry
 import ru.housekeeper.parser.gate.LogEntryParser
 import ru.housekeeper.repository.gate.LogEntryRepository
 import ru.housekeeper.rest.gate.LogEntryController
+import ru.housekeeper.service.OwnerService
+import ru.housekeeper.service.access.AccessService
 import ru.housekeeper.utils.logger
 import ru.housekeeper.utils.toLogEntryResponse
 import java.time.LocalDate
@@ -19,6 +21,8 @@ import java.time.LocalDate
 class LogEntryService(
     private val gateService: GateService,
     private val logEntryRepository: LogEntryRepository,
+    private val accessService: AccessService,
+    private val ownerService: OwnerService,
 ) {
 
     @Transactional
@@ -26,12 +30,20 @@ class LogEntryService(
         val gate = gateService.getAllGates()
             .firstOrNull { it.deviceId == entryRequest.deviceId }
         if (gate == null) let { throw IllegalArgumentException("Ограждающее устройство с deviceId = ${entryRequest.deviceId} не найдено в базе данных") }
+
+        val areaId = gate.areaId
+        val accessess = accessService.findByPhoneNumber(entryRequest.phoneNumber)
+        val access = accessess.first { it.areas.any { area -> area.areaId == areaId } }
+        val rooms = ownerService.findRoomsByOwnerId(access.ownerId)
+        val roomNumbers = rooms.joinToString(",") { it.number }
+        val roomLabel = rooms.joinToString(",") { it.type.shortDescription + it.number }
         return logEntryRepository.save(
             entryRequest.toLogEntry(
                 gateId = gate.id,
                 gateName = gate.name,
-                userName = entryRequest.userName,
-                flatNumber = entryRequest.flatNumber,
+                userName = access.phoneLabel,
+                flatNumber = roomNumbers,
+                line = roomLabel,
             ).let { logEntry ->
                 val entry = logEntryRepository.save(logEntry)
                 logger().info("Save log entry: id=${entry.id} ${entryRequest.dateTime}:${entryRequest.deviceId}/${gate.name}")
