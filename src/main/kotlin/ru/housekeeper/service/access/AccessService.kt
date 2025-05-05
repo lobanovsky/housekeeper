@@ -13,10 +13,7 @@ import ru.housekeeper.repository.access.AccessRepository
 import ru.housekeeper.service.AreaService
 import ru.housekeeper.service.OwnerService
 import ru.housekeeper.service.RoomService
-import ru.housekeeper.utils.MAX_ELDES_LABEL_LENGTH
-import ru.housekeeper.utils.PHONE_NUMBER_LENGTH
-import ru.housekeeper.utils.beautifulPhonePrint
-import ru.housekeeper.utils.isValidRussianCarNumber
+import ru.housekeeper.utils.*
 import java.time.LocalDateTime
 
 @Service
@@ -123,7 +120,7 @@ class AccessService(
 
     fun findById(accessId: Long): AccessEntity = accessRepository.findByIdOrNull(accessId) ?: throw AccessToAreaException("Доступ не найден")
 
-    fun findByPhoneNumber(phoneNumber: String, active: Boolean = true) = accessRepository.findByPhoneNumber(phoneNumber, active)
+    fun findByPhoneNumber(phoneNumber: String, active: Boolean = true) = accessRepository.findByPhoneNumber(phoneNumber.onlyNumbers(), active)
 
     fun findByOwnerIdAndPhone(ownerId: Long, phoneNumber: String, active: Boolean = true): AccessEntity? =
         accessRepository.findByPhoneNumberAndOwnerId(phoneNumber, ownerId, active)
