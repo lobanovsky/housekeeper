@@ -20,12 +20,14 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 import org.springframework.web.cors.CorsConfiguration
 import org.springframework.web.cors.CorsConfiguration.ALL
 import org.springframework.web.cors.CorsConfigurationSource
+import ru.housekeeper.security.JwtAuthenticationEntryPoint
 import ru.housekeeper.security.SecurityFilter
 
 @Configuration
 @EnableWebSecurity
 @EnableMethodSecurity(securedEnabled = true)
 class SecurityConfig(
+    private val jwtAuthenticationEntryPoint: JwtAuthenticationEntryPoint,
     private val securityFilter: SecurityFilter,
     private val userDetailsService: UserDetailsService,
     private val applicationEventPublisher: ApplicationEventPublisher
@@ -56,6 +58,7 @@ class SecurityConfig(
                 }
                 authorize(anyRequest, authenticated)
             }
+            exceptionHandling { authenticationEntryPoint = jwtAuthenticationEntryPoint }
             sessionManagement { sessionCreationPolicy = STATELESS }
             addFilterBefore<UsernamePasswordAuthenticationFilter>(securityFilter)
         }

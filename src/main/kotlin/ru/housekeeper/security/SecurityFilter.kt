@@ -35,7 +35,7 @@ class SecurityFilter(
         }
         val token = authHeader.substringAfter("Bearer").trim()
 
-        val email = runCatching { jwtService.extractLogin(token) }.getOrElse { throw AccessDeniedException("Token is not valid", it) }
+        val email = jwtService.extractLogin(token)
 
         if (email.isNotBlank() && SecurityContextHolder.getContext().authentication == null) {
             val userDetails = userDetailsService.loadUserByUsername(email) ?: throw AccessDeniedException("User not found")
