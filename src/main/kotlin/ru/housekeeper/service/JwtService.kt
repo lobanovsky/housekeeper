@@ -39,7 +39,7 @@ class JwtService(keyProperties: TokenKeyProperties) {
         .claims(buildMap(claimsBuilder))
         .subject(user.email)
         .issuedAt(Date())
-        .expiration(LocalDateTime.now().plusMinutes(1).asDate())
+        .expiration(LocalDateTime.now().plusMinutes(10).asDate())
         .signWith(secretKey, HS256)
         .compact()
 
