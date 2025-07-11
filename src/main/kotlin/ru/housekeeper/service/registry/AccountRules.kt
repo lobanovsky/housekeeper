@@ -63,11 +63,19 @@ fun findSpecialAccountByRules(payment: IncomingPayment): String? {
     ) return getSpecialParkingAccount(34)
 
     if (payment.fromName.contains("Бобровский Николай Эдуардович", true)
+        && payment.purpose.contains("34", true)
+    ) return getSpecialParkingAccount(34)
+
+    if (payment.fromName.contains("Бобровский Николай Эдуардович", true)
         && payment.purpose.contains("Машиноместо №35", true)
     ) return getSpecialParkingAccount(35)
 
     if (payment.fromName.contains("Бобровский Николай Эдуардович", true)
         && payment.purpose.contains("Машиноместо 35", true)
+    ) return getSpecialParkingAccount(35)
+
+    if (payment.fromName.contains("Бобровский Николай Эдуардович", true)
+        && payment.purpose.contains("35", true)
     ) return getSpecialParkingAccount(35)
 
     if (payment.fromName.contains("Бобровский Николай Эдуардович", true)
@@ -79,11 +87,19 @@ fun findSpecialAccountByRules(payment: IncomingPayment): String? {
     ) return getSpecialParkingAccount(67)
 
     if (payment.fromName.contains("Бобровский Николай Эдуардович", true)
+        && payment.purpose.contains("67", true)
+    ) return getSpecialParkingAccount(67)
+
+    if (payment.fromName.contains("Бобровский Николай Эдуардович", true)
         && payment.purpose.contains("Машиноместо №68", true)
     ) return getSpecialParkingAccount(68)
 
     if (payment.fromName.contains("Бобровский Николай Эдуардович", true)
         && payment.purpose.contains("Машиноместо 68", true)
+    ) return getSpecialParkingAccount(68)
+
+    if (payment.fromName.contains("Бобровский Николай Эдуардович", true)
+        && payment.purpose.contains("68", true)
     ) return getSpecialParkingAccount(68)
 
     if (payment.fromName.contains("ЛУЦКИЙ АЛЕКСЕЙ АЛЕКСАНДРОВИЧ", true)
