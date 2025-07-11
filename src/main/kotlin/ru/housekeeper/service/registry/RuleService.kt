@@ -53,8 +53,8 @@ class RuleService(
         var account = if (specialAccount) findSpecialAccountByRules(payment) else findAccountByRules(payment)
         if (account != null) return account
 
-        //10 digits
-        val regex = Regex("\\d{10}")
+        //10 only digits
+        val regex = Regex("""(?<!\d)(\d{10})(?!\d)""")
         val matchResult = regex.find(payment.purpose)
         account = matchResult?.value
         if (account != null) return account
