@@ -73,13 +73,22 @@ class RegistryService(
         val p_f_130 = IncomingPayment(type = IncomingPaymentTypeEnum.ACCOUNT, account = "0000500130", fromName = "0000500130", sum = BigDecimal("1385.17"))
         val p_f_138 = IncomingPayment(type = IncomingPaymentTypeEnum.ACCOUNT, account = "0000500138", fromName = "0000500138", sum = BigDecimal("1804.34"))
 
+        //144209.01 - 689 pack
+        val p2025_01 = IncomingPayment(type = IncomingPaymentTypeEnum.ACCOUNT, account = "0000700095", fromName = "Баранов Юрий Васильевич", sum = BigDecimal("18231.33"))
+        val p2025_02 = IncomingPayment(type = IncomingPaymentTypeEnum.ACCOUNT, account = "0000004166", fromName = "Беспалов Роман Александрович", sum = BigDecimal("62572.10"))
+        val p2025_03 = IncomingPayment(type = IncomingPaymentTypeEnum.ACCOUNT, account = "0000700128", fromName = "Битерман Оскар Эдуардович", sum = BigDecimal("20177.99"))
+        val p2025_04 = IncomingPayment(type = IncomingPaymentTypeEnum.ACCOUNT, account = "0000700026", fromName = "Канарейкина Наталья Ивановна", sum = BigDecimal("21758.85"))
+        val p2025_05 = IncomingPayment(type = IncomingPaymentTypeEnum.ACCOUNT, account = "0000700017", fromName = "Шапиро Владислав Маркович", sum = BigDecimal("21468.74"))
+
         val p8194_41 = listOf(p01, p02, p03, p04, p05, p06, p07, p08, p09)
         val p24985_05 = listOf(p10, p11, p12, p13)
         val p_f53471_49 = listOf(p_f_7, p_f_8, p_f_13, p_f_17, p_f_19, p_f_22, p_f_25, p_f_29, p_f_30, p_f_34, p_f_38, p_f_40, p_f_46, p_f_51, p_f_60, p_f_63, p_f_64, p_f_74, p_f_78, p_f_85, p_f_88, p_f_91, p_f_93, p_f_94, p_f_98, p_f_103, p_f_108, p_f_111, p_f_117, p_f_120, p_f_123, p_f_130, p_f_138)
+        val p144209_01 = listOf(p2025_01, p2025_02, p2025_03, p2025_04, p2025_05)
         return when (sum) {
             "8195.41" -> makeRegistry(p8194_41)
             "24985.05" -> makeRegistry(p24985_05)
             "53471.49" -> makeRegistry(p_f53471_49)
+            "144209.01" -> makeRegistry(p144209_01)
             else -> {
                 logger().error("Unknown sum: $sum")
                 throw IllegalArgumentException("Unknown sum: $sum")
