@@ -36,7 +36,7 @@ class RegistryController(
     @PostMapping(path = ["/custom-account"])
     @Operation(summary = "Check and create new registry for manual account")
     fun getCustomRegistry(
-        @RequestParam(value = "sum", required = true, defaultValue = "24985,05") sum: String,
+        @RequestParam(value = "sum", required = true, defaultValue = "11969.90") sum: String,
     ): ResponseEntity<ByteArray> {
         val registry = registryService.makeCustom(sum)
         logger().info("Registry size: ${registry.size}")
