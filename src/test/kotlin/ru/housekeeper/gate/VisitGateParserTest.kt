@@ -13,6 +13,7 @@ class VisitGateParserTest {
     @Test
     fun logEntriesParser() {
         val log = """
+            2025.09.02 18:55:09 C1 opened by user(CLOUD).
             2022.12.24 13:03:24 Opened by user:office5-1(call
             R:1):+79991112233
             2022.12.24 13:03:16 Opened by user:office5-1(call
@@ -56,7 +57,7 @@ class VisitGateParserTest {
         """.trimIndent()
 
         val uniqueEntries = LogEntryParser().parseLogEntries(log)
-        assertEquals(uniqueEntries.size, 24)
+        assertEquals(uniqueEntries.size, 25)
     }
 
     @Test

@@ -16,7 +16,7 @@ class LogEntryParser(private val file: MultipartFile? = null) {
         logger().info("Start parsing log entries file")
         val content = String(file?.bytes ?: ByteArray(0))
         return parseLogEntries(content)
-            .map { toLogEntryVO(it.dateTime, it.message, gate) }
+            .mapNotNull { toLogEntryVO(it.dateTime, it.message, gate) }
     }
 
     /**
@@ -25,12 +25,13 @@ class LogEntryParser(private val file: MultipartFile? = null) {
      * W: Num in 320 deleted
      * W: User 3-33 [79807210309] added in 140
      */
-    private fun toLogEntryVO(dateTime: LocalDateTime, line: String, gate: Gate): LogEntryVO {
+    private fun toLogEntryVO(dateTime: LocalDateTime, line: String, gate: Gate): LogEntryVO? {
         return when {
             line.startsWith("Opened by user:") -> openParser(dateTime, line, gate)
             line.startsWith("Auth. failed user(") -> authFailedParser(dateTime, line, gate)
             line.startsWith("W: Num in ") -> numDeletedParser(dateTime, line, gate)
             line.startsWith("W: User ") -> userAddedParser(dateTime, line, gate)
+            line.contains("(CLOUD)") -> skipParser()
             else -> {
                 logger().warn("Unknown line: $line")
                 LogEntryVO(
@@ -42,6 +43,8 @@ class LogEntryParser(private val file: MultipartFile? = null) {
             }
         }
     }
+
+    fun skipParser(): LogEntryVO? = null
 
     /**
      * Opened by user:114-1(call R:1):+79269009660
