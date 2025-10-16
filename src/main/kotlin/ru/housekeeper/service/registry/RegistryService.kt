@@ -83,17 +83,23 @@ class RegistryService(
         //11969.90 - 700 pack
         val p2025_08 = IncomingPayment(type = IncomingPaymentTypeEnum.ACCOUNT, account = "0000700076", fromName = "Цветкова Екатерина Валентиновна", sum = BigDecimal("11969.90"))
 
+        //24904.44 - 720 pack
+        val p2025_09_01 = IncomingPayment(type = IncomingPaymentTypeEnum.ACCOUNT, account = "0000700082", fromName = "Кузнецов Евгений Игоревич", sum = BigDecimal("12334.18"))
+        val p2025_09_02 = IncomingPayment(type = IncomingPaymentTypeEnum.ACCOUNT, account = "0000700083", fromName = "Кузнецов Евгений Игоревич", sum = BigDecimal("12570.26"))
+
         val p8194_41 = listOf(p01, p02, p03, p04, p05, p06, p07, p08, p09)
         val p24985_05 = listOf(p10, p11, p12, p13)
         val p_f53471_49 = listOf(p_f_7, p_f_8, p_f_13, p_f_17, p_f_19, p_f_22, p_f_25, p_f_29, p_f_30, p_f_34, p_f_38, p_f_40, p_f_46, p_f_51, p_f_60, p_f_63, p_f_64, p_f_74, p_f_78, p_f_85, p_f_88, p_f_91, p_f_93, p_f_94, p_f_98, p_f_103, p_f_108, p_f_111, p_f_117, p_f_120, p_f_123, p_f_130, p_f_138)
         val p144209_01 = listOf(p2025_01, p2025_02, p2025_03, p2025_04, p2025_05)
         val p11969_90 = listOf(p2025_08)
+        val p24904_44 = listOf(p2025_09_01, p2025_09_02)
         return when (sum) {
             "8195.41" -> makeRegistry(p8194_41)
             "24985.05" -> makeRegistry(p24985_05)
             "53471.49" -> makeRegistry(p_f53471_49)
             "144209.01" -> makeRegistry(p144209_01)
             "11969.90" -> makeRegistry(p11969_90)
+            "24904.44" -> makeRegistry(p24904_44)
             else -> {
                 logger().error("Unknown sum: $sum")
                 throw IllegalArgumentException("Unknown sum: $sum")
