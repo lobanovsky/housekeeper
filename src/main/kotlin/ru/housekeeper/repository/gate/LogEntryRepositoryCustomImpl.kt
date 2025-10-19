@@ -109,7 +109,7 @@ class LogEntryRepositoryCustomImpl(
     }
 
     override fun findAllLastMonthByGateId(gateId: Long): List<LogEntry> {
-        val startDate = LocalDateTime.now().minus(1, ChronoUnit.MONTHS)
+        val startDate = LocalDateTime.now().minus(3, ChronoUnit.MONTHS)
         val sql = "SELECT p FROM LogEntry p WHERE p.gateId = :gateId AND p.dateTime >= :startDate ORDER BY p.dateTime DESC"
         val query = entityManager.createQuery(sql, LogEntry::class.java)
         query.setParameter("gateId", gateId)
