@@ -1,15 +1,15 @@
-FROM gradle:8.13-jdk21 AS builder
+FROM gradle:9.2.1-jdk21 AS builder
 
 WORKDIR /app
 COPY . .
 RUN gradle shadowJar --no-daemon
 
 
-FROM markhobson/maven-chrome:jdk-21
+FROM openjdk:21-jdk-slim
 
 WORKDIR /app
 
-COPY --from=builder /app/build/libs/housekeeper-all.jar app.jar
+COPY --from=builder /app/build/libs/housekeeper.jar app.jar
 
 VOLUME ["/app/data"]
 
