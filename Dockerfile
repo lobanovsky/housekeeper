@@ -7,10 +7,16 @@ RUN gradle bootJar --no-daemon
 
 FROM eclipse-temurin:21-jre
 
-WORKDIR /app
+WORKDIR /opt/app
 
+# Копируем jar
 COPY --from=builder /app/build/libs/housekeeper.jar app.jar
 
-VOLUME ["/app/data"]
+# Копируем ресурсы receipt внутрь контейнера
+COPY --from=builder /app/src/main/resources/receipt /opt/app/receipts
+
+VOLUME ["/opt/app/logs", "/opt/app/receipts"]
+
+ENV RECEIPT_BASE_PATH=/opt/app/receipts
 
 CMD ["java", "-jar", "app.jar"]

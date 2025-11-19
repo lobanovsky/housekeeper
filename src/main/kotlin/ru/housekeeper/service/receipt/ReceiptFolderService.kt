@@ -6,7 +6,7 @@ import java.io.File
 @Service
 class ReceiptFolderService {
 
-    private val basePath = "/Users/evgeny/Projects/tsn/housekeeper/src/main/resources/receipt"
+    private val basePath: String = System.getenv("RECEIPT_BASE_PATH") ?: "/opt/app/receipts"
 
     fun getAvailableMonths(): List<String> {
         val base = File(basePath)

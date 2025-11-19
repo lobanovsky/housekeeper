@@ -19,6 +19,7 @@ services:
       - "8080:8080"
     volumes:
       - ./logs:/opt/app/logs
+      - ./receipts:/opt/app/receipts
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.backend.rule=Host(`backend.housekpr.ru`) && PathPrefix(`/api`)"

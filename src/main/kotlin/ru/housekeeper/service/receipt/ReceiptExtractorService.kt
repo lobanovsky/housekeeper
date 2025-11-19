@@ -14,7 +14,7 @@ class ReceiptExtractorService(
     private val accountService: AccountNumberService
 ) {
 
-    private val basePath = "/Users/evgeny/Projects/tsn/housekeeper/src/main/resources/receipt"
+    private val basePath: String = System.getenv("RECEIPT_BASE_PATH") ?: "/opt/app/receipts"
 
     fun extractReceipt(
         year: Int,
