@@ -52,6 +52,9 @@ dependencies {
     implementation("io.jsonwebtoken:jjwt-impl:${jwtVersion}")
     implementation("io.jsonwebtoken:jjwt-jackson:${jwtVersion}")
 
+    // https://mvnrepository.com/artifact/org.apache.pdfbox/pdfbox
+    implementation("org.apache.pdfbox:pdfbox:3.0.6")
+
     testImplementation("org.springframework.boot:spring-boot-starter-test")
     testImplementation("org.jetbrains.kotlin:kotlin-test:1.8.0")
     testImplementation("io.mockk:mockk:1.13.3")
