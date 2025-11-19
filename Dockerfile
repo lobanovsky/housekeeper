@@ -1,10 +1,16 @@
-FROM eclipse-temurin:17-alpine
+FROM gradle:8.13-jdk21 AS builder
 
-WORKDIR /opt/app
+WORKDIR /app
+COPY . .
+RUN gradle shadowJar --no-daemon
 
-COPY /build/libs/*.jar app.jar
 
-RUN chown -R 1000:1000 /opt/app
-USER 1000
+FROM markhobson/maven-chrome:jdk-21
 
-ENTRYPOINT java -jar /opt/app/app.jar
+WORKDIR /app
+
+COPY --from=builder /app/build/libs/housekeeper-all.jar app.jar
+
+VOLUME ["/app/data"]
+
+CMD ["java", "-jar", "app.jar"]
