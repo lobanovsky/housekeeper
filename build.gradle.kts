@@ -1,22 +1,22 @@
-import org.jetbrains.kotlin.gradle.dsl.JvmTarget
-import org.jetbrains.kotlin.gradle.tasks.KotlinJvmCompile
-
-group = "ru.housekeeper"
-version = "0.0.1"
-java.sourceCompatibility = JavaVersion.VERSION_17
-
-repositories {
-    mavenCentral()
-}
-
 plugins {
     val springBootVersion = "3.3.4"
-    val kotlinVersion = "2.0.10"
-    id("org.springframework.boot") version springBootVersion
-    id("io.spring.dependency-management") version "1.1.0"
+    val kotlinVersion = "2.2.20"
     kotlin("jvm") version kotlinVersion
     kotlin("plugin.spring") version kotlinVersion
     kotlin("plugin.jpa") version kotlinVersion
+    kotlin("plugin.serialization") version kotlinVersion
+    application
+    id("org.springframework.boot") version springBootVersion
+    id("io.spring.dependency-management") version "1.1.0"
+}
+
+application {
+    mainClass = "HousekeeperApplicationKt"
+}
+
+repositories {
+    mavenCentral()
+    maven("https://jitpack.io")
 }
 
 dependencies {
@@ -68,17 +68,20 @@ dependencyManagement {
     }
 }
 
-tasks.withType<KotlinJvmCompile>().configureEach {
-    compilerOptions {
-        jvmTarget.set(JvmTarget.JVM_17)
-        freeCompilerArgs.add("-Xjsr305=strict")
-    }
-}
-
-tasks.withType<Test> {
+//tasks.withType<KotlinJvmCompile>().configureEach {
+//    compilerOptions {
+//        jvmTarget.set(JvmTarget.JVM_17)
+//        freeCompilerArgs.add("-Xjsr305=strict")
+//    }
+//}
+//
+//
+//tasks.jar {
+//    enabled = false
+//}
+tasks.test {
     useJUnitPlatform()
 }
-
-tasks.jar {
-    enabled = false
+kotlin {
+    jvmToolchain(21)
 }
