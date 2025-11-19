@@ -6,6 +6,7 @@ import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
 import ru.housekeeper.enums.receipt.ObjectType
 import ru.housekeeper.enums.receipt.PaymentType
+import ru.housekeeper.service.receipt.PdfMergeService
 import ru.housekeeper.service.receipt.ReceiptExtractorService
 
 @CrossOrigin
@@ -13,6 +14,7 @@ import ru.housekeeper.service.receipt.ReceiptExtractorService
 @RequestMapping("/receipt")
 class ReceiptController(
     private val extractor: ReceiptExtractorService,
+    private val pdfMerge: PdfMergeService,
 ) {
 
     @GetMapping(produces = [MediaType.APPLICATION_PDF_VALUE])
@@ -33,6 +35,29 @@ class ReceiptController(
                 "attachment; filename=receipt-$year-$month-$type-$payment-$number.pdf"
             )
             .body(pdf)
+    }
+
+
+    @GetMapping("/merged", produces = [MediaType.APPLICATION_PDF_VALUE])
+    fun getMergedReceipt(
+        @RequestParam year: Int,
+        @RequestParam month: Int,
+        @RequestParam type: ObjectType,
+        @RequestParam number: Int
+    ): ResponseEntity<ByteArray> {
+
+        val jku = extractor.extractReceipt(year, month, type, PaymentType.JKU, number)
+        val kap = extractor.extractReceipt(year, month, type, PaymentType.KAP, number)
+
+        val merged = pdfMerge.mergePdfPages(jku, kap)
+            ?: return ResponseEntity.notFound().build()
+
+        return ResponseEntity.ok()
+            .header(
+                HttpHeaders.CONTENT_DISPOSITION,
+                "attachment; filename=receipt-$year-$month-$type-$number.pdf"
+            )
+            .body(merged)
     }
 
 }
