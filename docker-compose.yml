@@ -1,7 +1,7 @@
 services:
 
   housekeeper:
-    image: ${CONTAINER_REGISTRY}/housekeeper:${TAG}
+    image: lobanovsky/housekeeper:${TAG}
     container_name: housekeeper
     restart: always
     environment:
