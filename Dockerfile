@@ -2,7 +2,7 @@ FROM gradle:9.2.1-jdk21 AS builder
 
 WORKDIR /app
 COPY . .
-RUN gradle shadowJar --no-daemon
+RUN gradle bootJar --no-daemon
 
 
 FROM eclipse-temurin:21-jre
