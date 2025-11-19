@@ -10,7 +10,7 @@ FROM eclipse-temurin:21-jre
 WORKDIR /opt/app
 
 # Копируем jar
-COPY --from=builder /app/build/libs/housekeeper.jar app.jar
+COPY --from=builder /app/build/libs/housekeeper.jar housekeeper.jar
 
 # Копируем ресурсы receipt внутрь контейнера после сборки
 COPY --from=builder /app/build/resources/main/receipt /opt/app/receipts
@@ -19,4 +19,4 @@ VOLUME ["/opt/app/logs", "/opt/app/receipts"]
 
 ENV RECEIPT_BASE_PATH=/opt/app/receipts
 
-CMD ["java", "-jar", "app.jar"]
+CMD ["java", "-jar", "housekeeper.jar"]
