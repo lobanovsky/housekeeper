@@ -5,7 +5,7 @@ COPY . .
 RUN gradle shadowJar --no-daemon
 
 
-FROM openjdk:21-jdk-slim
+FROM eclipse-temurin:21-jre
 
 WORKDIR /app
 
