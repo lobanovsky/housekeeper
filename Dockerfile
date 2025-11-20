@@ -14,11 +14,11 @@ WORKDIR /opt/app
 COPY --from=builder /app/build/libs/housekeeper.jar housekeeper.jar
 
 # Копируем ресурсы (ГЛАВНОЕ — из build/resources/main)
-COPY --from=builder /app/build/resources/main/receipt/2025-06/2025-06-кап-ремонт-кв.pdf /opt/app/receipts
+COPY --from=builder /app/build/resources/main/receipt /opt/app/receipt
 
 # Проверка наличия файлов (только для отладки, можно удалить после)
 RUN echo "===== CHECK RECEIPTS =====" \
-    && ls -R /opt/app/receipts
+    && ls -R /opt/app/receipt
 
 ENV RECEIPT_BASE_PATH=/opt/app/receipts
 
