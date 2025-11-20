@@ -1,11 +1,12 @@
+# Stage: builder — собираем jar
 FROM gradle:9.2.1-jdk21 AS builder
 
 WORKDIR /app
 COPY . .
 RUN gradle bootJar --no-daemon
 
-
-FROM eclipse-temurin:21-jre
+# Stage: runtime — минимальный образ с JRE и готовым приложением
+FROM eclipse-temurin:21-jre AS runtime
 
 WORKDIR /opt/app
 
@@ -13,9 +14,11 @@ WORKDIR /opt/app
 COPY --from=builder /app/build/libs/housekeeper.jar housekeeper.jar
 
 # Копируем ресурсы (ГЛАВНОЕ — из build/resources/main)
+COPY --from=builder /app/build/resources/main/receipt/2025-06/2025-06-кап-ремонт-кв.pdf /opt/app/receipts
 
-COPY --from=builder /app/build/resources/main/receipt /opt/app/receipts
-RUN ls -R  /opt/app/receipts
+# Проверка наличия файлов (только для отладки, можно удалить после)
+RUN echo "===== CHECK RECEIPTS =====" \
+    && ls -R /opt/app/receipts
 
 ENV RECEIPT_BASE_PATH=/opt/app/receipts
 
