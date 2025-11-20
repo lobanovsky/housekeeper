@@ -77,7 +77,7 @@ class ReceiptController(
         return ResponseEntity.ok()
             .header(
                 HttpHeaders.CONTENT_DISPOSITION,
-                "attachment; filename=Квитанция-$year-$month-${type.description} №$number.pdf"
+                "attachment; filename=MP17dom1-$year-$month-${type.descriptionEN}-$number.pdf"
             )
             .body(merged)
     }
