@@ -87,6 +87,6 @@ class ReceiptController(
     @GetMapping("/available-months", produces = [MediaType.APPLICATION_JSON_VALUE])
     fun getAvailableMonths(): AvailableMonthsResponse {
         val list = folderService.getAvailableMonths()
-        return AvailableMonthsResponse(months = list)
+        return AvailableMonthsResponse(months = list.sortedByDescending { it })
     }
 }
