@@ -12,11 +12,13 @@ WORKDIR /opt/app
 # Копируем jar
 COPY --from=builder /app/build/libs/housekeeper.jar housekeeper.jar
 
-# Копируем ресурсы receipt внутрь контейнера после сборки
-COPY --from=builder /app/build/resources/main/receipt /opt/app/receipts
+# Копируем ресурсы (ГЛАВНОЕ — из build/resources/main)
 
-VOLUME ["/opt/app/logs", "/opt/app/receipts"]
+COPY --from=builder /app/build/resources/main/receipt /opt/app/receipts
+RUN ls -R  /opt/app/receipts
 
 ENV RECEIPT_BASE_PATH=/opt/app/receipts
+
+VOLUME ["/opt/app/logs", "/opt/app/receipts"]
 
 CMD ["java", "-jar", "housekeeper.jar"]
