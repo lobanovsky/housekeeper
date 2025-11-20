@@ -5,8 +5,8 @@ import org.springframework.http.HttpStatus
 import org.springframework.http.MediaType
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
-import ru.housekeeper.enums.receipt.ObjectType
 import ru.housekeeper.enums.receipt.PaymentType
+import ru.housekeeper.enums.receipt.RoomType
 import ru.housekeeper.model.response.AvailableMonthsResponse
 import ru.housekeeper.service.receipt.PdfMergeService
 import ru.housekeeper.service.receipt.ReceiptExtractorService
@@ -25,7 +25,7 @@ class ReceiptController(
     fun getReceipt(
         @RequestParam year: Int,
         @RequestParam month: Int,
-        @RequestParam type: ObjectType,
+        @RequestParam type: RoomType,
         @RequestParam payment: PaymentType,
         @RequestParam number: Int
     ): ResponseEntity<ByteArray> {
@@ -46,7 +46,7 @@ class ReceiptController(
     fun getMergedReceipt(
         @RequestParam year: Int,
         @RequestParam month: Int,
-        @RequestParam type: ObjectType,
+        @RequestParam type: RoomType,
         @RequestParam number: Int
     ): ResponseEntity<*> {
 

@@ -4,8 +4,8 @@ import org.apache.pdfbox.Loader
 import org.apache.pdfbox.pdmodel.PDDocument
 import org.apache.pdfbox.text.PDFTextStripper
 import org.springframework.stereotype.Service
-import ru.housekeeper.enums.receipt.ObjectType
 import ru.housekeeper.enums.receipt.PaymentType
+import ru.housekeeper.enums.receipt.RoomType
 import java.io.ByteArrayOutputStream
 import java.io.File
 
@@ -19,7 +19,7 @@ class ReceiptExtractorService(
     fun extractReceipt(
         year: Int,
         month: Int,
-        type: ObjectType,
+        type: RoomType,
         payment: PaymentType,
         number: Int
     ): ByteArray? {
@@ -27,10 +27,10 @@ class ReceiptExtractorService(
         val folder = "%04d-%02d".format(year, month)
 
         val filename = when (payment to type) {
-            PaymentType.JKU to ObjectType.KV -> "$folder-кв.pdf"
-            PaymentType.JKU to ObjectType.MM -> "$folder-мм.pdf"
-            PaymentType.KAP to ObjectType.KV -> "$folder-кап-ремонт-кв.pdf"
-            PaymentType.KAP to ObjectType.MM -> "$folder-кап-ремонт-мм.pdf"
+            PaymentType.JKU to RoomType.FLAT -> "$folder-кв.pdf"
+            PaymentType.JKU to RoomType.PARKING_SPACE -> "$folder-мм.pdf"
+            PaymentType.KAP to RoomType.FLAT -> "$folder-кап-ремонт-кв.pdf"
+            PaymentType.KAP to RoomType.PARKING_SPACE -> "$folder-кап-ремонт-мм.pdf"
             else -> throw IllegalArgumentException("Unsupported")
         }
 

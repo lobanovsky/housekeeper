@@ -1,3 +1,6 @@
 package ru.housekeeper.enums.receipt
 
-enum class PaymentType { JKU, KAP }
+enum class PaymentType(description: String) {
+    JKU("ЖКУ"),
+    KAP("Капитальный ремонт")
+}
