@@ -78,6 +78,9 @@ class ReceiptController(
             .header(
                 HttpHeaders.CONTENT_DISPOSITION,
                 "attachment; filename=MP17dom1-$year-$month-${type.descriptionEN}-$number.pdf"
+            ).header(
+                HttpHeaders.ACCESS_CONTROL_EXPOSE_HEADERS,
+                HttpHeaders.CONTENT_DISPOSITION
             )
             .body(merged)
     }
