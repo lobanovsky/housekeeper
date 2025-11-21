@@ -37,7 +37,7 @@ class MailingService(
             to = email,
             subject = "Приглашение в сервис Хаускипер",
             body = String(resourceLoader.getResource("classpath:email/invitation.html").inputStream.readBytes())
-                .replace("{{host}}", "https://housekeeper.docduck.io")
+                .replace("{{host}}", "https://housekpr.ru")
                 .replace("{{login}}", email)
                 .replace("{{password}}", password)
                 .replace("{{code}}", code),
