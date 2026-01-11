@@ -11,6 +11,7 @@ import ru.housekeeper.model.response.AvailableMonthsResponse
 import ru.housekeeper.service.receipt.PdfMergeService
 import ru.housekeeper.service.receipt.ReceiptExtractorService
 import ru.housekeeper.service.receipt.ReceiptFolderService
+import ru.housekeeper.utils.logger
 
 @CrossOrigin
 @RestController
@@ -72,6 +73,8 @@ class ReceiptController(
                     "Внимание" to "Квитанции за выбранный период отсутствуют. Обратитесь в ТСН."
                 )
             )
+
+        logger().info("Merged PDF generated successfully for year: $year, month: $month, type: ${type.descriptionEN}, number: $number")
 
         // 3. Вернуть PDF
         return ResponseEntity.ok()
