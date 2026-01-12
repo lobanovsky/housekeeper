@@ -142,6 +142,9 @@ class PaymentService(
 
     private fun customRuleForPayments(payment: OutgoingPayment, counterparty: Counterparty): Pair<String, String> {
 
+        if (payment.purpose.contains("за услуги по формированию электронного архива техдокументации дома", true))
+            return getPair(CategoryOfPaymentEnum.MAINTENANCE)
+
 //        if (payment.purpose.contains("огнетушител", true))
 //            return getPair(CategoryOfPaymentEnum.FIRE_SAFETY)
 //
