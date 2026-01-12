@@ -71,6 +71,8 @@ enum class CategoryOfPaymentEnum(val description: String) {
 
     ALARMS("Сигнализации"),
 
+    EDO("Электронный документооборот (ЭДО)"),
+
     OTHER("Остальное"),
 
     UNKNOWN("Неизвестно")
