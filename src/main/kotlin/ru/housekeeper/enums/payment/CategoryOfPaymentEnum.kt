@@ -75,6 +75,8 @@ enum class CategoryOfPaymentEnum(val description: String) {
 
     DESIGN_DOCUMENTATION("Проектная документация"),
 
+    OVERHAUL("Капитальный ремонт"),
+
     OTHER("Остальное"),
 
     UNKNOWN("Неизвестно")
