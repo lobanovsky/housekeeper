@@ -5,7 +5,7 @@ enum class CategoryOfPaymentEnum(val description: String) {
 
     GARBAGE_COLLECTION("Вывоз мусора"),
 
-    ELEVATOR("Лифт"),
+    ELEVATOR("Техобслуживание лифтов"),
 
     FIRE_SAFETY("Пожарная безопасность"),
 
