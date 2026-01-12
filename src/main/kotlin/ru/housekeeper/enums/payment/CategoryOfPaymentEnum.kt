@@ -77,9 +77,11 @@ enum class CategoryOfPaymentEnum(val description: String) {
 
     WATER_CHEMICAL_ANALYSIS("Химический анализ воды"),
 
-    OVERHAUL("Капитальный ремонт"),
+    HEATING("Отопление"),
+    WATER_SUPPLY("Водоснабжение"),
+    ELECTRICITY_SUPPLY("Электроснабжение"),
 
-    OTHER("Остальное"),
+    OVERHAUL("Капитальный ремонт"),
 
     UNKNOWN("Неизвестно")
 

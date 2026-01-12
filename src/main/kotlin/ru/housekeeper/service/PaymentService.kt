@@ -142,27 +142,27 @@ class PaymentService(
 
     private fun customRuleForPayments(payment: OutgoingPayment, counterparty: Counterparty): Pair<String, String> {
 
-        if (payment.purpose.contains("огнетушител", true))
-            return getPair(CategoryOfPaymentEnum.FIRE_SAFETY)
-
-        if (payment.purpose.contains("теплообменник", true))
-            return getPair(CategoryOfPaymentEnum.INDIVIDUAL_HEAT_POINT)
-
-        if (payment.purpose.contains("Аккумуляторные батареи для диспетчеризация", true))
-            return getPair(CategoryOfPaymentEnum.DISPATCHING)
-
-        if (payment.purpose.contains("Под отчет на приобретение посадочного материала", true))
-            return getPair(CategoryOfPaymentEnum.GARDEN)
-
-        if (payment.purpose.contains("ИД взыск", true))
-            return getPair(CategoryOfPaymentEnum.COURT_COSTS)
-
-        if (payment.toName.equals("Лобановский Евгений Владимирович", true)
-            && payment.purpose.contains("Оплата за предоставление услуг по договору с самозанятым", true)
-        ) return getPair(CategoryOfPaymentEnum.STAFF_SALARY)
-
-        if (payment.purpose.contains("Под отчёт", true) || payment.purpose.contains("Под отчет", true))
-            return getPair(CategoryOfPaymentEnum.UNDER_THE_REPORT)
+//        if (payment.purpose.contains("огнетушител", true))
+//            return getPair(CategoryOfPaymentEnum.FIRE_SAFETY)
+//
+//        if (payment.purpose.contains("теплообменник", true))
+//            return getPair(CategoryOfPaymentEnum.INDIVIDUAL_HEAT_POINT)
+//
+//        if (payment.purpose.contains("Аккумуляторные батареи для диспетчеризация", true))
+//            return getPair(CategoryOfPaymentEnum.DISPATCHING)
+//
+//        if (payment.purpose.contains("Под отчет на приобретение посадочного материала", true))
+//            return getPair(CategoryOfPaymentEnum.GARDEN)
+//
+//        if (payment.purpose.contains("ИД взыск", true))
+//            return getPair(CategoryOfPaymentEnum.COURT_COSTS)
+//
+//        if (payment.toName.equals("Лобановский Евгений Владимирович", true)
+//            && payment.purpose.contains("Оплата за предоставление услуг по договору с самозанятым", true)
+//        ) return getPair(CategoryOfPaymentEnum.STAFF_SALARY)
+//
+//        if (payment.purpose.contains("Под отчёт", true) || payment.purpose.contains("Под отчет", true))
+//            return getPair(CategoryOfPaymentEnum.UNDER_THE_REPORT)
 
         return Pair(
             counterparty.category.name,
@@ -186,7 +186,8 @@ class PaymentService(
         return Counterparty(
             uuid = other.onlyCyrillicLettersAndNumbers(),
             name = other,
-            category = CategoryOfPaymentEnum.OTHER
+            category = CategoryOfPaymentEnum.UNKNOWN,
+            subcategory = CategoryOfPaymentEnum.UNKNOWN,
         )
     }
 

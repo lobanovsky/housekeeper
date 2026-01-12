@@ -14,5 +14,6 @@ fun CounterpartyRequest.toCounterparty() = Counterparty(
     name = name,
     inn = inn,
     manualCreated = true,
-    category = CategoryOfPaymentEnum.UNKNOWN
+    category = CategoryOfPaymentEnum.UNKNOWN,
+    subcategory = CategoryOfPaymentEnum.UNKNOWN,
 )

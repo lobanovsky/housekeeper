@@ -42,4 +42,7 @@ class Counterparty(
     @Enumerated(EnumType.STRING)
     val category: CategoryOfPaymentEnum,
 
+    @Enumerated(EnumType.STRING)
+    val subcategory: CategoryOfPaymentEnum,
+
     )
