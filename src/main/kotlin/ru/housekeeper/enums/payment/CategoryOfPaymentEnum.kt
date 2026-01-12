@@ -75,6 +75,8 @@ enum class CategoryOfPaymentEnum(val description: String) {
 
     DESIGN_DOCUMENTATION("Проектная документация"),
 
+    WATER_CHEMICAL_ANALYSIS("Химический анализ воды"),
+
     OVERHAUL("Капитальный ремонт"),
 
     OTHER("Остальное"),
