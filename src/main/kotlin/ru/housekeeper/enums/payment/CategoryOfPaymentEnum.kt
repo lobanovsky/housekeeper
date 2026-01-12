@@ -73,6 +73,8 @@ enum class CategoryOfPaymentEnum(val description: String) {
 
     EDO("Электронный документооборот (ЭДО)"),
 
+    DESIGN_DOCUMENTATION("Проектная документация"),
+
     OTHER("Остальное"),
 
     UNKNOWN("Неизвестно")
