@@ -19,6 +19,6 @@ fun CounterpartyVO.toCounterparty() = Counterparty(
     bank = bank,
     bik = bik,
     sign = sign,
-    category = CategoryOfPaymentEnum.UNKNOWN,
-    subcategory = CategoryOfPaymentEnum.UNKNOWN,
+    category = CategoryOfPaymentEnum.MAINTENANCE,
+    subcategory = CategoryOfPaymentEnum.MAINTENANCE,
 )

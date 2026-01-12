@@ -182,12 +182,12 @@ class PaymentService(
         counterpartyByName = counterpartyGroupByUUID[makeUUID(payment.toInn, payment.toName)]
         if (counterpartyByName != null) return counterpartyByName
         logger().info("Unknown counterparty: ${payment.id}, ${payment.purpose}, ${payment.toName}, ${payment.toInn}")
-        val other = "Остальное"
+        val other = "Текущий ремонт"
         return Counterparty(
             uuid = other.onlyCyrillicLettersAndNumbers(),
             name = other,
-            category = CategoryOfPaymentEnum.UNKNOWN,
-            subcategory = CategoryOfPaymentEnum.UNKNOWN,
+            category = CategoryOfPaymentEnum.MAINTENANCE,
+            subcategory = CategoryOfPaymentEnum.MAINTENANCE,
         )
     }
 

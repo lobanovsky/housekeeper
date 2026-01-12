@@ -81,8 +81,6 @@ enum class CategoryOfPaymentEnum(val description: String) {
     WATER_SUPPLY("Водоснабжение"),
     ELECTRICITY_SUPPLY("Электроснабжение"),
 
-    OVERHAUL("Капитальный ремонт"),
-
-    UNKNOWN("Неизвестно")
+    OVERHAUL("Капитальный ремонт")
 
 }
