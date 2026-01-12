@@ -69,6 +69,8 @@ enum class CategoryOfPaymentEnum(val description: String) {
 
     OPERATIONAL_TESTS("Эксплуатационные испытания"),
 
+    ALARMS("Сигнализации"),
+
     OTHER("Остальное"),
 
     UNKNOWN("Неизвестно")
