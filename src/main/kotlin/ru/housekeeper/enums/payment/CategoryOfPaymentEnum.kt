@@ -55,7 +55,7 @@ enum class CategoryOfPaymentEnum(val description: String) {
 
     PARKING_VIDEO_SURVEILLANCE("Видеонаблюдение паркинга"),
 
-    MAINTENANCE("Текущий ремонт"),
+    MAINTENANCE("Содержание и ремонт"),
 
     UNDER_THE_REPORT("Под отчёт"),
 
