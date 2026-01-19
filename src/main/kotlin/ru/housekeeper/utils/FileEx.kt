@@ -3,6 +3,7 @@ package ru.housekeeper.utils
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.PageRequest
 import org.springframework.data.support.PageableExecutionUtils
+import org.springframework.http.ContentDisposition
 import org.springframework.http.HttpHeaders
 import org.springframework.http.MediaType
 import org.springframework.http.ResponseEntity
@@ -10,11 +11,23 @@ import ru.housekeeper.model.dto.FileType
 import ru.housekeeper.model.dto.FileVO
 import ru.housekeeper.model.entity.File
 
-fun getExcelReport(fileName: String, excelMaker: () -> ByteArray) = ResponseEntity.ok()
-    .contentType(MediaType.APPLICATION_OCTET_STREAM)
-    .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"$fileName\"")
-    .header(HttpHeaders.ACCESS_CONTROL_EXPOSE_HEADERS, HttpHeaders.CONTENT_DISPOSITION)
-    .body(excelMaker.invoke())
+
+fun getExcelReport(
+    fileName: String,
+    excelMaker: () -> ByteArray
+): ResponseEntity<ByteArray> {
+
+    val contentDisposition = ContentDisposition
+        .attachment()
+        .filename(fileName)
+        .build()
+
+    return ResponseEntity.ok()
+        .contentType(MediaType.APPLICATION_OCTET_STREAM)
+        .header(HttpHeaders.CONTENT_DISPOSITION, contentDisposition.toString())
+        .header(HttpHeaders.ACCESS_CONTROL_EXPOSE_HEADERS, HttpHeaders.CONTENT_DISPOSITION)
+        .body(excelMaker())
+}
 
 
 fun File.toFileVO(): FileVO {
