@@ -10,7 +10,7 @@ import java.time.LocalDate
 /**
  * Парсер для воды
  */
-fun main() {
+fun main6() {
     val year = "2026"
     val month = "01"
     process(
