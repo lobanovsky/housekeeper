@@ -32,6 +32,5 @@ target/
 /private/
 /.env
 
-/src/main/kotlin/ru/housekeeper/experiment/
 /.kotlin/
 /build.log
