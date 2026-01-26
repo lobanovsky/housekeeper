@@ -24,7 +24,7 @@ fun main2() {
     val inn = "9715357654"
     val account = "40703810338000004376"
     val specialAccount = "40705810238000000478"
-    val fileNumber = "0112"
+    val fileNumber = "0101"
 
     val prefixPath = "/Users/evgeny/Projects/tsn/housekeeper/etc/registry"
     val accountFileName = "${inn}_${account}_001_${fileNumber}.txt"

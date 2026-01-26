@@ -28,7 +28,7 @@ fun findDuplicateFilenames(directory: File) {
 }
 
 
-fun main()  {
+fun main3()  {
 //    val dir = "/Users/evgeny/Yandex.Disk.localized/Домовладелец/from sber/VTB-реестры" // Укажите путь к директории
     val dir = "/Users/evgeny/Yandex.Disk.localized/Домовладелец/from sber/Sber-реестры" // Укажите путь к директории
     findDuplicateFilenames(File(dir))
