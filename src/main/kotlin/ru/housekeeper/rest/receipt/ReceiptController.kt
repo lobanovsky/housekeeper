@@ -95,4 +95,55 @@ class ReceiptController(
         val list = folderService.getAvailableMonths()
         return AvailableMonthsResponse(months = list.sortedByDescending { it })
     }
+
+    //специальная ручка для массвой печати квитанций
+    //для этих данных
+    //кв: 33, 34, 70, 71, 80, 93, 96, 104, 118, 120, 122, 124, 126, 140, 141
+    //мм: 1, 8, 9, 10, 13, 14, 18, 43, 44, 102, 102, 141
+    @GetMapping("/batch-print", produces = [MediaType.APPLICATION_PDF_VALUE])
+    fun getBatchPrintReceipts(
+        @RequestParam year: Int,
+        @RequestParam month: Int,
+    ): ResponseEntity<ByteArray> {
+        val apartmentNumbers = listOf(33, 34, 70, 71, 80, 93, 96, 104, 118, 120, 122, 124, 126, 140, 141)
+        val parkingNumbers = listOf(1, 8, 9, 10, 13, 14, 18, 43, 44, 102, 102, 141)
+
+        val pdfsToMerge = mutableListOf<ByteArray>()
+
+        for (number in apartmentNumbers) {
+            val jkuPdf = extractor.extractReceipt(year, month, RoomType.FLAT, PaymentType.JKU, number)
+            val kapPdf = extractor.extractReceipt(year, month, RoomType.FLAT, PaymentType.KAP, number)
+            val mergedPdf = pdfMerge.mergePdfPages(jkuPdf, kapPdf)
+            if (mergedPdf != null) {
+                pdfsToMerge.add(mergedPdf)
+            } else {
+                logger().warn("Квитанция для квартиры №$number за $year-$month не найдена.")
+            }
+        }
+
+        for (number in parkingNumbers) {
+            val jkuPdf = extractor.extractReceipt(year, month, RoomType.PARKING_SPACE, PaymentType.JKU, number)
+            val kapPdf = extractor.extractReceipt(year, month, RoomType.PARKING_SPACE, PaymentType.KAP, number)
+            val mergedPdf = pdfMerge.mergePdfPages(jkuPdf, kapPdf)
+            if (mergedPdf != null) {
+                pdfsToMerge.add(mergedPdf)
+            } else {
+                logger().warn("Квитанция для машиноместа №$number за $year-$month не найдена.")
+            }
+        }
+        val finalMergedPdf = pdfMerge.mergePdfPages(*pdfsToMerge.toTypedArray())
+            ?: return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                .contentType(MediaType.APPLICATION_JSON)
+                .body(null)
+
+        return ResponseEntity.ok()
+            .header(
+                HttpHeaders.CONTENT_DISPOSITION,
+                "attachment; filename=MP17dom1-batch-$year-$month.pdf"
+            ).header(
+                HttpHeaders.ACCESS_CONTROL_EXPOSE_HEADERS,
+                HttpHeaders.CONTENT_DISPOSITION
+            )
+            .body(finalMergedPdf)
+    }
 }
