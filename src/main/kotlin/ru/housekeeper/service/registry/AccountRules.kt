@@ -12,7 +12,8 @@ import ru.housekeeper.utils.*
 fun findSpecialAccountByRules(payment: IncomingPayment): String? {
     //Коммерческие помещения
     if (payment.fromInn?.equals("7734401489") == true
-        && payment.purpose.contains("Оплата за капитальный ремонт", true)
+        && (payment.purpose.contains("Оплата за капитальный ремонт", true) ||
+                payment.purpose.contains("Оплата капитального ремонта", true))
     ) return getSpecialOfficeAccount(5)
 
     //flats
