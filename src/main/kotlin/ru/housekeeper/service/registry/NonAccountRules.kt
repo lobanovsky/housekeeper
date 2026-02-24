@@ -75,7 +75,8 @@ fun rules(payment: IncomingPayment): Boolean {
     //ОБЩЕСТВО С ОГРАНИЧЕННОЙ ОТВЕТСТВЕННОСТЬЮ "РОКОСКЛИНИК"
     if (taxableEqInn(payment, "7734401489")
         && !payment.purpose.contains(getOfficeAccount(5))
-        && !payment.purpose.contains("Оплата за капитальный ремонт")
+        && !payment.purpose.contains("Оплата за капитальный ремонт", ignoreCase = true)
+        && !payment.purpose.contains("Оплата капитального ремонта", ignoreCase = true)
     ) return true
 
     return false
