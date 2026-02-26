@@ -49,7 +49,7 @@ class GateSyncService(
 
     private fun syncGate(gate: Gate): GateSyncResult {
         val lastEntry = logEntryRepository.findTopByGateIdOrderByDateTimeDesc(gate.id)
-        val fromDate = lastEntry?.dateTime?.toLocalDate()
+        val fromDate = lastEntry?.dateTime?.toLocalDate()?.minusDays(1)
 
         logger().info("Syncing gate ${gate.id} '${gate.name}' (deviceId=${gate.deviceId}) from=$fromDate")
 
