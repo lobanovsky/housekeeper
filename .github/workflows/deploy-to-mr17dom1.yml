@@ -71,6 +71,9 @@ jobs:
           echo "MY_NAME=${{ secrets.MY_NAME}}" >> .env
           echo "MY_ACCOUNT=${{ secrets.MY_ACCOUNT}}" >> .env
           echo "AUTH_TOKEN_KEY=${{ secrets.AUTH_TOKEN_KEY }}" >> .env
+          echo "ELDES_API_URL=${{ secrets.ELDES_API_URL }}" >> .env
+          echo "ELDES_API_EMAIL=${{ secrets.ELDES_API_EMAIL }}" >> .env
+          echo "ELDES_API_PASSWORD=${{ secrets.ELDES_API_PASSWORD }}" >> .env
 
       - name: copy files to host
         uses: appleboy/scp-action@v0.1.7

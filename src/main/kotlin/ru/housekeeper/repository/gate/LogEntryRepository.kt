@@ -25,4 +25,7 @@ interface LogEntryRepository : CrudRepository<LogEntry, Long>, LogEntryRepositor
     @Query("SELECT COUNT(p) FROM LogEntry p WHERE p.phoneNumber = :phoneNumber")
     fun countByPhoneNumber(@Param("phoneNumber") phoneNumber: String): Int
 
+    @Query("SELECT l FROM LogEntry l WHERE l.gateId = :gateId ORDER BY l.dateTime DESC LIMIT 1")
+    fun findTopByGateIdOrderByDateTimeDesc(@Param("gateId") gateId: Long): LogEntry?
+
 }

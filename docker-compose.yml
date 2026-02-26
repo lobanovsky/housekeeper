@@ -15,6 +15,9 @@ services:
       MY_INN: ${MY_INN}
       MY_NAME: ${MY_NAME}
       AUTH_TOKEN_KEY: ${AUTH_TOKEN_KEY}
+      ELDES_API_URL: ${ELDES_API_URL}
+      ELDES_API_EMAIL: ${ELDES_API_EMAIL}
+      ELDES_API_PASSWORD: ${ELDES_API_PASSWORD}
     ports:
       - "8080:8080"
     volumes:

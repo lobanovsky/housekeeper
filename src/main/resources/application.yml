@@ -62,3 +62,8 @@ my:
   inn: ${MY_INN}
   name: ${MY_NAME}
   account: ${MY_ACCOUNT}
+
+eldes-api:
+  url: ${ELDES_API_URL:http://109.173.116.61:8070}
+  email: ${ELDES_API_EMAIL:}
+  password: ${ELDES_API_PASSWORD:}
