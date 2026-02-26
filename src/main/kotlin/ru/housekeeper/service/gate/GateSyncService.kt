@@ -75,7 +75,7 @@ class GateSyncService(
         var page = 0
         while (true) {
             val response = eldesApiClient.fetchEventLog(deviceId, from, page, PAGE_SIZE)
-            all.addAll(response.content)
+            all.addAll(response.entries)
             if (page >= response.totalPages - 1) break
             page++
         }

@@ -6,6 +6,7 @@ import org.springframework.http.HttpHeaders
 import org.springframework.http.HttpMethod
 import org.springframework.stereotype.Component
 import org.springframework.web.client.HttpClientErrorException
+import org.springframework.web.client.postForObject
 import org.springframework.web.util.UriComponentsBuilder
 import ru.housekeeper.config.EldesApiProperties
 import ru.housekeeper.utils.logger
@@ -27,7 +28,7 @@ class EldesApiClient(
 
     data class LoginRequest(val email: String, val password: String)
 
-    data class LoginResponse(val accessToken: String)
+    data class LoginResponse(val token: String)
 
     data class EventLogEntryResponse(
         val deviceId: String,
@@ -41,23 +42,23 @@ class EldesApiClient(
     )
 
     data class EventLogListResponse(
-        val content: List<EventLogEntryResponse>,
-        val totalPages: Int,
-        val totalElements: Long,
-        val number: Int,
-        val size: Int,
-    )
+        val entries: List<EventLogEntryResponse>,
+        val total: Long,
+        val page: Int,
+        val pageSize: Int,
+    ) {
+        val totalPages: Int get() = if (pageSize == 0) 1 else Math.ceil(total.toDouble() / pageSize).toInt()
+    }
 
     // --- Auth ---
 
     private fun authenticate() {
         logger().info("Authenticating to eldes-api at ${props.url}")
-        val response = restTemplate.postForObject(
+        val response = restTemplate.postForObject<LoginResponse>(
             "${props.url}/api/auth/login",
             LoginRequest(props.email, props.password),
-            LoginResponse::class.java,
         ) ?: throw IllegalStateException("eldes-api login returned null")
-        token = response.accessToken
+        token = response.token
         logger().info("eldes-api authentication successful")
     }
 
@@ -93,10 +94,9 @@ class EldesApiClient(
         pageSize: Int,
     ): EventLogListResponse {
         val uriBuilder = UriComponentsBuilder
-            .fromHttpUrl("${props.url}/api/event-logs")
-            .queryParam("deviceId", deviceId)
+            .fromHttpUrl("${props.url}/api/private/devices/$deviceId/event-log")
             .queryParam("page", page)
-            .queryParam("size", pageSize)
+            .queryParam("pageSize", pageSize)
 
         if (from != null) uriBuilder.queryParam("from", from.toString())
 
