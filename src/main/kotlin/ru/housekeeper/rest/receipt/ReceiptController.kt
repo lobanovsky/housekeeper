@@ -98,14 +98,14 @@ class ReceiptController(
 
     //специальная ручка для массвой печати квитанций
     //для этих данных
-    //кв: 33, 34, 70, 71, 80, 93, 96, 104, 118, 120, 122, 124, 126, 140, 141
+    //кв: 33, 34, 70, 71, 80, 93, 96, 104, 108, 118, 120, 122, 124, 126, 140, 141
     //мм: 1, 8, 9, 10, 13, 14, 18, 43, 44, 102, 102, 141
     @GetMapping("/batch-print", produces = [MediaType.APPLICATION_PDF_VALUE])
     fun getBatchPrintReceipts(
         @RequestParam year: Int,
         @RequestParam month: Int,
     ): ResponseEntity<ByteArray> {
-        val apartmentNumbers = listOf(33, 34, 70, 71, 80, 93, 96, 104, 118, 120, 122, 124, 126, 140, 141)
+        val apartmentNumbers = listOf(33, 34, 70, 71, 80, 93, 96, 104, 108, 118, 120, 122, 124, 126, 140, 141)
         val parkingNumbers = listOf(1, 8, 9, 10, 13, 14, 18, 43, 44, 102, 102, 141)
 
         val pdfsToMerge = mutableListOf<ByteArray>()
