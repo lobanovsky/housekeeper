@@ -77,6 +77,10 @@ class LogEntryController(
     @GetMapping("/overview/{phone-number}")
     fun getLastByPhoneNumber(@PathVariable("phone-number") phoneNumber: String) = logEntryService.getOverview(phoneNumber)
 
+    @Operation(summary = "Get rooms by phone number")
+    @GetMapping("/phone-number/{phone-number}/rooms")
+    fun getRoomsByPhoneNumber(@PathVariable("phone-number") phoneNumber: String) = logEntryService.findRoomsByPhoneNumber(phoneNumber)
+
 
     enum class FieldFilter(name: String) {
         FLAT_NUMBER("flat-number"),

@@ -110,6 +110,25 @@ class LogEntryService(
 
     fun getAllLastNMonths(n: Int) = logEntryRepository.getAllLastNMonths(n)
 
+    fun findRoomsByPhoneNumber(phoneNumber: String): List<RoomByPhoneResponse> {
+        val accesses = accessService.findByPhoneNumber(phoneNumber)
+        if (accesses.isEmpty()) throw IllegalArgumentException("Активные доступы для номера [$phoneNumber] не найдены")
+        val ownerIds = accesses.map { it.ownerId }.distinct()
+        return ownerIds.flatMap { ownerId ->
+            ownerService.findRoomsByOwnerId(ownerId).map { room ->
+                RoomByPhoneResponse(
+                    number = room.number,
+                    type = room.type.shortDescription,
+                )
+            }
+        }
+    }
+
+    data class RoomByPhoneResponse(
+        val number: String,
+        val type: String,
+    )
+
     fun getOverview(phoneNumber: String): LogEntryOverview {
         val firstEntry = logEntryRepository.getFirstEntryByPhoneNumber(phoneNumber)
         if (firstEntry == null) throw IllegalArgumentException("Не найдены открытия шлагбаума или ворот с помощью телефона [$phoneNumber]")
