@@ -220,7 +220,8 @@ private fun filterByCustomRules(number: String, oldValue: BigDecimal, newValue: 
     if (number == "864041") plus(customValue, oldValue, newValue, BigDecimal(7.81))
 
     //13, 28, 53, 96-1, 115-2, 127-2, 132-1, 136
-    //office5, 20, 26, 28, 29, 47, 49-1, 49-2, 82, 93, 94, 123, 127-1, 127-2, 130, 132, 131, 86
+    //office5, 20, 26, 28, 29, 47, 49-1, 49-2, 82, 93, 94, 123, 127-1, 127-2, 130, 132,
+    //131, 86, 13, 65 (х+г), 86, 102, 115, 143
     socialNorm(
         number,
         setOf(
@@ -252,6 +253,17 @@ private fun filterByCustomRules(number: String, oldValue: BigDecimal, newValue: 
             "884916",
             "852902",
             "770211",
+            "875688",
+            "853026",
+            "775416",
+            "770211",
+            "770262",
+            "816693",
+            "775132",
+            "864962",
+            "862656",
+            "775126",
+            "884769"
         ),
         customValue,
         oldValue,
