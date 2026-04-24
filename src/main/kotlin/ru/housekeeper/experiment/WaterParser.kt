@@ -10,9 +10,9 @@ import java.time.LocalDate
 /**
  * Парсер для воды
  */
-fun main6() {
+fun main() {
     val year = "2026"
-    val month = "03"
+    val month = "04"
     process(
         //(папка месяц) Показания, которые сняли со счётчиков
         currentFilename = "/Users/evgeny/Yandex.Disk.localized/Домовладелец/${year}-${month}/counters/${year}-${month}-вода.xlsx",
@@ -25,7 +25,8 @@ fun main6() {
         //85 номер столбца - январь 2026
         //88 номер столбца - февраль 2026
         //91 номер столбца - март 2026
-        previousColumnValueNumber = 88
+        //94 номер столбца - апрель 2026
+        previousColumnValueNumber = 91
     )
 }
 
@@ -174,10 +175,10 @@ private fun filterByCustomRules(number: String, oldValue: BigDecimal, newValue: 
     if (number == "866997") plus(customValue, oldValue, newValue, BigDecimal(4))
     //40
     if (number == "210258335") plus(customValue, oldValue, newValue, BigDecimal(3))
-    //54-1
-    if (number == "844794") plus(customValue, oldValue, newValue, BigDecimal(1))
-    //54-2
-    if (number == "853231") plus(customValue, oldValue, newValue, BigDecimal(2))
+//    54-1
+//    if (number == "844794") plus(customValue, oldValue, newValue, BigDecimal(1))
+//    54-2
+//    if (number == "853231") plus(customValue, oldValue, newValue, BigDecimal(2))
     //67
     if (number == "852198") plus(customValue, oldValue, newValue, BigDecimal(10))
     //74
@@ -202,8 +203,8 @@ private fun filterByCustomRules(number: String, oldValue: BigDecimal, newValue: 
     if (number == "857832") plus(customValue, oldValue, newValue, BigDecimal(10))
     //118
     if (number == "50081663") plus(customValue, oldValue, newValue, BigDecimal(4.5))
-    //119
-    if (number == "848177") plus(customValue, oldValue, newValue, BigDecimal(0.5))
+//    //119
+//    if (number == "848177") plus(customValue, oldValue, newValue, BigDecimal(0.5))
     //122
     if (number == "848171") plus(customValue, oldValue, newValue, BigDecimal(4))
     //124
@@ -216,6 +217,8 @@ private fun filterByCustomRules(number: String, oldValue: BigDecimal, newValue: 
     if (number == "853209") plus(customValue, oldValue, newValue, BigDecimal(1.24))
     //139-2
     if (number == "152086") plus(customValue, oldValue, newValue, BigDecimal(3.86))
+    //86 (горячая, заменили счётчик)
+    if (number == "107512") plus(customValue, oldValue, newValue, BigDecimal(3.5))
     //Консьерж под.1
     if (number == "864041") plus(customValue, oldValue, newValue, BigDecimal(7.81))
 
@@ -263,7 +266,29 @@ private fun filterByCustomRules(number: String, oldValue: BigDecimal, newValue: 
             "864962",
             "862656",
             "775126",
-            "884769"
+            "884769",
+            "779608",
+            "844798",
+            "852110",
+            "875644",
+            "879991",
+            "857855",
+            "853230",
+            "853267",
+            "853164",
+            "853181",
+            "816518",
+            "852925",
+            "770270",
+            "857834",
+            "770279",
+            "848177",
+            "863973",
+            "875679",
+            "864052",
+            "875778",
+            "844794",
+            "853231",
         ),
         customValue,
         oldValue,
