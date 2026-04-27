@@ -96,3 +96,4 @@ jobs:
             cd ${{ secrets.MR17_HOST_PROJECT_PATH }}
             docker compose pull
             docker compose up -d
+
