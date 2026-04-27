@@ -74,6 +74,7 @@ jobs:
           echo "ELDES_API_URL=${{ secrets.ELDES_API_URL }}" >> .env
           echo "ELDES_API_EMAIL=${{ secrets.ELDES_API_EMAIL }}" >> .env
           echo "ELDES_API_PASSWORD=${{ secrets.ELDES_API_PASSWORD }}" >> .env
+          echo "RECEIPT_BASE_PATH=${{ secrets.RECEIPT_BASE_PATH }}" >> .env
 
       - name: copy files to host
         uses: appleboy/scp-action@v0.1.7

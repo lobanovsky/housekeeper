@@ -18,6 +18,7 @@ services:
       ELDES_API_URL: ${ELDES_API_URL}
       ELDES_API_EMAIL: ${ELDES_API_EMAIL}
       ELDES_API_PASSWORD: ${ELDES_API_PASSWORD}
+      RECEIPT_BASE_PATH: ${RECEIPT_BASE_PATH}
     ports:
       - "8080:8080"
     volumes:
