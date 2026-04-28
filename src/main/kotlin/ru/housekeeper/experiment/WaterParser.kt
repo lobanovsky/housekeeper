@@ -203,8 +203,8 @@ private fun filterByCustomRules(number: String, oldValue: BigDecimal, newValue: 
     if (number == "857832") plus(customValue, oldValue, newValue, BigDecimal(10))
     //118
     if (number == "50081663") plus(customValue, oldValue, newValue, BigDecimal(4.5))
-//    //119
-//    if (number == "848177") plus(customValue, oldValue, newValue, BigDecimal(0.5))
+    //119
+    if (number == "848177") plus(customValue, oldValue, newValue, BigDecimal(10.0))
     //122
     if (number == "848171") plus(customValue, oldValue, newValue, BigDecimal(4))
     //124
@@ -282,7 +282,6 @@ private fun filterByCustomRules(number: String, oldValue: BigDecimal, newValue: 
             "770270",
             "857834",
             "770279",
-            "848177",
             "863973",
             "875679",
             "864052",
