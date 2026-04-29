@@ -3,6 +3,8 @@ package ru.housekeeper.service.receipt
 import org.springframework.stereotype.Service
 import ru.housekeeper.utils.logger
 import java.io.File
+import java.nio.file.Paths
+import kotlin.io.path.absolutePathString
 
 @Service
 class ReceiptFolderService {
@@ -12,7 +14,10 @@ class ReceiptFolderService {
     fun getAvailableMonths(): List<String> {
         val base = File(basePath)
         logger().info("Looking for receipts in ${base.absoluteFile}")
-        if (!base.exists()) return emptyList()
+        if (!base.exists()) {
+            logger().info("Receipts folder not found for path: ${Paths.get(basePath).absolutePathString()}")
+            return emptyList()
+        }
 
         return base.listFiles()
             ?.filter { it.isDirectory && it.name.matches(Regex("""\d{4}-\d{2}""")) }
