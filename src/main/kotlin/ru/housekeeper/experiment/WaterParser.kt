@@ -149,8 +149,8 @@ private fun filterByCustomRules(number: String, oldValue: BigDecimal, newValue: 
     if (number == "885072") plus(customValue, oldValue, newValue, BigDecimal(0.5))
     //125
     if (number == "884789") plus(customValue, oldValue, newValue, BigDecimal(8))
-//    135-1
-//    if (number == "885042") plus(customValue, oldValue, newValue, BigDecimal(3.8))
+    135-1
+    if (number == "885042") plus(customValue, oldValue, newValue, BigDecimal(0.5))
     //136 (за 11 месяцев не платили с июля 2023) 6.935 x 11 = 76,285
 //    if (number == "884838") plus(customValue, oldValue, newValue, BigDecimal(76.285), "(за 11 месяцев не платили с июля 2023) 6.935 x 11 = 76,285")
 
@@ -252,7 +252,6 @@ private fun filterByCustomRules(number: String, oldValue: BigDecimal, newValue: 
             "852090",
             "848175",
             "852237",
-            "885042",
             "884916",
             "852902",
             "770211",
