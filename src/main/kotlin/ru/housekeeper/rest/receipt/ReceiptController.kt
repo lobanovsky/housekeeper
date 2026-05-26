@@ -105,7 +105,7 @@ class ReceiptController(
         @RequestParam year: Int,
         @RequestParam month: Int,
     ): ResponseEntity<ByteArray> {
-        val apartmentNumbers = listOf(18, 33, 34, 70, 71, 80, 93, 96, 104, 108, 118, 120, 122, 124, 126, 140, 141)
+        val apartmentNumbers = listOf(18, 33, 34, 70, 71, 80, 93, 96, 104, 108, 115, 118, 120, 122, 124, 126, 140, 141)
         val parkingNumbers = listOf(1, 8, 9, 10, 13, 14, 18, 43, 44, 102, 103, 141)
 
         val pdfsToMerge = mutableListOf<ByteArray>()
