@@ -271,8 +271,6 @@ private fun filterByCustomRules(number: String, oldValue: BigDecimal, newValue: 
             "853230",
             "853267",
             "853164",
-            "853181",
-            "816518",
             "852925",
             "770270",
             "857834",
