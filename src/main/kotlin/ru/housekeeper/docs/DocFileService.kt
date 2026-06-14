@@ -25,7 +25,7 @@ class DocFileService {
         }
         run.fontSize = 8
         run.fontFamily = "Times New Roman"
-        val fos = FileOutputStream(File("$rootPath${path}/${fileName}.docx"))
+        val fos = FileOutputStream(File("$rootPath${path}/${fileName}"))
         document.write(fos)
         fos.close()
 

@@ -1,5 +1,6 @@
 package ru.housekeeper.service
 
+import org.hibernate.internal.util.collections.CollectionHelper.listOf
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
 import org.springframework.web.multipart.MultipartFile
@@ -110,14 +111,16 @@ class DecisionService(
     fun prepareDecision(): DecisionInfo {
         val template = templateService.findTemplateById(5L)
         val header = template?.header?.split("\n") ?: emptyList()
+        val body = template?.body?.split("\n") ?: emptyList()
         val footer = template?.footer?.split("\n") ?: emptyList()
 
-        val existOwner = ownerService.findAll()
+        val existOwners = ownerService.findAll()
+//        val existOwners = listOf<OwnerEntity>(ownerService.findByFullName("Лобановский Евгений Владимирович"))
         val existRooms = roomService.findAll().associateBy { it.id }
 
         val decisions = mutableListOf<Decision>()
         val createDate = LocalDateTime.now()
-        existOwner.forEach { owner ->
+        existOwners.forEach { owner ->
             val totalSquare = getTotalSquare(owner.rooms.toList(), existRooms)
             val percentageSquare = getPercentageSquare(owner.rooms.toList(), existRooms)
             decisions.add(
@@ -128,7 +131,7 @@ class DecisionService(
                     percentage = percentageSquare,
                     rooms = owner.rooms,
                     emails = owner.emails.toMutableSet(),
-                    blank = listOf(header, makeBlank(owner.rooms.toList(), existRooms), footer).flatten()
+                    blank = listOf(header, makeBlank(owner.rooms.toList(), existRooms), body, footer).flatten()
                         .joinToString("\n"),
                     numbersOfRooms = getRoomNumbers(owner.rooms.toList(), existRooms),
                     createDate = createDate,

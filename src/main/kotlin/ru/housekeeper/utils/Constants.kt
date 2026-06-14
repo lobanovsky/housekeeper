@@ -10,8 +10,9 @@ val TOTAL_SQUARE: BigDecimal = FLAT_SQUARE.add(GARAGE_SQUARE)
 const val MAX_SIZE_PER_PAGE_FOR_EXCEL = 5000
 const val MAX_SIZE_PER_PAGE = 5000
 
-const val NUMBER_OF_QUESTIONS = 18
+const val NUMBER_OF_QUESTIONS = 13
 
+//2/3 = 66,67% ≈ 67%
 const val QUORUM = 67.0
 
 const val MAX_ELDES_LABEL_LENGTH = 15
