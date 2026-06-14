@@ -6,7 +6,6 @@ import org.springframework.stereotype.Service
 import org.springframework.web.multipart.MultipartFile
 import ru.housekeeper.enums.RoomTypeEnum
 import ru.housekeeper.model.entity.Decision
-import ru.housekeeper.model.entity.OwnerEntity
 import ru.housekeeper.model.entity.Room
 import ru.housekeeper.parser.AnswerParser
 import ru.housekeeper.repository.DecisionRepository
@@ -24,6 +23,7 @@ class DecisionService(
     private val decisionRepository: DecisionRepository,
     private val emailService: EmailService,
     private val docFileService: ru.housekeeper.docs.DocFileService,
+    private val pdfFileService: ru.housekeeper.docs.PdfFileService,
 ) {
 
     fun getNotVoted(): List<Decision> =
@@ -31,20 +31,29 @@ class DecisionService(
 
     fun getPrint(): List<Decision> = decisionRepository.findByPrint(print = true).sortedByDescending { it.percentage }
 
-    fun printDecision(path: String, getDecisions: () -> List<Decision>): Int {
+    fun printDecision(path: String, withDocx: Boolean = false, getDecisions: () -> List<Decision>): Int {
         val decisions = getDecisions.invoke()
-        logger().info("Number of printing decisions: ${decisions.size}")
+        logger().info("Number of printing decisions: ${decisions.size}, withDocx=$withDocx")
 
         decisions.forEach { decision ->
-            val blank = decision.blank
-            val decisionLines = blank.split("\n")
-            val fileName = "Решение собственника (${decision.numbersOfRooms}) ${decision.fullName}.docx"
-            docFileService.doIt(
+            val decisionLines = decision.blank.split("\n")
+            val baseName = "Решение собственника (${decision.numbersOfRooms}) ${decision.fullName}"
+            pdfFileService.doIt(
                 rootPath = "etc",
                 lines = decisionLines,
                 path = path,
-                fileName = fileName
+                fileName = "$baseName.pdf",
+                ownerName = decision.fullName
             )
+            if (withDocx) {
+                docFileService.doIt(
+                    rootPath = "etc",
+                    lines = decisionLines,
+                    path = path,
+                    fileName = "$baseName.docx",
+                    ownerName = decision.fullName
+                )
+            }
         }
         return decisions.size
     }
@@ -115,8 +124,8 @@ class DecisionService(
         val body = template?.body?.split("\n") ?: emptyList()
         val footer = template?.footer?.split("\n") ?: emptyList()
 
-//        val existOwners = ownerService.findAll()
-        val existOwners = listOf<OwnerEntity>(ownerService.findByFullName("Лобановский Евгений Владимирович"))
+        val existOwners = ownerService.findAll().filter { it.active }
+//        val existOwners = listOf<OwnerEntity>(ownerService.findByFullName("Федоров Дмитрий Викторович"))
         val existRooms = roomService.findAll().associateBy { it.id }
 
         val decisions = mutableListOf<Decision>()

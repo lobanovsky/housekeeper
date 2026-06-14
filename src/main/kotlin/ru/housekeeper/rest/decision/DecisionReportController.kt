@@ -4,10 +4,7 @@ import io.swagger.v3.oas.annotations.Operation
 import org.springframework.http.HttpHeaders
 import org.springframework.http.MediaType
 import org.springframework.http.ResponseEntity
-import org.springframework.web.bind.annotation.CrossOrigin
-import org.springframework.web.bind.annotation.GetMapping
-import org.springframework.web.bind.annotation.RequestMapping
-import org.springframework.web.bind.annotation.RestController
+import org.springframework.web.bind.annotation.*
 import ru.housekeeper.excel.toExcelDecisions
 import ru.housekeeper.excel.toExcelForTemplate
 import ru.housekeeper.service.DecisionService
@@ -22,14 +19,18 @@ class DecisionReportController(
 ) {
 
     @GetMapping(path = ["/not-voted"])
-    @Operation(summary = "Print not voted decisions")
-    fun makeNotVotedDecisionsReport(): Int =
-        decisionService.printDecision("/not-voted") { decisionService.getNotVoted() }
+    @Operation(summary = "Print not voted decisions (PDF by default, add ?docx=true for DOCX too)")
+    fun makeNotVotedDecisionsReport(
+        @RequestParam(defaultValue = "false") docx: Boolean
+    ): Int =
+        decisionService.printDecision("/not-voted", docx) { decisionService.getNotVoted() }
 
     @GetMapping(path = ["/selected-to-print"])
-    @Operation(summary = "Print selected decisions")
-    fun printSelectedDecisionsReport(): Int =
-        decisionService.printDecision("/selected-to-print") { decisionService.getPrint() }
+    @Operation(summary = "Print selected decisions (PDF by default, add ?docx=true for DOCX too)")
+    fun printSelectedDecisionsReport(
+        @RequestParam(defaultValue = "false") docx: Boolean
+    ): Int =
+        decisionService.printDecision("/selected-to-print", docx) { decisionService.getPrint() }
 
     @GetMapping()
     @Operation(summary = "Export all decisions")
