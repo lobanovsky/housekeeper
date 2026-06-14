@@ -6,6 +6,7 @@ import org.springframework.stereotype.Service
 import org.springframework.web.multipart.MultipartFile
 import ru.housekeeper.enums.RoomTypeEnum
 import ru.housekeeper.model.entity.Decision
+import ru.housekeeper.model.entity.OwnerEntity
 import ru.housekeeper.model.entity.Room
 import ru.housekeeper.parser.AnswerParser
 import ru.housekeeper.repository.DecisionRepository
@@ -114,8 +115,8 @@ class DecisionService(
         val body = template?.body?.split("\n") ?: emptyList()
         val footer = template?.footer?.split("\n") ?: emptyList()
 
-        val existOwners = ownerService.findAll()
-//        val existOwners = listOf<OwnerEntity>(ownerService.findByFullName("Лобановский Евгений Владимирович"))
+//        val existOwners = ownerService.findAll()
+        val existOwners = listOf<OwnerEntity>(ownerService.findByFullName("Лобановский Евгений Владимирович"))
         val existRooms = roomService.findAll().associateBy { it.id }
 
         val decisions = mutableListOf<Decision>()
@@ -165,11 +166,12 @@ class DecisionService(
         val sortedRooms = rooms.mapNotNull { existRooms[it] }
         sortedRooms.forEach { room ->
             val cert = if (room.certificate?.isNotBlank() == true) ", ${room.certificate}" else ""
+            val cadastre = if (room.cadastreNumber?.isNotBlank() == true) ", кад.№ ${room.cadastreNumber}" else ""
             val description = room.type.description
             val number = room.number
             val square = room.square
             val percentage = room.percentage
-            lines.add("$description № ${number}, ${square}кв.м, доля: ${percentage}%$cert")
+            lines.add("$description № ${number}, ${square}кв.м, доля: ${percentage}%$cert$cadastre")
         }
         return lines.sortedBy { it }
     }
