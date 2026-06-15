@@ -6,6 +6,7 @@ import org.springframework.stereotype.Service
 import org.springframework.web.multipart.MultipartFile
 import ru.housekeeper.enums.RoomTypeEnum
 import ru.housekeeper.model.entity.Decision
+import ru.housekeeper.model.entity.OwnerEntity
 import ru.housekeeper.model.entity.Room
 import ru.housekeeper.parser.AnswerParser
 import ru.housekeeper.repository.DecisionRepository
@@ -82,11 +83,11 @@ class DecisionService(
         var numberOfMailsSent = 0
         var numberOfDecisionsSent = 0
         val decisions = getDecisions.invoke()
-        logger().info("Number of decistions for email sending: ${decisions.size}")
+        logger().info("Number of decisions for email sending: ${decisions.size}")
         decisions.forEach { decision ->
             val subject = "ТСН МР17дом1. Решение собственника ${decision.fullName}. (${decision.numbersOfRooms})"
             val file = ru.housekeeper.docs.SimpleDocFileService().doIt(decision.blank.split("\n"))
-            val attachmentFilename = "Решение собственника (${decision.numbersOfRooms}) ${decision.fullName}.docx"
+            val attachmentFilename = "Решение собственника (${decision.numbersOfRooms}) ${decision.fullName}.pdf"
             val attachmentFile = File("etc/blanks/$attachmentFilename")
             attachmentFile.writeBytes(file.toByteArray())
             decision.emails.forEach { email ->

@@ -31,7 +31,7 @@ class EmailService(
     ): Boolean {
         val message: MimeMessage = mailSender.createMimeMessage()
         return try {
-            val helper = MimeMessageHelper(message, "utf-8")
+            val helper = MimeMessageHelper(message, true, "utf-8")
             helper.setFrom(from)
             helper.setTo(to)
             helper.setBcc("e.lobanovsky@ya.ru")
