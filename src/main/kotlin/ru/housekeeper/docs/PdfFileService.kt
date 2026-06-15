@@ -52,11 +52,10 @@ class PdfFileService {
             }
 
             for ((index, rawLine) in lines.withIndex()) {
-                val line = sanitize(rawLine, regular)
+                val line = sanitize(stripMarkers(rawLine), regular)
                 val header = isHeader(line)
                 val ownerLine = ownerNameTrimmed != null && line.trim() == ownerNameTrimmed
 
-                val font: PDFont = if (header || ownerLine) bold else regular
                 val fontSize = when {
                     line.isBlank() -> blankLineFontSize
                     header && index == 0 -> titleFontSize
@@ -65,17 +64,38 @@ class PdfFileService {
                 }
                 val leading = fontSize * 1.25f
 
-                for (subLine in wrap(line, font, fontSize, contentWidth)) {
-                    if (y - leading < margin) newPage()
-                    y -= leading
-                    if (subLine.isNotEmpty()) {
-                        val textWidth = font.getStringWidth(subLine) / 1000f * fontSize
-                        val x = if (header) (pageSize.width - textWidth) / 2 else margin
-                        contentStream.beginText()
-                        contentStream.setFont(font, fontSize)
-                        contentStream.newLineAtOffset(x, y)
-                        contentStream.showText(subLine)
-                        contentStream.endText()
+                if (header || ownerLine || line.isBlank()) {
+                    // Одношрифтовый путь: заголовки (по центру) / ФИО / пустые строки.
+                    val font: PDFont = if (header || ownerLine) bold else regular
+                    for (subLine in wrap(line, font, fontSize, contentWidth)) {
+                        if (y - leading < margin) newPage()
+                        y -= leading
+                        if (subLine.isNotEmpty()) {
+                            val textWidth = font.getStringWidth(subLine) / 1000f * fontSize
+                            val x = if (header) (pageSize.width - textWidth) / 2 else margin
+                            contentStream.beginText()
+                            contentStream.setFont(font, fontSize)
+                            contentStream.newLineAtOffset(x, y)
+                            contentStream.showText(subLine)
+                            contentStream.endText()
+                        }
+                    }
+                } else {
+                    // Обычная строка с возможным инлайн-жирным по маркерам **...**.
+                    val words = styledWords(rawLine, regular, bold)
+                    val spaceWidth = regular.getStringWidth(" ") / 1000f * fontSize
+                    for (wrapped in wrapStyled(words, fontSize, spaceWidth, contentWidth)) {
+                        if (y - leading < margin) newPage()
+                        y -= leading
+                        var x = margin
+                        for (word in wrapped) {
+                            contentStream.beginText()
+                            contentStream.setFont(word.font, fontSize)
+                            contentStream.newLineAtOffset(x, y)
+                            contentStream.showText(word.text)
+                            contentStream.endText()
+                            x += word.font.getStringWidth(word.text) / 1000f * fontSize + spaceWidth
+                        }
                     }
                 }
 
@@ -88,6 +108,56 @@ class PdfFileService {
             outFile.parentFile?.mkdirs()
             document.save(outFile)
         }
+    }
+
+    private class StyledWord(val text: String, val font: PDFont)
+
+    private fun stripMarkers(line: String): String = line.replace("**", "")
+
+    // Разбор строки на стилизованные слова: текст между парами ** — жирный.
+    // Ведущий отступ строки сохраняется как часть первого слова.
+    private fun styledWords(rawLine: String, regular: PDFont, bold: PDFont): List<StyledWord> {
+        val indent = rawLine.takeWhile { it == ' ' }
+        val segments = rawLine.substring(indent.length).split("**")
+        val words = mutableListOf<StyledWord>()
+        segments.forEachIndexed { segIndex, segment ->
+            if (segment.isEmpty()) return@forEachIndexed
+            val font = if (segIndex % 2 == 1) bold else regular
+            segment.split(" ").filter { it.isNotEmpty() }.forEach { word ->
+                words.add(StyledWord(sanitize(word, font), font))
+            }
+        }
+        if (indent.isNotEmpty() && words.isNotEmpty()) {
+            words[0] = StyledWord(indent + words[0].text, words[0].font)
+        }
+        return words
+    }
+
+    // Жадный перенос стилизованных слов по ширине; каждое слово меряется своим шрифтом.
+    private fun wrapStyled(
+        words: List<StyledWord>,
+        fontSize: Float,
+        spaceWidth: Float,
+        maxWidth: Float,
+    ): List<List<StyledWord>> {
+        if (words.isEmpty()) return listOf(emptyList())
+        val result = mutableListOf<List<StyledWord>>()
+        var current = mutableListOf<StyledWord>()
+        var currentWidth = 0f
+        for (word in words) {
+            val wordWidth = word.font.getStringWidth(word.text) / 1000f * fontSize
+            val addWidth = if (current.isEmpty()) wordWidth else spaceWidth + wordWidth
+            if (current.isEmpty() || currentWidth + addWidth <= maxWidth) {
+                current.add(word)
+                currentWidth += addWidth
+            } else {
+                result.add(current)
+                current = mutableListOf(word)
+                currentWidth = wordWidth
+            }
+        }
+        result.add(current)
+        return result
     }
 
     // Жадный перенос по словам до ширины контента, сохраняя ведущий отступ строки.

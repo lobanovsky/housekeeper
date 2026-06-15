@@ -25,7 +25,8 @@ class DocFileService {
         narrowMargins(document)
         val ownerNameTrimmed = ownerName?.trim()
 
-        for ((index, line) in lines.withIndex()) {
+        for ((index, rawLine) in lines.withIndex()) {
+            val line = rawLine.replace("**", "") // маркеры жирного используются только в PDF
             val paragraph = document.createParagraph()
             paragraph.spacingBefore = 0
             paragraph.spacingAfter = 0

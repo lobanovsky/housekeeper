@@ -23,6 +23,7 @@ class PdfFileServiceTest {
             "1. Избрать председателем Шурыгина Д.М. (кв. 127) и секретаря общего собрания. " +
                 "Длинный текст, который должен перенестись на следующую строку по словам без обрезания по краю страницы.",
             "    ЗА ____________   ПРОТИВ ____________   ВОЗДЕРЖАЛСЯ ____________",
+            "Голосование проводится **с 22.06.2026г. до 13.07.2026г.** включительно.",
         )
 
         val dir = File("etc/test-pdf")
@@ -46,6 +47,9 @@ class PdfFileServiceTest {
         assertTrue(text.contains("Лобановский Евгений Владимирович"), "Owner name missing")
         assertTrue(text.contains("Машиноместо"), "Room line missing")
         assertTrue(text.contains("ВОЗДЕРЖАЛСЯ"), "Voting line missing")
+        // Маркеры жирного не должны попадать в текст, а сам текст — должен
+        assertTrue(text.contains("с 22.06.2026г. до 13.07.2026г."), "Bolded phrase missing")
+        assertTrue(!text.contains("**"), "Bold markers leaked into PDF text: $text")
 
         outFile.delete()
     }

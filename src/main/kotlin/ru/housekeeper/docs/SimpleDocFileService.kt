@@ -8,7 +8,9 @@ import java.io.ByteArrayOutputStream
 @Service
 class SimpleDocFileService {
 
-    fun doIt(lines: List<String>): ByteArrayOutputStream {
+    fun doIt(rawLines: List<String>): ByteArrayOutputStream {
+        // маркеры жирного (**...**) используются только в PDF — здесь убираем
+        val lines = rawLines.map { it.replace("**", "") }
 
         val document = XWPFDocument()
         //title
