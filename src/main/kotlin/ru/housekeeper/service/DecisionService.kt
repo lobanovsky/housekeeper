@@ -125,7 +125,7 @@ class DecisionService(
         val footer = template?.footer?.split("\n") ?: emptyList()
 
         val existOwners = ownerService.findAll().filter { it.active }
-//        val existOwners = listOf<OwnerEntity>(ownerService.findByFullName("Федоров Дмитрий Викторович"))
+//        val existOwners = listOf<OwnerEntity>(ownerService.findByFullName("Лобановский Евгений Владимирович"))
         val existRooms = roomService.findAll().associateBy { it.id }
 
         val decisions = mutableListOf<Decision>()
@@ -171,18 +171,17 @@ class DecisionService(
     }
 
     private fun makeBlank(rooms: List<Long?>, existRooms: Map<Long?, Room>): List<String> {
-        val lines = mutableListOf(existRooms[rooms.first()]?.ownerName ?: "")
-        val sortedRooms = rooms.mapNotNull { existRooms[it] }
-        sortedRooms.forEach { room ->
+        val ownerName = existRooms[rooms.first()]?.ownerName ?: ""
+        val roomLines = rooms.mapNotNull { existRooms[it] }.map { room ->
             val cert = if (room.certificate?.isNotBlank() == true) ", ${room.certificate}" else ""
             val cadastre = if (room.cadastreNumber?.isNotBlank() == true) ", кад.№ ${room.cadastreNumber}" else ""
             val description = room.type.description
             val number = room.number
             val square = room.square
             val percentage = room.percentage
-            lines.add("$description № ${number}, ${square}кв.м, доля: ${percentage}%$cert$cadastre")
-        }
-        return lines.sortedBy { it }
+            "$description № ${number}, ${square}кв.м, доля: ${percentage}%$cert$cadastre"
+        }.sortedBy { it }
+        return listOf(ownerName) + roomLines
     }
 
     private fun getTotalSquare(rooms: List<Long?>, existRooms: Map<Long?, Room>) =
