@@ -6,7 +6,6 @@ import org.springframework.stereotype.Service
 import org.springframework.web.multipart.MultipartFile
 import ru.housekeeper.enums.RoomTypeEnum
 import ru.housekeeper.model.entity.Decision
-import ru.housekeeper.model.entity.OwnerEntity
 import ru.housekeeper.model.entity.Room
 import ru.housekeeper.parser.AnswerParser
 import ru.housekeeper.repository.DecisionRepository
@@ -32,12 +31,19 @@ class DecisionService(
 
     fun getPrint(): List<Decision> = decisionRepository.findByPrint(print = true).sortedByDescending { it.percentage }
 
+    // Подстановка плейсхолдеров бланка при рендере (id появляется только после сохранения).
+    private fun renderLines(decision: Decision): List<String> =
+        decision.blank
+            .replace("{{decision_number}}", decision.id?.toString() ?: "")
+            .replace("{{fullName}}", decision.fullName)
+            .split("\n")
+
     fun printDecision(path: String, withDocx: Boolean = false, getDecisions: () -> List<Decision>): Int {
         val decisions = getDecisions.invoke()
         logger().info("Number of printing decisions: ${decisions.size}, withDocx=$withDocx")
 
         decisions.forEach { decision ->
-            val decisionLines = decision.blank.split("\n")
+            val decisionLines = renderLines(decision)
             val baseName = "Решение собственника (${decision.numbersOfRooms}) ${decision.fullName}"
             pdfFileService.doIt(
                 rootPath = "etc",
@@ -86,7 +92,7 @@ class DecisionService(
         logger().info("Number of decisions for email sending: ${decisions.size}")
         decisions.forEach { decision ->
             val subject = "ТСН МР17дом1. Решение собственника ${decision.fullName}. (${decision.numbersOfRooms})"
-            val file = ru.housekeeper.docs.SimpleDocFileService().doIt(decision.blank.split("\n"))
+            val file = ru.housekeeper.docs.SimpleDocFileService().doIt(renderLines(decision))
             val attachmentFilename = "Решение собственника (${decision.numbersOfRooms}) ${decision.fullName}.pdf"
             val attachmentFile = File("etc/blanks/$attachmentFilename")
             attachmentFile.writeBytes(file.toByteArray())
