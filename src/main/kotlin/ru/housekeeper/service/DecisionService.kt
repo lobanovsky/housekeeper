@@ -92,10 +92,15 @@ class DecisionService(
         logger().info("Number of decisions for email sending: ${decisions.size}")
         decisions.forEach { decision ->
             val subject = "ТСН МР17дом1. Решение собственника ${decision.fullName}. (${decision.numbersOfRooms})"
-            val file = ru.housekeeper.docs.SimpleDocFileService().doIt(renderLines(decision))
             val attachmentFilename = "Решение собственника (${decision.numbersOfRooms}) ${decision.fullName}.pdf"
+            pdfFileService.doIt(
+                rootPath = "etc",
+                lines = renderLines(decision),
+                path = "/blanks",
+                fileName = attachmentFilename,
+                ownerName = decision.fullName,
+            )
             val attachmentFile = File("etc/blanks/$attachmentFilename")
-            attachmentFile.writeBytes(file.toByteArray())
             decision.emails.forEach { email ->
                 logger().info("Send ${numberOfMailsSent + 1} of $totalEmails")
                 val result = emailService.sendMessageWithAttachment(
