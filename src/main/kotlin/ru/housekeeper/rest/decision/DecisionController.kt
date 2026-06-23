@@ -33,13 +33,14 @@ class DecisionController(
     @Operation(summary = "Prepare decisions")
     @PostMapping
     fun makeBlankDecision(): DecisionResponse {
-        val (totalSize, totalSquare, totalPercentage) = decisionService.prepareDecision()
-        return DecisionResponse(totalSize, totalSquare, totalPercentage)
+        val (totalSize, totalSquare, totalPercentage, skipped) = decisionService.prepareDecision()
+        return DecisionResponse(totalSize, totalSquare, totalPercentage, skipped)
     }
 
     data class DecisionResponse(
         val totalSize: Int,
         val square: BigDecimal,
-        val percentage: BigDecimal
+        val percentage: BigDecimal,
+        val skipped: Int,
     )
 }

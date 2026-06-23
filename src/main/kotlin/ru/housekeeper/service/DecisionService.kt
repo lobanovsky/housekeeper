@@ -127,9 +127,9 @@ class DecisionService(
         val totalSize: Int,
         val totalSquare: BigDecimal,
         val totalPercentage: BigDecimal,
+        val skipped: Int,
     )
 
-    //TODO to add skip duplicate
     fun prepareDecision(): DecisionInfo {
         val template = templateService.findTemplateById(5L)
         val header = template?.header?.split("\n") ?: emptyList()
@@ -160,11 +160,15 @@ class DecisionService(
                 )
             )
         }
-        decisionRepository.saveAll(decisions)
+        val existingUuids = decisionRepository.findAllUuids().toSet()
+        val newDecisions = decisions.filter { it.uuid !in existingUuids }
+        decisionRepository.saveAll(newDecisions)
+        logger().info("Decisions created: ${newDecisions.size}, skipped (already exist): ${decisions.size - newDecisions.size}")
         return DecisionInfo(
-            totalSize = decisions.size,
-            totalSquare = decisions.sumOf { it.square },
-            totalPercentage = decisions.sumOf { it.percentage },
+            totalSize = newDecisions.size,
+            totalSquare = newDecisions.sumOf { it.square },
+            totalPercentage = newDecisions.sumOf { it.percentage },
+            skipped = decisions.size - newDecisions.size,
         )
     }
 

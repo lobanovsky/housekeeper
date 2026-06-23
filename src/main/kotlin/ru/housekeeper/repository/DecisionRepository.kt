@@ -31,4 +31,7 @@ interface DecisionRepository : CrudRepository<Decision, Long> {
     @Query("SELECT COUNT(d) FROM Decision d")
     fun countDecisions(): Long
 
+    @Query("SELECT d.uuid FROM Decision d")
+    fun findAllUuids(): List<String>
+
 }
