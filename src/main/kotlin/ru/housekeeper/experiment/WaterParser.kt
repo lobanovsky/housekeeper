@@ -12,7 +12,7 @@ import java.time.LocalDate
  */
 fun main6() {
     val year = "2026"
-    val month = "05"
+    val month = "06"
     process(
         //(папка месяц) Показания, которые сняли со счётчиков
         currentFilename = "/Users/evgeny/Yandex.Disk.localized/Домовладелец/${year}-${month}/counters/${year}-${month}-вода.xlsx",
@@ -22,7 +22,8 @@ fun main6() {
         destinationPath = "/Users/evgeny/Yandex.Disk.localized/Домовладелец/0-counters/",
         //(указать номер столбца с предыдущими показаниями) Чтобы задать новое значение, нужно прибавить +3
         //94 номер столбца - апрель 2026
-        previousColumnValueNumber = 94
+        //97 номер столбца - май 2026
+        previousColumnValueNumber = 97
     )
 }
 
@@ -45,7 +46,6 @@ fun process(
 
 fun readOldValues(workbook: Workbook, sheetName: String, previousColumnValueNumber: Int, values: Map<String, BigDecimal>): List<Result> {
     val sheet = workbook.getSheet(sheetName)
-    val evaluator = workbook.creationHelper.createFormulaEvaluator()
     val result = mutableListOf<Result>()
     for (i in 1..sheet.lastRowNum) {
         val row = sheet.getRow(i)
@@ -57,7 +57,15 @@ fun readOldValues(workbook: Workbook, sheetName: String, previousColumnValueNumb
         val number = if (numberCell.cellType == CellType.STRING) numberCell.stringCellValue.trim() else ""
         val oldValue = when (valueCell.cellType) {
             CellType.NUMERIC -> numericToBigDecimal(valueCell)
-            CellType.FORMULA -> doubleToBigDecimal(evaluator.evaluate(valueCell).numberValue)
+            CellType.FORMULA -> when (valueCell.cachedFormulaResultType) {
+                CellType.NUMERIC -> numericToBigDecimal(valueCell)
+                CellType.STRING -> {
+                    val value = valueCell.stringCellValue
+                    if (value.isBlank()) BigDecimal.ZERO else BigDecimal(value.replace(",", "."))
+                }
+
+                else -> BigDecimal.ZERO
+            }
             CellType.STRING -> {
                 val value = valueCell.stringCellValue
                 if (value.isBlank()) BigDecimal.ZERO else BigDecimal(value.replace(",", "."))
@@ -84,7 +92,7 @@ fun readOldValues(workbook: Workbook, sheetName: String, previousColumnValueNumb
 }
 
 private fun filterByCustomRules(number: String, oldValue: BigDecimal, newValue: BigDecimal): CustomValue {
-    var customValue = CustomValue(newValue)
+    val customValue = CustomValue(newValue)
 
     if (newValue < oldValue) zero(customValue, oldValue, newValue)
 
@@ -145,10 +153,78 @@ private fun filterByCustomRules(number: String, oldValue: BigDecimal, newValue: 
     if (number == "885072") plus(customValue, oldValue, newValue, BigDecimal(0.5))
     //125
     if (number == "884789") plus(customValue, oldValue, newValue, BigDecimal(8))
-    135-1
+    //135-1
     if (number == "885042") plus(customValue, oldValue, newValue, BigDecimal(0.5))
-    //136 (за 11 месяцев не платили с июля 2023) 6.935 x 11 = 76,285
-//    if (number == "884838") plus(customValue, oldValue, newValue, BigDecimal(76.285), "(за 11 месяцев не платили с июля 2023) 6.935 x 11 = 76,285")
+
+    //Оф.8
+    if (number == "875755") plus(customValue, oldValue, newValue, BigDecimal(1))
+    //8
+    if (number == "689574") {
+        plus(customValue, oldValue, newValue, BigDecimal(3))
+    }
+    //9
+    if (number == "689402") plus(customValue, oldValue, newValue, BigDecimal(11))
+    //10
+    if (number == "689579") plus(customValue, oldValue, newValue, BigDecimal(3))
+    //11
+    if (number == "686187") plus(customValue, oldValue, newValue, BigDecimal(10))
+    //18-1
+    if (number == "876011") plus(customValue, oldValue, newValue, BigDecimal(10))
+    //18-2
+    if (number == "875741") plus(customValue, oldValue, newValue, BigDecimal(0))
+    //50
+    if (number == "779682") plus(customValue, oldValue, newValue, BigDecimal(1.5))
+    //51
+    if (number == "775190") plus(customValue, oldValue, newValue, BigDecimal(3.5))
+    //52
+    if (number == "779601") plus(customValue, oldValue, newValue, BigDecimal(4.5))
+    //56
+    if (number == "779686") plus(customValue, oldValue, newValue, BigDecimal(2.5))
+    //57
+    if (number == "770457") plus(customValue, oldValue, newValue, BigDecimal(7))
+    //59
+    if (number == "779606") plus(customValue, oldValue, newValue, BigDecimal(3.5))
+    //60-1
+    if (number == "113280") plus(customValue, oldValue, newValue, BigDecimal(1))
+    //60-2
+    if (number == "113173") plus(customValue, oldValue, newValue, BigDecimal(4))
+    //75
+    if (number == "884917") plus(customValue, oldValue, newValue, BigDecimal(1.5))
+    //76
+    if (number == "885077") plus(customValue, oldValue, newValue, BigDecimal(2))
+    //77
+    if (number == "885073") plus(customValue, oldValue, newValue, BigDecimal(8.5))
+    //80
+    if (number == "884996") plus(customValue, oldValue, newValue, BigDecimal(3))
+    //81
+    if (number == "884913") plus(customValue, oldValue, newValue, BigDecimal(3))
+    //82
+    if (number == "884831") plus(customValue, oldValue, newValue, BigDecimal(4))
+    //85-1
+    if (number == "779757") plus(customValue, oldValue, newValue, BigDecimal(5.5))
+    //85-2
+    if (number == "775118") plus(customValue, oldValue, newValue, BigDecimal(9.5))
+    //90-1
+    if (number == "779769") plus(customValue, oldValue, newValue, BigDecimal(0.5))
+    //90-2
+    if (number == "779701") plus(customValue, oldValue, newValue, BigDecimal(3))
+    //106
+    if (number == "816518") plus(customValue, oldValue, newValue, BigDecimal(0.1))
+    //116
+    if (number == "770277") plus(customValue, oldValue, newValue, BigDecimal(12))
+    //119
+    if (number == "770264") plus(customValue, oldValue, newValue, BigDecimal(2.5))
+    //120-1
+    if (number == "779762") plus(customValue, oldValue, newValue, BigDecimal(0.3))
+    //120-2
+    if (number == "779775") plus(customValue, oldValue, newValue, BigDecimal(2.5))
+    //126-1
+    if (number == "875864") plus(customValue, oldValue, newValue, BigDecimal(10))
+    //134
+    if (number == "884914") plus(customValue, oldValue, newValue, BigDecimal(3.5))
+    //137
+    if (number == "885050") plus(customValue, oldValue, newValue, BigDecimal(14))
+
 
     //холодная вода
     //БКФН Гараж
@@ -171,10 +247,6 @@ private fun filterByCustomRules(number: String, oldValue: BigDecimal, newValue: 
     if (number == "866997") plus(customValue, oldValue, newValue, BigDecimal(4))
     //40
     if (number == "210258335") plus(customValue, oldValue, newValue, BigDecimal(3))
-//    54-1
-//    if (number == "844794") plus(customValue, oldValue, newValue, BigDecimal(1))
-//    54-2
-//    if (number == "853231") plus(customValue, oldValue, newValue, BigDecimal(2))
     //67
     if (number == "852198") plus(customValue, oldValue, newValue, BigDecimal(10))
     //74
@@ -217,6 +289,78 @@ private fun filterByCustomRules(number: String, oldValue: BigDecimal, newValue: 
     if (number == "107512") plus(customValue, oldValue, newValue, BigDecimal(3.5))
     //Консьерж под.1
     if (number == "864041") plus(customValue, oldValue, newValue, BigDecimal(7.81))
+
+    //8
+    if (number == "672306") plus(customValue, oldValue, newValue, BigDecimal(6))
+    //9
+    if (number == "667878") plus(customValue, oldValue, newValue, BigDecimal(11))
+    //10
+    if (number == "665306") plus(customValue, oldValue, newValue, BigDecimal(4))
+    //11
+    if (number == "672310") plus(customValue, oldValue, newValue, BigDecimal(11))
+    //13-1
+    if (number == "864017") plus(customValue, oldValue, newValue, BigDecimal(0.5))
+    //13-2
+    if (number == "863944") plus(customValue, oldValue, newValue, BigDecimal(10))
+    //18-1
+    if (number == "865290") plus(customValue, oldValue, newValue, BigDecimal(19))
+    //18-2
+    if (number == "863963") plus(customValue, oldValue, newValue, BigDecimal(0.15))
+    //50
+    if (number == "857867") plus(customValue, oldValue, newValue, BigDecimal(2))
+    //51
+    if (number == "857863") plus(customValue, oldValue, newValue, BigDecimal(4.5))
+    //52
+    if (number == "853034") plus(customValue, oldValue, newValue, BigDecimal(10))
+    //53
+    if (number == "851481") plus(customValue, oldValue, newValue, BigDecimal(3))
+    //56
+    if (number == "857854") plus(customValue, oldValue, newValue, BigDecimal(7))
+    //57
+    if (number == "851456") plus(customValue, oldValue, newValue, BigDecimal(7))
+    //59
+    if (number == "857879") plus(customValue, oldValue, newValue, BigDecimal(8))
+    //60-1
+    if (number == "122191") plus(customValue, oldValue, newValue, BigDecimal(3))
+    //60-2
+    if (number == "115264") plus(customValue, oldValue, newValue, BigDecimal(2))
+    //75
+    if (number == "852081") plus(customValue, oldValue, newValue, BigDecimal(1))
+    //76
+    if (number == "852091") plus(customValue, oldValue, newValue, BigDecimal(2))
+    //77
+    if (number == "853144") plus(customValue, oldValue, newValue, BigDecimal(7))
+    //80
+    if (number == "852092") plus(customValue, oldValue, newValue, BigDecimal(3))
+    //81
+    if (number == "853205") plus(customValue, oldValue, newValue, BigDecimal(4))
+    //85-1
+    if (number == "864879") plus(customValue, oldValue, newValue, BigDecimal(0))
+    //85-2
+    if (number == "864968") plus(customValue, oldValue, newValue, BigDecimal(18))
+    //90-1
+    if (number == "864969") plus(customValue, oldValue, newValue, BigDecimal(1.5))
+    //90-2
+    if (number == "864820") plus(customValue, oldValue, newValue, BigDecimal(2))
+    //115-1
+    if (number == "864819") plus(customValue, oldValue, newValue, BigDecimal(1.2))
+    //115-2
+    if (number == "862653") plus(customValue, oldValue, newValue, BigDecimal(3))
+    //116
+    if (number == "852911") plus(customValue, oldValue, newValue, BigDecimal(12))
+    //117
+    if (number == "857823") plus(customValue, oldValue, newValue, BigDecimal(5))
+    //120-1
+    if (number == "862651") plus(customValue, oldValue, newValue, BigDecimal(1.3))
+    //120-2
+    if (number == "864815") plus(customValue, oldValue, newValue, BigDecimal(4))
+    //135
+    if (number == "857831") plus(customValue, oldValue, newValue, BigDecimal(3))
+    //136
+    if (number == "844785") plus(customValue, oldValue, newValue, BigDecimal(7))
+    //137
+    if (number == "853096") plus(customValue, oldValue, newValue, BigDecimal(14))
+
 
     //13, 28, 53, 96-1, 115-2, 127-2, 132-1, 136
     //office5, 20, 26, 28, 29, 47, 49-1, 49-2, 82, 93, 94, 123, 127-1, 127-2, 130, 132,
@@ -305,8 +449,7 @@ private fun plus(
 ): CustomValue {
     customValue.newValue = oldValue.plus(constantValue)
     customValue.description =
-        if (description == null) "${newValue.setScale(2, RoundingMode.HALF_EVEN)} -> +${constantValue.setScale(2, RoundingMode.HALF_EVEN)}"
-        else description
+        description ?: "+${constantValue.setScale(2, RoundingMode.HALF_EVEN)}"
     return customValue
 }
 
@@ -320,7 +463,7 @@ private fun socialNorm(
     if (numbers.contains(number)) {
         val socialNorm = BigDecimal(6.935)
         customValue.newValue = oldValue.plus(socialNorm)
-        customValue.description = "${newValue.setScale(2, RoundingMode.HALF_EVEN)} -> соц.норма +${socialNorm.setScale(3, RoundingMode.HALF_EVEN)}"
+        customValue.description = "соц.норма +${socialNorm.setScale(3, RoundingMode.HALF_EVEN)}"
     }
     return customValue
 }
@@ -391,7 +534,6 @@ fun readCurrentValuesMyFormat(currentValuesFile: String): Map<String, BigDecimal
 
 
 private fun numericToBigDecimal(cell: Cell) = BigDecimal(cell.numericCellValue).setScale(2, RoundingMode.HALF_EVEN)
-private fun doubleToBigDecimal(value: Double) = BigDecimal(value).setScale(2, RoundingMode.HALF_EVEN)
 
 data class Result(
     val flat: String,
