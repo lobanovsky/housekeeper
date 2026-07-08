@@ -5,9 +5,12 @@ import org.springframework.http.HttpHeaders
 import org.springframework.http.MediaType
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
-import ru.housekeeper.excel.*
+import ru.housekeeper.excel.toExcelRoomOwnerContacts
+import ru.housekeeper.excel.toExcelRooms
+import ru.housekeeper.model.filter.RoomFilter
 import ru.housekeeper.service.RoomService
-import ru.housekeeper.utils.*
+import ru.housekeeper.utils.getExcelReport
+import ru.housekeeper.utils.yyyyMMddHHmmssDateFormat
 import java.time.LocalDateTime
 
 @CrossOrigin
@@ -27,6 +30,17 @@ class RoomReportController(
             .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"$fileName\"")
             .header(HttpHeaders.ACCESS_CONTROL_EXPOSE_HEADERS, HttpHeaders.CONTENT_DISPOSITION)
             .body(toExcelRooms(rooms = rooms))
+    }
+
+    @PostMapping(path = ["/owner-contacts"])
+    @Operation(summary = "Export room owner contacts to excel")
+    fun exportRoomOwnerContacts(
+        @RequestParam(value = "active", required = false, defaultValue = "true") active: Boolean,
+        @RequestBody filter: RoomFilter,
+    ): ResponseEntity<ByteArray> {
+        val contacts = roomService.findOwnerContacts(filter, active)
+        val fileName = "Room_owner_contacts_${LocalDateTime.now().format(yyyyMMddHHmmssDateFormat())}.xlsx"
+        return getExcelReport(fileName) { toExcelRoomOwnerContacts(contacts) }
     }
 
 }

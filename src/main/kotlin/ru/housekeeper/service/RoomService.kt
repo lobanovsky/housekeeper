@@ -5,9 +5,13 @@ import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
 import org.springframework.web.multipart.MultipartFile
 import ru.housekeeper.enums.RoomTypeEnum
+import ru.housekeeper.model.dto.OwnerContactPhoneResponse
+import ru.housekeeper.model.dto.RoomOwnerContactsResponse
 import ru.housekeeper.model.entity.Room
 import ru.housekeeper.model.filter.RoomFilter
 import ru.housekeeper.parser.RegistryParser
+import ru.housekeeper.repository.access.AccessRepository
+import ru.housekeeper.repository.owner.OwnerRepository
 import ru.housekeeper.repository.room.RoomRepository
 import ru.housekeeper.utils.MAX_SIZE_PER_PAGE
 import ru.housekeeper.utils.entityNotfound
@@ -17,6 +21,8 @@ import java.math.BigDecimal
 @Service
 class RoomService(
     private val roomRepository: RoomRepository,
+    private val ownerRepository: OwnerRepository,
+    private val accessRepository: AccessRepository,
 //    private val ownerService: OwnerService,
 ) {
 
@@ -118,4 +124,52 @@ class RoomService(
     fun findByOwnerId(ownerId: Long): List<Room> = roomRepository.findByOwnerId(ownerId)
 
     fun findByBuildingIdsAndOwnerIds(buildingIds: Set<Long>, ownerId: Long): List<Room> = roomRepository.findByBuildingIdsAndOwnerIds(buildingIds, ownerId)
+
+    fun findOwnerContacts(filter: RoomFilter, activeAccess: Boolean = true): List<RoomOwnerContactsResponse> {
+        val rooms = findWithFilter(pageSize = MAX_SIZE_PER_PAGE, filter = filter).content
+            .filter { filter.type != null || it.type == RoomTypeEnum.FLAT || it.type == RoomTypeEnum.GARAGE }
+
+        val ownerIds = rooms.flatMap { it.owners }.toSet()
+        if (ownerIds.isEmpty()) return emptyList()
+
+        val ownersById = ownerRepository.findByIds(ownerIds)
+            .associateBy { it.id }
+        val phonesByOwnerId = accessRepository.findByOwnerIds(ownerIds, activeAccess)
+            .groupBy { it.ownerId }
+            .mapValues { (_, accesses) ->
+                accesses
+                    .groupBy { it.phoneNumber }
+                    .map { (phoneNumber, phoneAccesses) ->
+                        OwnerContactPhoneResponse(
+                            phoneNumber = phoneNumber,
+                            fullName = phoneAccesses
+                                .firstNotNullOfOrNull { it.phoneLabel?.trim()?.takeIf(String::isNotBlank) },
+                        )
+                    }
+                    .sortedBy { it.phoneNumber }
+            }
+
+        return rooms.flatMap { room ->
+            room.owners.mapNotNull { ownerId ->
+                val owner = ownersById[ownerId] ?: return@mapNotNull null
+                RoomOwnerContactsResponse(
+                    roomId = room.id,
+                    buildingId = room.buildingId,
+                    roomNumber = room.number,
+                    roomType = room.type,
+                    roomTypeDescription = room.type.description,
+                    account = room.account,
+                    square = room.square,
+                    ownerId = owner.id!!,
+                    ownerFullName = owner.fullName,
+                    phones = phonesByOwnerId[ownerId] ?: emptyList(),
+                )
+            }
+        }.sortedWith(
+            compareBy<RoomOwnerContactsResponse> { it.buildingId }
+                .thenBy { it.roomType }
+                .thenBy { it.roomNumber }
+                .thenBy { it.ownerFullName }
+        )
+    }
 }

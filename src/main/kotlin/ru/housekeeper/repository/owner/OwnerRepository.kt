@@ -12,4 +12,7 @@ interface OwnerRepository : CrudRepository<OwnerEntity, Long>, OwnerRepositoryCu
     @Query("SELECT p FROM OwnerEntity p WHERE p.fullName = :fullName")
     fun findByFullName(@Param("fullName") fullName: String): OwnerEntity?
 
+    @Query("SELECT p FROM OwnerEntity p WHERE p.id in (:ids)")
+    fun findByIds(@Param("ids") ids: Set<Long>): List<OwnerEntity>
+
 }

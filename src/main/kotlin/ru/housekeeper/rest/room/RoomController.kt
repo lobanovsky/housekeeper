@@ -4,6 +4,7 @@ import io.swagger.v3.oas.annotations.Operation
 import org.springframework.data.domain.Page
 import org.springframework.web.bind.annotation.*
 import ru.housekeeper.enums.RoomTypeEnum
+import ru.housekeeper.model.dto.RoomOwnerContactsResponse
 import ru.housekeeper.model.dto.RoomVO
 import ru.housekeeper.model.filter.RoomFilter
 import ru.housekeeper.service.BuildingService
@@ -40,6 +41,13 @@ class RoomController(
         @RequestParam(value = "pageSize", required = false, defaultValue = "10") pageSize: Int,
         @RequestBody filter: RoomFilter,
     ): Page<RoomVO> = roomService.findWithFilter(pageNum, pageSize, filter).toRoomVO(pageNum, pageSize)
+
+    @PostMapping("/owner-contacts")
+    @Operation(summary = "Get room owner contacts")
+    fun getRoomOwnerContacts(
+        @RequestParam(value = "active", required = false, defaultValue = "true") active: Boolean,
+        @RequestBody filter: RoomFilter,
+    ): List<RoomOwnerContactsResponse> = roomService.findOwnerContacts(filter, active)
 
     /**
      * Вернуть двумерный массив: дом с квартирами с разбивкой по этажам

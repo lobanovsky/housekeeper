@@ -26,6 +26,12 @@ interface AccessRepository : CrudRepository<AccessEntity, Long>, AccessRepositor
         @Param("active") active: Boolean = true
     ): List<AccessEntity>
 
+    @Query("select a from AccessEntity a where a.ownerId in (:ownerIds) and a.active = :active")
+    fun findByOwnerIds(
+        @Param("ownerIds") ownerIds: Set<Long>,
+        @Param("active") active: Boolean = true
+    ): List<AccessEntity>
+
     //find by phone number and owner id
     @Query("select a from AccessEntity a where a.phoneNumber = :number and a.ownerId = :ownerId and a.active = :active")
     fun findByPhoneNumberAndOwnerId(
