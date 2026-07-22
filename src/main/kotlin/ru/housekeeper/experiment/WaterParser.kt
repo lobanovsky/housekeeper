@@ -110,7 +110,7 @@ private fun filterByCustomRules(number: String, oldValue: BigDecimal, newValue: 
     //5
     if (number == "875778") plus(customValue, oldValue, newValue, BigDecimal(0.43))
     //48
-    if (number == "210157253") plus(customValue, oldValue, newValue, BigDecimal(4))
+    if (number == "210157253") plus(customValue, oldValue, newValue, BigDecimal(0))
     //49-1
     if (number == "882039") plus(customValue, oldValue, newValue, BigDecimal(4))
     //49-2
