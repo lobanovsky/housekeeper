@@ -24,7 +24,7 @@ fun rules(payment: IncomingPayment): Boolean {
     if (purposeAndFromContains(
             payment = payment,
             from = "Департамент финансов города",
-            purposes = setOf("0313068"),
+            purposes = setOf("0313068", "1313068"),
             type = SUBSIDY_FOR_CAPITAL_REPAIR
         )
     ) return true
