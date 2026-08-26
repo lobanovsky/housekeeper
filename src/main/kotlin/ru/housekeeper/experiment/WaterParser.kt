@@ -12,7 +12,7 @@ import java.time.LocalDate
  */
 fun main6() {
     val year = "2026"
-    val month = "07"
+    val month = "08"
     process(
         //(папка месяц) Показания, которые сняли со счётчиков
         currentFilename = "/Users/evgeny/Yandex.Disk.localized/Домовладелец/${year}-${month}/counters/${year}-${month}-вода.xlsx",
@@ -21,9 +21,8 @@ fun main6() {
         //Куда сохранить результат
         destinationPath = "/Users/evgeny/Yandex.Disk.localized/Домовладелец/0-counters/",
         //(указать номер столбца с предыдущими показаниями) Чтобы задать новое значение, нужно прибавить +3
-        //94 номер столбца - апрель 2026
-        //97 номер столбца - май 2026
-        previousColumnValueNumber = 100
+        //103 номер столбца - август 2026
+        previousColumnValueNumber = 103
     )
 }
 
@@ -102,7 +101,7 @@ private fun filterByCustomRules(number: String, oldValue: BigDecimal, newValue: 
     //оф.5
     if (number == "55464842") plus(customValue, oldValue, newValue, BigDecimal(2.5))
     //2
-    if (number == "875745") plus(customValue, oldValue, newValue, BigDecimal(1.86))
+//    if (number == "875745") plus(customValue, oldValue, newValue, BigDecimal(1.86))
     //3
     if (number == "875697") plus(customValue, oldValue, newValue, BigDecimal(1.53))
     //4
@@ -400,7 +399,6 @@ private fun filterByCustomRules(number: String, oldValue: BigDecimal, newValue: 
             "875688",
             "853026",
             "775416",
-            "770211",
             "770262",
             "864962",
             "862656",
@@ -425,6 +423,7 @@ private fun filterByCustomRules(number: String, oldValue: BigDecimal, newValue: 
             "875778",
             "844794",
             "853231",
+            "875745"
         ),
         customValue,
         oldValue,
