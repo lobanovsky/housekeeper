@@ -12,7 +12,7 @@ import java.time.LocalDate
  */
 fun main6() {
     val year = "2026"
-    val month = "08"
+    val month = "09"
     process(
         //(папка месяц) Показания, которые сняли со счётчиков
         currentFilename = "/Users/evgeny/Yandex.Disk.localized/Домовладелец/${year}-${month}/counters/${year}-${month}-вода.xlsx",
@@ -21,8 +21,8 @@ fun main6() {
         //Куда сохранить результат
         destinationPath = "/Users/evgeny/Yandex.Disk.localized/Домовладелец/0-counters/",
         //(указать номер столбца с предыдущими показаниями) Чтобы задать новое значение, нужно прибавить +3
-        //103 номер столбца - август 2026
-        previousColumnValueNumber = 103
+        //106 номер столбца - август 2026
+        previousColumnValueNumber = 106
     )
 }
 
