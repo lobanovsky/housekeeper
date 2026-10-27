@@ -267,7 +267,7 @@ private fun filterByCustomRules(number: String, oldValue: BigDecimal, newValue: 
     //112
     if (number == "857821") plus(customValue, oldValue, newValue, BigDecimal(13))
     //113
-    if (number == "857832") plus(customValue, oldValue, newValue, BigDecimal(10))
+    if (number == "857832") plus(customValue, oldValue, newValue, BigDecimal(0))
     //118
     if (number == "50081663") plus(customValue, oldValue, newValue, BigDecimal(4.5))
     //119 - старый
